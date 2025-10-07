@@ -1,0 +1,37 @@
+.optionsWrapper {
+  min-height: 70px;
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 8px;
+  align-items: center;
+  border-bottom: 1px solid #f1f2f3;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  .count {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22.39px;
+    text-align: center;
+    color: #666;
+    background-color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #e9ecef;
+    min-width: 120px;
+  }
+  
+  @media screen and (max-width: 767px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    
+    .count {
+      text-align: center;
+      order: -1;
+    }
+  }
+}

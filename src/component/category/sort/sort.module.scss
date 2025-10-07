@@ -1,0 +1,108 @@
+.sortWrapper {
+  position: relative;
+  cursor: pointer;
+  
+  .activeItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    justify-content: center;
+    background-color: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: #007bff;
+      background-color: #f8f9ff;
+    }
+    
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 21px;
+      text-align: center;
+      color: #333;
+    }
+    
+    .chevron {
+      transition: transform 0.3s ease;
+      
+      &.rotated {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  
+  .sortOptions {
+    display: none;
+    z-index: 1000;
+    
+    &.show {
+      width: 100%;
+      display: block;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: #fff;
+      border: 2px solid #e9ecef;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 2px;
+    }
+    
+    .sortHeader {
+      padding: 12px 20px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      
+      .sortLabel {
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+      }
+    }
+    
+    .item {
+      padding: 12px 20px;
+      border-bottom: 1px solid #f1f2f3;
+      transition: background-color 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      &:hover {
+        background-color: #f8f9ff;
+      }
+      
+      &.active {
+        background-color: #e3f2fd;
+        border-left: 3px solid #1976d2;
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      p {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+      }
+      
+      .activeIndicator {
+        color: #1976d2;
+        font-weight: 700;
+        font-size: 16px;
+      }
+    }
+  }
+  
+  @media screen and (min-width: 425px) {
+    min-width: 170px;
+  }
+}

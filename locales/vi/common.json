@@ -1,0 +1,75 @@
+{
+  "cart": {
+    "remove": "xóa khỏi giỏ hàng",
+    "total": "Tổng số sản phẩm:"
+  },
+  "category": {
+    "items": "Sản phẩm",
+    "filters": "Bộ lọc",
+    "clearAll": "xóa tất cả"
+  },
+  "footer": {
+    "social": "MẠNG XÃ HỘI"
+  },
+  "instagram": {
+    "share": "Chia sẻ phong cách của bạn",
+    "title": "#PHONGCACH"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "home": "Trang chủ",
+    "card": "Giỏ hàng"
+  },
+  "product": {
+    "addToCard": "Thêm vào giỏ hàng",
+    "buyNow": "Mua ngay",
+    "quantity": "Số lượng",
+    "keySpecifications": "Thông số chính",
+    "tabs": {
+      "description": "Mô tả",
+      "specifications": "Thông số kỹ thuật",
+      "reviews": "Đánh giá"
+    },
+    "noSpecifications": "Chưa có thông số kỹ thuật",
+    "noReviews": "Chưa có đánh giá nào",
+    "customerReviews": "Đánh giá khách hàng"
+  },
+  "carousel": {
+    "title": "Sản phẩm bán chạy"
+  },
+  "search": {
+    "placeHolder": "Tìm kiếm sản phẩm"
+  },
+  "subscribe": {
+    "title": "Đăng ký nhận tin tức",
+    "description": "Cập nhật thông tin về các chương trình khuyến mãi và sự kiện. Nhận quà tặng và ưu đãi đặc biệt!",
+    "submit": "Đăng ký"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "subtitle": "Chào mừng bạn trở lại!",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "loginButton": "Đăng nhập",
+      "forgotPassword": "Quên mật khẩu?",
+      "noAccount": "Chưa có tài khoản?",
+      "signUpNow": "Đăng ký ngay",
+      "orLoginWith": "Hoặc đăng nhập bằng",
+      "google": "Google",
+      "facebook": "Facebook"
+    },
+    "register": {
+      "title": "Đăng ký",
+      "subtitle": "Tạo tài khoản mới",
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "registerButton": "Đăng ký",
+      "hasAccount": "Đã có tài khoản?",
+      "loginNow": "Đăng nhập ngay"
+    }
+  }
+}

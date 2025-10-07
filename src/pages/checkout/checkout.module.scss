@@ -1,0 +1,134 @@
+.checkoutPage {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 20px 0 60px;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  // Page Header
+  .pageHeader {
+    margin-bottom: 30px;
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: #666;
+
+      button {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        padding: 0;
+        font-size: 14px;
+        transition: color 0.2s;
+
+        &:hover {
+          color: #0056b3;
+          text-decoration: underline;
+        }
+      }
+
+      span {
+        color: #999;
+      }
+    }
+
+    .pageTitle {
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  // Empty Cart State
+  .emptyCart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+
+    .emptyCartContent {
+      text-align: center;
+      background: white;
+      padding: 60px 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+      .emptyIcon {
+        font-size: 64px;
+        margin-bottom: 20px;
+      }
+
+      h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 12px;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 24px;
+        font-size: 16px;
+      }
+
+      .shopNowBtn {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background: linear-gradient(135deg, #0056b3, #004085);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+      }
+    }
+  }
+
+  // Checkout Form Layout
+  .checkoutForm {
+    .checkoutContent {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 10px 0 40px;
+
+    .container {
+      padding: 0 15px;
+    }
+
+    .pageHeader {
+      margin-bottom: 20px;
+
+      .pageTitle {
+        font-size: 24px;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,46 @@
+.orderSummary {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .summaryCard {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+  }
+
+  .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &.totalRow {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+      font-weight: 600;
+      font-size: 1.1rem;
+
+      .totalPrice {
+        color: #3b82f6;
+        font-size: 1.25rem;
+      }
+    }
+  }
+}

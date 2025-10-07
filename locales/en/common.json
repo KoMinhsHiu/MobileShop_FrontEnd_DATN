@@ -1,0 +1,48 @@
+{
+  "cart": {
+    "remove": "remove from cart",
+    "total": "Total items:"
+  },
+  "category": {
+    "items": "Item(s)",
+    "filters": "Filters",
+    "clearAll": "clear all"
+  },
+  "footer": {
+    "social": "SOCIAL"
+  },
+  "instagram": {
+    "share": "Share Your Look",
+    "title": "#YOURLOOK"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "home": "Home",
+    "card": "Card"
+  },
+  "product": {
+    "addToCard": "Add To Cart",
+    "buyNow": "Buy Now",
+    "quantity": "Quantity",
+    "keySpecifications": "Key Specifications",
+    "tabs": {
+      "description": "Description",
+      "specifications": "Specifications",
+      "reviews": "Reviews"
+    },
+    "noSpecifications": "No specifications available",
+    "noReviews": "No reviews yet",
+    "customerReviews": "Customer Reviews"
+  },
+  "carousel": {
+    "title": "Best Seller"
+  },
+  "search": {
+    "placeHolder": "Search for items"
+  },
+  "subscribe": {
+    "title": "Subscribe to Newsletters",
+    "description": "Be aware of upcoming sales and events. Receive gifts and special offers!",
+    "submit": "Subscribe"
+  }
+}

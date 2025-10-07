@@ -1,0 +1,60 @@
+.colorSelect {
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f2f3;
+  display: block;
+  line-height: 1.5;
+  
+  .title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    display: inline;
+  }
+  
+  .colorList {
+    display: inline;
+    
+    .colorOption {
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: inline;
+      
+      &:hover {
+        background-color: #f0f0f0;
+        color: #333;
+      }
+      
+      &.selected {
+        color: #007bff;
+        font-weight: 600;
+        background-color: #e3f2fd;
+      }
+    }
+    
+    .separator {
+      color: #999;
+      font-weight: normal;
+      display: inline;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .colorSelect {
+    .title {
+      font-size: 14px;
+    }
+    
+    .colorList {
+      .colorOption {
+        font-size: 13px;
+        padding: 2px 3px;
+      }
+    }
+  }
+}

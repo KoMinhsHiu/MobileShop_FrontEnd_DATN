@@ -1,0 +1,243 @@
+.cartItem {
+  display: grid;
+  grid-template-columns: 100px 2fr 100px 80px 100px 50px;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 0;
+  border: none;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+
+  &:first-child {
+    border-radius: 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 8px 8px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    text-align: center;
+    border-radius: 8px !important;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 0;
+    
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .imageColumn {
+    .productImage {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      @media (max-width: 768px) {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+      }
+    }
+  }
+
+  .infoColumn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-right: 8px;
+
+    @media (max-width: 768px) {
+      align-items: center;
+      text-align: center;
+      padding-right: 0;
+    }
+
+    .productName {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      text-decoration: none;
+      display: block;
+      line-height: 1.3;
+      transition: color 0.2s;
+      margin-bottom: 4px;
+
+      &:hover {
+        color: #007bff;
+      }
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+      }
+    }
+
+    .attribute {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      margin-bottom: 2px;
+
+      @media (max-width: 768px) {
+        justify-content: center;
+        font-size: 14px;
+      }
+
+      .attributeName {
+        color: #666;
+        font-weight: 500;
+        min-width: fit-content;
+      }
+
+      .attributeValue {
+        color: #333;
+        font-weight: 600;
+        background: #f8f9fa;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+
+        @media (max-width: 768px) {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+
+  .priceColumn {
+    text-align: center;
+
+    .unitPrice {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .quantityColumn {
+    display: flex;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
+  }
+
+  .totalColumn {
+    text-align: center;
+
+    .totalPrice {
+      font-size: 16px;
+      font-weight: 700;
+      color: #007bff;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .actionColumn {
+    display: flex;
+    justify-content: center;
+
+    .removeButton {
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #dc3545;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+
+      &:hover {
+        background: #dc3545;
+        color: white;
+        transform: scale(1.1);
+      }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        
+        &:hover {
+          background: none;
+          color: #dc3545;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .imageColumn {
+      grid-row: 1;
+    }
+    
+    .infoColumn {
+      grid-row: 2;
+    }
+    
+    .priceColumn,
+    .quantityColumn,
+    .totalColumn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      &::before {
+        font-weight: 500;
+        color: #666;
+      }
+    }
+    
+    .priceColumn::before {
+      content: "Giá đơn vị:";
+    }
+    
+    .quantityColumn::before {
+      content: "Số lượng:";
+    }
+    
+    .totalColumn::before {
+      content: "Thành tiền:";
+    }
+    
+    .actionColumn {
+      grid-row: 6;
+      justify-content: center;
+    }
+  }
+}

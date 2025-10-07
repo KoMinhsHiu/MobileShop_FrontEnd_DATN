@@ -1,0 +1,99 @@
+.addToCart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  
+  .quantityBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    width: fit-content;
+    margin: 0 auto;
+    
+    button {
+      border: none;
+      background-color: transparent;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+      
+      &:hover:not(.disable) {
+        background-color: #e9ecef;
+      }
+      
+      &.disable {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+    
+    .plus {
+      background-image: url("/images/icon/plus.png");
+      background-size: 12px 12px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    
+    .minus {
+      background-image: url("/images/icon/minus.png");
+      background-size: 12px 12px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    
+    .quantity {
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      width: 40px;
+      outline: none;
+    }
+  }
+  
+  .addToCartButton {
+    width: 100%;
+    height: 52px;
+    background-color: #2ba0d0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &:hover:not(.disable) {
+      background-color: #2391b8;
+    }
+    
+    &.disable {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .addToCart {
+    flex: 1;
+    
+    .quantityBox {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

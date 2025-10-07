@@ -1,0 +1,48 @@
+.tabNavigation {
+  display: flex;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 2rem;
+  gap: 0;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+
+  &:hover {
+    color: #007bff;
+    background-color: #f8f9fa;
+  }
+
+  &.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+    background-color: #f8f9fa;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .tabNavigation {
+    flex-direction: column;
+  }
+
+  .tabButton {
+    border-bottom: 1px solid #e9ecef;
+    border-right: none;
+
+    &.active {
+      border-bottom-color: #e9ecef;
+      border-left: 3px solid #007bff;
+    }
+  }
+}

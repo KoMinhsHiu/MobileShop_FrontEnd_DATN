@@ -1,0 +1,236 @@
+.footer {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: #fff;
+  
+  .mainFooter {
+    padding: 40px 0;
+  }
+  
+  .desktopFooter {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+  
+  .columnWrapper {
+    display: flex;
+    gap: 40px;
+    flex: 1;
+    
+    .column {
+      flex: 1;
+      
+      .titleRow {
+        margin-bottom: 20px;
+        
+        .title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #fff;
+          margin: 0;
+        }
+      }
+      
+      .linkBox {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .subLink {
+        font-size: 14px;
+        color: #bdc3c7;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        line-height: 1.5;
+        
+        &:hover {
+          color: #3498db;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  
+  .contactInfo {
+    min-width: 300px;
+    
+    .contactTitle {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 20px 0;
+    }
+    
+    .contactItems {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .contactItem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: #bdc3c7;
+      
+      .contactIcon {
+        width: 16px;
+        color: #3498db;
+      }
+      
+      a {
+        color: #bdc3c7;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        
+        &:hover {
+          color: #3498db;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  
+  .socialBox {
+    padding: 30px 0;
+    border-top: 1px solid #34495e;
+    border-bottom: 1px solid #34495e;
+    text-align: center;
+    
+    .socialTitle {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      margin: 0 0 20px 0;
+    }
+    
+    .socialItems {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .socialLink {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 25px;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 500;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: #fff;
+      }
+      
+      svg {
+        font-size: 18px;
+      }
+    }
+  }
+  
+  .copyright {
+    padding: 20px 0;
+    background: rgba(0, 0, 0, 0.2);
+    
+    .copyrightContent {
+      text-align: center;
+      
+      p {
+        margin: 4px 0;
+        font-size: 14px;
+        color: #95a5a6;
+        
+        &:first-child {
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  // Mobile styles
+  @media screen and (max-width: 768px) {
+    .mainFooter {
+      padding: 20px 0;
+    }
+    
+    .desktopFooter {
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .columnWrapper {
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .contactInfo {
+      min-width: auto;
+      
+      .contactTitle {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      
+      .contactItems {
+        gap: 12px;
+      }
+      
+      .contactItem {
+        font-size: 13px;
+      }
+    }
+    
+    .socialBox {
+      padding: 20px 0;
+      
+      .socialTitle {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      
+      .socialItems {
+        gap: 12px;
+      }
+      
+      .socialLink {
+        padding: 10px 16px;
+        font-size: 13px;
+        
+        svg {
+          font-size: 16px;
+        }
+      }
+    }
+    
+    .copyright {
+      padding: 16px 0;
+      
+      .copyrightContent p {
+        font-size: 12px;
+      }
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .socialItems {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .socialLink {
+      width: 200px;
+      justify-content: center;
+    }
+  }
+}

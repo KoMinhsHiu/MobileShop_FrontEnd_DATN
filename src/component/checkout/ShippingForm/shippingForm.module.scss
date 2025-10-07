@@ -1,0 +1,93 @@
+.shipping-form {
+  .section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .section-header {
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f0f0;
+
+      h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+      }
+    }
+
+    // Form Groups
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      input, textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        &::placeholder {
+          color: #999;
+        }
+
+        &.input-error {
+          border-color: #dc3545;
+          
+          &:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+          }
+        }
+      }
+
+      .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &::before {
+          content: '⚠️';
+          font-size: 10px;
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+
+      @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

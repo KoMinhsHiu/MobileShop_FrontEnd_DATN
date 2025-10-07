@@ -1,0 +1,136 @@
+.orderTimeline {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 1rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+  }
+
+  .timelineStep {
+    position: relative;
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .timelineIcon {
+      position: absolute;
+      left: -2rem;
+      top: 0;
+      width: 2rem;
+      height: 2rem;
+      background: #e5e7eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+
+      .stepIcon {
+        font-size: 1rem;
+      }
+    }
+
+    .timelineContent {
+      .stepTitle {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin: 0 0 0.25rem 0;
+      }
+
+      .stepDescription {
+        color: #9ca3af;
+        margin: 0;
+        font-size: 0.9rem;
+      }
+    }
+
+    &.completed {
+      .timelineIcon {
+        background: #10b981;
+      }
+
+      .stepTitle {
+        color: #1f2937;
+      }
+
+      .stepDescription {
+        color: #6b7280;
+      }
+    }
+
+    &.current {
+      .timelineIcon {
+        background: #3b82f6;
+        animation: pulse 2s infinite;
+      }
+
+      .stepTitle {
+        color: #3b82f6;
+        font-weight: 700;
+      }
+
+      .stepDescription {
+        color: #6b7280;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .orderTimeline {
+    .timeline {
+      padding-left: 1.5rem;
+
+      &::before {
+        left: 0.75rem;
+      }
+
+      .timelineStep {
+        .timelineIcon {
+          left: -1.5rem;
+          width: 1.5rem;
+          height: 1.5rem;
+
+          .stepIcon {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+}

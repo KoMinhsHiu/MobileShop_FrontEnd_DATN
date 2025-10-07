@@ -1,0 +1,180 @@
+.ordersPage {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 2rem 0;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+
+  .pageTitle {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .pageSubtitle {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #6b7280;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .emptyIcon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .shopNowBtn {
+    display: inline-block;
+    background: #3b82f6;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #2563eb;
+    }
+  }
+}
+
+.filters {
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    label {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .filterSelect {
+      padding: 0.5rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: white;
+      font-size: 1rem;
+      color: #374151;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+    }
+  }
+}
+
+
+.noResults {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  p {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .ordersPage {
+    padding: 1rem 0;
+
+    .container {
+      padding: 0 0.5rem;
+    }
+  }
+
+  .pageHeader {
+    margin-bottom: 2rem;
+
+    .pageTitle {
+      font-size: 2rem;
+    }
+
+    .pageSubtitle {
+      font-size: 1rem;
+    }
+  }
+
+
+  .filters {
+    .filterGroup {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+}

@@ -1,0 +1,120 @@
+.updateQuantity {
+  width: 100px;
+  height: 36px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+  }
+
+  &.disable {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+    
+    &:hover {
+      border-color: #dee2e6;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      margin: -8px 0 0 -8px;
+      border: 2px solid #007bff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 90px;
+    height: 40px;
+
+    .button {
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+    }
+
+    .quantity {
+      font-size: 16px;
+      padding: 4px 8px;
+    }
+  }
+
+  .button {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+
+    &:hover {
+      background: linear-gradient(135deg, #0056b3, #004085);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 123, 255, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 123, 255, 0.3);
+    }
+
+    &:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+
+      &:hover {
+        background: #6c757d;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .quantity {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    min-width: 20px;
+    text-align: center;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+  }
+}

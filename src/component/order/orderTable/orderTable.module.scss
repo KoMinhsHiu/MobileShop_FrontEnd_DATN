@@ -1,0 +1,123 @@
+.ordersTable {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr 1fr;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+
+  .headerCell {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.tableBody {
+  .tableRow {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #f9fafb;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .tableCell {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+
+    .orderNumber {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .orderDate {
+      color: #6b7280;
+    }
+
+    .orderTotal {
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .viewDetailBtn {
+      padding: 0.5rem 1rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-size: 0.9rem;
+
+      &:hover {
+        background: #2563eb;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .tableHeader {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 1rem;
+
+    .headerCell {
+      display: none;
+    }
+  }
+
+  .tableBody {
+    .tableRow {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      padding: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .tableCell {
+      justify-content: space-between;
+      padding: 0.5rem 0;
+
+      &:before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #374151;
+      }
+
+      &[data-label="Mã đơn hàng"]:before { content: "Mã đơn hàng:"; }
+      &[data-label="Ngày đặt"]:before { content: "Ngày đặt:"; }
+      &[data-label="Tổng tiền"]:before { content: "Tổng tiền:"; }
+      &[data-label="Trạng thái"]:before { content: "Trạng thái:"; }
+      &[data-label="Thao tác"]:before { content: "Thao tác:"; }
+    }
+  }
+}
