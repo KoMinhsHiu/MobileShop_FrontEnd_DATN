@@ -1,12 +1,19 @@
 import React from 'react';
 import AdminLayout from '@/component/admin/AdminLayout';
 import Dashboard from '@/component/admin/dashboard/Dashboard';
+import MetaTags from '@/component/metaTags';
 
 const AdminDashboard: React.FC = () => {
   return (
-    <AdminLayout currentPage="/admin">
-      <Dashboard />
-    </AdminLayout>
+    <>
+      <MetaTags 
+        title="Admin Dashboard - PhoneHub" 
+        description="Quản lý cửa hàng điện thoại PhoneHub - Dashboard tổng quan"
+      />
+      <AdminLayout currentPage="/admin">
+        <Dashboard />
+      </AdminLayout>
+    </>
   );
 };
 
