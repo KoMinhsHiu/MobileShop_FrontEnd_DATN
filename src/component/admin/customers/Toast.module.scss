@@ -1,0 +1,162 @@
+@import '../orders/styles/shared.scss';
+
+.toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  width: 100%;
+
+  .toast {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-left: 4px solid;
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+    overflow: hidden;
+
+    &.success {
+      border-left-color: #28a745;
+      
+      .toastIcon {
+        color: #28a745;
+      }
+    }
+
+    &.error {
+      border-left-color: #dc3545;
+      
+      .toastIcon {
+        color: #dc3545;
+      }
+    }
+
+    &.warning {
+      border-left-color: #ffc107;
+      
+      .toastIcon {
+        color: #ffc107;
+      }
+    }
+
+    &.info {
+      border-left-color: #17a2b8;
+      
+      .toastIcon {
+        color: #17a2b8;
+      }
+    }
+
+    .toastIcon {
+      font-size: 20px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .toastContent {
+      flex: 1;
+      min-width: 0;
+
+      .toastMessage {
+        font-size: 14px;
+        color: #1a1a1a;
+        margin: 0;
+        line-height: 1.4;
+      }
+    }
+
+    .toastClose {
+      background: none;
+      border: none;
+      color: #6c757d;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+
+      &:hover {
+        background: #f8f9fa;
+        color: #495057;
+      }
+    }
+
+    .toastProgress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: rgba(0, 0, 0, 0.1);
+      animation: progressBar 5s linear forwards;
+    }
+
+    &.success .toastProgress {
+      background: #28a745;
+    }
+
+    &.error .toastProgress {
+      background: #dc3545;
+    }
+
+    &.warning .toastProgress {
+      background: #ffc107;
+    }
+
+    &.info .toastProgress {
+      background: #17a2b8;
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .toastContainer {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+
+    .toast {
+      padding: 12px;
+
+      .toastIcon {
+        font-size: 18px;
+      }
+
+      .toastContent {
+        .toastMessage {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}

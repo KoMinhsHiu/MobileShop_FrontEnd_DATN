@@ -1,0 +1,397 @@
+@import './styles/shared.scss';
+
+.orderManagement {
+  padding: 24px;
+  background: $order-gray-50;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: $order-gray-800;
+    margin: 0;
+  }
+  
+  .headerActions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.filtersCard {
+  @include card;
+  padding: 24px;
+  margin-bottom: 24px;
+  
+  .filtersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .filterGroup {
+    display: flex;
+    flex-direction: column;
+    
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      color: $order-gray-700;
+      margin-bottom: 6px;
+    }
+    
+    input, select {
+      @include input-base;
+    }
+  }
+  
+  .filterActions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+}
+
+.tableCard {
+  @include card;
+  
+  .tableHeader {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    .tableInfo {
+      color: #6b7280;
+      font-size: 14px;
+    }
+  }
+  
+  .tableContainer {
+    overflow-x: auto;
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th {
+      background: $order-gray-50;
+      padding: 16px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: $order-gray-700;
+      font-size: 14px;
+      border-bottom: 1px solid $order-gray-200;
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: 16px 12px;
+      border-bottom: 1px solid $order-gray-100;
+      font-size: 14px;
+      color: $order-gray-700;
+    }
+    
+    tr:hover {
+      background: $order-gray-50;
+    }
+  }
+}
+
+.orderId {
+  font-weight: 600;
+  color: $order-primary;
+  font-family: 'Courier New', monospace;
+}
+
+.customerName {
+  font-weight: 500;
+  color: $order-gray-800;
+}
+
+.orderDate {
+  color: $order-gray-500;
+  font-size: 13px;
+}
+
+.amount {
+  font-weight: 600;
+  color: $order-success;
+}
+
+.paymentMethod {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  
+  &.cod {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  &.vnpay {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  &.momo {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  
+  &.bankTransfer {
+    background: #e0e7ff;
+    color: #3730a3;
+  }
+}
+
+.statusBadge {
+  @include badge($order-gray-100, $order-gray-700);
+  padding: 6px 12px;
+  
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  &.shipping {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  &.completed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  &.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  
+  button {
+    @include button-base;
+    padding: 6px 12px;
+    font-size: 12px;
+    gap: 4px;
+    
+    &.viewBtn {
+      background: #e0e7ff;
+      color: #3730a3;
+      
+      &:hover:not(:disabled) {
+        background: #c7d2fe;
+      }
+    }
+    
+    &.editBtn {
+      background: #fef3c7;
+      color: #92400e;
+      
+      &:hover:not(:disabled) {
+        background: #fde68a;
+      }
+    }
+  }
+}
+
+.pagination {
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .paginationInfo {
+    color: #6b7280;
+    font-size: 14px;
+  }
+  
+  .paginationControls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    
+    button {
+      @include button-secondary;
+      padding: 8px 12px;
+      font-size: 14px;
+      
+      &.active {
+        background: $order-primary;
+        color: $order-white;
+        border-color: $order-primary;
+      }
+    }
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 24px;
+  color: $order-gray-500;
+  
+  .emptyIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $order-gray-700;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+// Responsive
+@include mobile {
+  .orderManagement {
+    padding: 16px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .filtersCard {
+    padding: 16px;
+    
+    .filtersGrid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .tableCard {
+    .tableHeader {
+      padding: 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+  }
+  
+  .table {
+    th, td {
+      padding: 12px 8px;
+      font-size: 13px;
+    }
+  }
+  
+  .pagination {
+    padding: 16px;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+// Loading states
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.spinner {
+  border: 3px solid $order-gray-200;
+  border-top: 3px solid $order-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinnerSmall {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.spinnerMedium {
+  width: 32px;
+  height: 32px;
+}
+
+.spinnerLarge {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+.loadingMessage {
+  color: $order-gray-600;
+  font-size: 14px;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Error states
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 16px;
+  text-align: center;
+}
+
+.errorIcon {
+  font-size: 48px;
+  color: $order-error;
+}
+
+.errorTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: $order-gray-800;
+  margin: 0;
+}
+
+.errorMessage {
+  color: $order-gray-600;
+  font-size: 14px;
+  margin: 0;
+  max-width: 400px;
+}
+
+.retryButton {
+  @include button-primary;
+  margin-top: 8px;
+}

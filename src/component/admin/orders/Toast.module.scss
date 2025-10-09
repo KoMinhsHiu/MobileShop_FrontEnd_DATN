@@ -1,0 +1,129 @@
+@import './styles/shared.scss';
+
+.toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toast {
+  background: white;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+  min-width: 300px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideIn 0.3s ease-out;
+  
+  &.success {
+    border-left-color: $order-success;
+    
+    .icon {
+      color: $order-success;
+    }
+  }
+  
+  &.error {
+    border-left-color: $order-error;
+    
+    .icon {
+      color: $order-error;
+    }
+  }
+  
+  &.warning {
+    border-left-color: $order-warning;
+    
+    .icon {
+      color: $order-warning;
+    }
+  }
+  
+  &.info {
+    border-left-color: $order-primary;
+    
+    .icon {
+      color: $order-primary;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  
+  .title {
+    font-weight: 600;
+    color: $order-gray-800;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .message {
+    color: $order-gray-500;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  color: $order-gray-400;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: $order-transition;
+  
+  &:hover {
+    background: $order-gray-100;
+    color: $order-gray-500;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast.removing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .toastContainer {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+  
+  .toast {
+    min-width: auto;
+    max-width: none;
+  }
+}

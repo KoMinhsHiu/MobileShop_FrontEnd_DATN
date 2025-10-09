@@ -34,17 +34,24 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   }, [router]);
 
   // Use the page layout if it exists, otherwise use default layout
-  const getLayout = Component.getLayout ?? ((page) => (
-    <main className={inter.className}>
-      <Header />
-      <div className="container">
-        {page}
-      </div>
-      <NavigationBar />
-      <Footer />
-      <ChatbotPopup />
-    </main>
-  ));
+  const getLayout = Component.getLayout ?? ((page) => {
+    // Check if it's an admin page
+    if (router.pathname.startsWith('/admin')) {
+      return page;
+    }
+    
+    return (
+      <main className={inter.className}>
+        <Header />
+        <div className="container">
+          {page}
+        </div>
+        <NavigationBar />
+        <Footer />
+        <ChatbotPopup />
+      </main>
+    );
+  });
 
   return (
     <>

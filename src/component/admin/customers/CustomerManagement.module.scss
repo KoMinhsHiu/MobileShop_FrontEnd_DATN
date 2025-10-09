@@ -1,0 +1,452 @@
+// ============================================================================
+// IMPORTS
+// ============================================================================
+
+@import '../orders/styles/shared.scss';
+
+// ============================================================================
+// MAIN CONTAINER
+// ============================================================================
+
+.customerManagement {
+  padding: 24px;
+  background: #f8f9fa;
+  min-height: 100vh;
+
+  // ============================================================================
+  // HEADER SECTION
+  // ============================================================================
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+
+      svg {
+        margin-right: 12px;
+        color: #007bff;
+      }
+    }
+
+    .headerActions {
+      display: flex;
+      gap: 12px;
+
+      .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &.btn-primary {
+          background: #007bff;
+          color: white;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+
+        &.btn-outline {
+          background: transparent;
+          color: #007bff;
+          border: 1px solid #007bff;
+
+          &:hover {
+            background: #007bff;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  // ============================================================================
+  // FILTERS SECTION
+  // ============================================================================
+
+  .filters {
+    background: white;
+    padding: 20px 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+
+    .filtersRow {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: end;
+
+      .filterGroup {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #495057;
+        }
+
+        .formControl {
+          padding: 10px 12px;
+          border: 1px solid #dee2e6;
+          border-radius: 8px;
+          font-size: 14px;
+          transition: border-color 0.2s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+          }
+        }
+
+        .select {
+          background: white;
+          cursor: pointer;
+        }
+      }
+
+      .filterActions {
+        display: flex;
+        gap: 8px;
+
+        .btn {
+          padding: 10px 16px;
+          border-radius: 8px;
+          border: none;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &.btn-primary {
+            background: #007bff;
+            color: white;
+
+            &:hover {
+              background: #0056b3;
+            }
+          }
+
+          &.btn-secondary {
+            background: #6c757d;
+            color: white;
+
+            &:hover {
+              background: #545b62;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ============================================================================
+  // TABLE SECTION
+  // ============================================================================
+
+  .tableContainer {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background: #f8f9fa;
+
+        th {
+          padding: 16px 12px;
+          text-align: center;
+          font-weight: 600;
+          color: #495057;
+          border-bottom: 2px solid #dee2e6;
+          position: relative;
+
+          &.sortable {
+            cursor: pointer;
+            user-select: none;
+
+            &:hover {
+              background: #e9ecef;
+            }
+
+            .sortIcon {
+              margin-left: 6px;
+              opacity: 0.5;
+              transition: opacity 0.2s ease;
+
+              &.active {
+                opacity: 1;
+                color: #007bff;
+              }
+            }
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background: #f8f9fa;
+          }
+
+          td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+
+            .avatar {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 2px solid #dee2e6;
+            }
+
+            .avatarPlaceholder {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              background: #e9ecef;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 18px;
+              color: #6c757d;
+            }
+
+            .statusBadge {
+              padding: 4px 12px;
+              border-radius: 20px;
+              font-size: 12px;
+              font-weight: 500;
+              text-transform: uppercase;
+
+              &.active {
+                background: #d4edda;
+                color: #155724;
+              }
+
+              &.inactive {
+                background: #f8d7da;
+                color: #721c24;
+              }
+            }
+
+            .roleBadge {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              font-size: 14px;
+              font-weight: 500;
+
+              .roleIcon {
+                font-size: 16px;
+              }
+            }
+
+            .actions {
+              display: flex;
+              gap: 4px;
+              flex-wrap: wrap;
+
+              .btn {
+                padding: 4px 8px;
+                border-radius: 4px;
+                border: none;
+                font-size: 11px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                white-space: nowrap;
+
+                &.btn-view {
+                  background: #17a2b8;
+                  color: white;
+
+                  &:hover {
+                    background: #138496;
+                  }
+                }
+
+                &.btn-edit {
+                  background: #ffc107;
+                  color: #212529;
+
+                  &:hover {
+                    background: #e0a800;
+                  }
+                }
+
+                &.btn-lock {
+                  background: #dc3545;
+                  color: white;
+
+                  &:hover {
+                    background: #c82333;
+                  }
+                }
+
+                &.btn-unlock {
+                  background: #28a745;
+                  color: white;
+
+                  &:hover {
+                    background: #218838;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: white;
+    border-top: 1px solid #dee2e6;
+
+    .paginationInfo {
+      color: #6c757d;
+      font-size: 14px;
+    }
+
+    .paginationControls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .btn {
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #495057;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(:disabled) {
+          background: #e9ecef;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        &.active {
+          background: #007bff;
+          color: white;
+          border-color: #007bff;
+        }
+      }
+
+      .pageNumbers {
+        display: flex;
+        gap: 4px;
+      }
+    }
+  }
+
+  .emptyState {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+
+    .emptyIcon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN
+// ============================================================================
+
+@media (max-width: 768px) {
+  .customerManagement {
+    padding: 16px;
+
+    .header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .headerActions {
+        justify-content: center;
+      }
+    }
+
+    .filters {
+      .filtersRow {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
+    .tableContainer {
+      overflow-x: auto;
+
+      .table {
+        min-width: 800px;
+      }
+    }
+
+    .pagination {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+
+      .paginationControls {
+        justify-content: center;
+      }
+    }
+  }
+}
