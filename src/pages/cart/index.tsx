@@ -6,11 +6,12 @@ import { useCart } from "@/context/cartContext";
 import { formatPrice, parsePrice } from "@/utils/function/formatPrice";
 import MetaTags from "@/component/metaTags";
 import CartItem from "@/component/cart/cartItem";
+import { withAuth } from "@/component/auth";
 
 import styles from "./cart.module.scss";
 
-const CartPage = () => {
-  const { cart } = useCart();
+const CartPageComponent = () => {
+  const { cart, isLoading } = useCart();
   const router = useRouter();
 
   // Calculate cart summary
@@ -24,11 +25,16 @@ const CartPage = () => {
       };
     }
 
+    console.log('🛒 Cart products:', cart.products);
+    
     const totalItems = cart.products.reduce((sum: number, product: any) => sum + product.quantity, 0);
     const subtotal = cart.products.reduce((sum: number, product: any) => {
       const price = parsePrice(product.price);
+      console.log(`🛒 Product: ${product.name}, Price: ${product.price}, Parsed: ${price}, Quantity: ${product.quantity}`);
       return sum + (price * product.quantity);
     }, 0);
+    
+    console.log('🛒 Calculated subtotal:', subtotal);
     
     // Calculate shipping fee (free shipping for orders over 500,000 VND)
     const shippingFee = subtotal >= 500000 ? 0 : 30000;
@@ -70,14 +76,22 @@ const CartPage = () => {
             </div>
             <h1 className={styles.pageTitle}>Giỏ hàng của bạn</h1>
             <p className={styles.pageSubtitle}>
-              {cartSummary.totalItems > 0 
+              {isLoading ? 'Đang tải...' : cartSummary.totalItems > 0 
                 ? `Bạn có ${cartSummary.totalItems} sản phẩm trong giỏ hàng` 
                 : 'Giỏ hàng của bạn đang trống'
               }
             </p>
           </div>
 
-          {cart && cart.products && cart.products.length > 0 ? (
+          {isLoading ? (
+            // Loading State
+            <div className={styles.loadingContainer}>
+              <div className={styles.loadingSpinner}>
+                <div className={styles.spinner}></div>
+                <p>Đang tải giỏ hàng...</p>
+              </div>
+            </div>
+          ) : cart && cart.products && cart.products.length > 0 ? (
         <div className={styles.cartContent}>
           <div className={styles.cartItems}>
             <div className={styles.sectionHeader}>
@@ -176,6 +190,9 @@ const CartPage = () => {
     </>
   );
 };
+
+// Protect the cart page with authentication
+const CartPage = withAuth(CartPageComponent);
 
 export default CartPage;
 

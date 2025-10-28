@@ -35,21 +35,28 @@
   }
 
   .imageColumn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
     .productImage {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
+      max-width: 100px;
+      max-height: 100px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
       border-radius: 8px;
       border: 1px solid #e0e0e0;
       transition: transform 0.2s;
+      background-color: #f8f9fa;
 
       &:hover {
         transform: scale(1.05);
       }
 
       @media (max-width: 768px) {
-        width: 120px;
-        height: 120px;
+        max-width: 120px;
+        max-height: 120px;
         margin: 0 auto;
       }
     }

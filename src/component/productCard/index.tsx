@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShoppingCart, faHeart, faEye } from "@fortawesome/free-solid-svg-icons";
@@ -14,20 +14,35 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, isLoading } = useCart();
 
+  useEffect(() => {
+    // Debug logging moved to useEffect to prevent hydration issues
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ProductCard received product:', product);
+    }
+  }, [product]);
+
   const formatPrice = (price: string) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(parseInt(price.replace(/\./g, '')));
+    try {
+      const numericPrice = parseInt(price.replace(/\./g, ''));
+      if (isNaN(numericPrice)) return price;
+      
+      // Use a more consistent formatting approach
+      return `${numericPrice.toLocaleString('vi-VN')} VNĐ`;
+    } catch (error) {
+      console.error('Error formatting price:', error, 'Price:', price);
+      return price;
+    }
   };
 
   const calculateDiscountPrice = (originalPrice: string, discount: number) => {
-    const price = parseInt(originalPrice.replace(/\./g, ''));
-    const discountedPrice = price - discount;
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(discountedPrice);
+    try {
+      const price = parseInt(originalPrice.replace(/\./g, ''));
+      const discountedPrice = price - discount;
+      return `${discountedPrice.toLocaleString('vi-VN')} VNĐ`;
+    } catch (error) {
+      console.error('Error calculating discount price:', error, 'Original price:', originalPrice, 'Discount:', discount);
+      return originalPrice;
+    }
   };
 
   const handleQuickAddToCart = (e: React.MouseEvent) => {
@@ -56,6 +71,10 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
     ));
   };
 
+  if (!product) {
+    return null;
+  }
+
   return (
     <div 
       className={styles.productCard}
@@ -73,9 +92,9 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           )}
           
           {/* Discount Badge */}
-          {parseInt(product.disconnect) > 0 && (
+          {parseInt(product.disconnect) > parseInt(product.price.replace(/\./g, '')) && (
             <div className={styles.discountBadge}>
-              -{Math.round((parseInt(product.disconnect) / parseInt(product.price.replace(/\./g, ''))) * 100)}%
+              -{Math.round(((parseInt(product.disconnect) - parseInt(product.price.replace(/\./g, ''))) / parseInt(product.disconnect)) * 100)}%
             </div>
           )}
           
@@ -92,9 +111,17 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
             <button className={styles.quickBtn} title="Yêu thích">
               <FontAwesomeIcon icon={faHeart} />
             </button>
-            <Link href={`/product/${product.id}`} className={styles.quickBtn} title="Xem chi tiết">
+            <button 
+              className={styles.quickBtn} 
+              title="Xem chi tiết"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `/product/${product.id}`;
+              }}
+            >
               <FontAwesomeIcon icon={faEye} />
-            </Link>
+            </button>
           </div>
         </div>
         
@@ -111,13 +138,13 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           
           {/* Price */}
           <div className={styles.priceContainer}>
-            {parseInt(product.disconnect) > 0 ? (
+            {parseInt(product.disconnect) > parseInt(product.price) ? (
               <>
                 <span className={styles.discountPrice}>
-                  {calculateDiscountPrice(product.price, parseInt(product.disconnect))}
+                  {formatPrice(product.price)}
                 </span>
                 <span className={styles.originalPrice}>
-                  {formatPrice(product.price)}
+                  {formatPrice(product.disconnect)}
                 </span>
               </>
             ) : (

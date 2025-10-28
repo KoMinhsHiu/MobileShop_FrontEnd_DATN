@@ -1,33 +1,49 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 import { useCart } from "@/context/cartContext";
+import { formatPrice, parsePrice } from "@/utils/function/formatPrice";
 import MetaTags from "@/component/metaTags";
 import ShippingForm from "@/component/checkout/ShippingForm";
 import PaymentMethods from "@/component/checkout/PaymentMethods";
 import OrderSummary from "@/component/checkout/OrderSummary";
 import { ShippingInfo } from "@/component/checkout/ShippingForm/types";
 import { PaymentMethod } from "@/component/checkout/PaymentMethods/types";
+import { ordersAPI, CreateOrderRequest } from "@/utils/api/orders";
+import { useLocation } from "@/utils/hooks/useLocation";
+import { withAuth } from "@/component/auth";
 
 import styles from "./checkout.module.scss";
 
-const CheckoutPage = () => {
+const CheckoutPageComponent = () => {
   const { cart } = useCart();
   const router = useRouter();
+  const { provinces, communes, selectedProvince, selectedCommune, loading, handleProvinceChange, handleCommuneChange } = useLocation();
+
+  // Debug logging for communes state
+  useEffect(() => {
+    console.log('🔍 Checkout communes state changed:', {
+      communesCount: communes.length,
+      selectedProvince,
+      selectedCommune,
+      communes: communes.slice(0, 5) // Show first 5 communes for debugging
+    });
+  }, [communes, selectedProvince, selectedCommune]);
 
   // Form state
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     fullName: '',
     phone: '',
     province: '',
-    district: '',
-    ward: '',
+    commune: '',
     address: '',
     note: ''
   });
 
   const [selectedPayment, setSelectedPayment] = useState<string>('cod');
   const [phoneError, setPhoneError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const paymentMethods: PaymentMethod[] = [
     { type: 'cod', label: 'Thanh toán khi nhận hàng (COD)' },
@@ -87,13 +103,126 @@ const CheckoutPage = () => {
     }
   };
 
+  // Transform cart data to API format
+  const transformCartToOrderItems = () => {
+    if (!cart?.products) return [];
+
+    return cart.products.map((product: any) => ({
+      variantId: parseInt(product.productAttributeId) || parseInt(product.id),
+      colorId: parseInt(product.productAttributeId) || parseInt(product.id), // Fallback to variantId if no separate colorId
+      quantity: product.quantity,
+      price: parsePrice(product.price),
+      discount: parsePrice(product.price) // Assuming no discount for now
+    }));
+  };
+
+  // Get province and commune IDs from names
+  const getLocationIds = () => {
+    console.log('🔍 getLocationIds called with:', {
+      shippingInfo,
+      provincesCount: provinces.length,
+      communesCount: communes.length,
+      selectedProvince,
+      selectedCommune
+    });
+
+    // Method 1: Try to find by selected codes first (most reliable)
+    let province = null;
+    let commune = null;
+
+    if (selectedProvince) {
+      province = provinces.find(p => p.code.toString() === selectedProvince);
+    }
+
+    if (selectedCommune) {
+      commune = communes.find(c => c.code.toString() === selectedCommune);
+    }
+
+    // Method 2: If not found by codes, try by names
+    if (!province) {
+      province = provinces.find(p => p.name === shippingInfo.province);
+    }
+
+    if (!commune) {
+      commune = communes.find(c => c.name === shippingInfo.commune);
+    }
+
+    // Method 3: If still not found, try partial match
+    if (!province) {
+      province = provinces.find(p => p.name.includes(shippingInfo.province) || shippingInfo.province.includes(p.name));
+    }
+    
+    if (!commune) {
+      commune = communes.find(c => c.name.includes(shippingInfo.commune) || shippingInfo.commune.includes(c.name));
+    }
+
+    const result = {
+      provinceId: province?.id || 1, // Use id instead of code
+      communeId: commune?.id || 1, // Use id instead of code
+      provinceCode: province?.code || 1, // Keep code for debugging
+      communeCode: commune?.code || 1 // Keep code for debugging
+    };
+
+    console.log('🔍 Location IDs Debug:', {
+      provinceName: shippingInfo.province,
+      communeName: shippingInfo.commune,
+      foundProvince: province,
+      foundCommune: commune,
+      result,
+      searchMethod: {
+        provinceByCode: selectedProvince ? provinces.find(p => p.code.toString() === selectedProvince) ? 'found' : 'not-found' : 'no-code',
+        communeByCode: selectedCommune ? communes.find(c => c.code.toString() === selectedCommune) ? 'found' : 'not-found' : 'no-code',
+        provinceByName: provinces.find(p => p.name === shippingInfo.province) ? 'found' : 'not-found',
+        communeByName: communes.find(c => c.name === shippingInfo.commune) ? 'found' : 'not-found'
+      },
+      debugInfo: {
+        allProvinces: provinces.map(p => ({ id: p.id, code: p.code, name: p.name })),
+        allCommunes: communes.map(c => ({ id: c.id, code: c.code, name: c.name, provinceCode: c.provinceCode })),
+        selectedProvinceCode: selectedProvince,
+        selectedCommuneCode: selectedCommune
+      }
+    });
+
+    // Log warning if using fallback values
+    if (result.provinceId === 1 || result.communeId === 1) {
+      console.warn('⚠️ Using fallback values for location IDs:', {
+        provinceId: result.provinceId,
+        communeId: result.communeId,
+        provinceName: shippingInfo.province,
+        communeName: shippingInfo.commune,
+        debugInfo: {
+          provincesAvailable: provinces.length > 0,
+          communesAvailable: communes.length > 0,
+          selectedProvince,
+          selectedCommune,
+          provinceFound: !!province,
+          communeFound: !!commune
+        }
+      });
+    }
+
+    return result;
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
-    if (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.province || 
-        !shippingInfo.district || !shippingInfo.ward || !shippingInfo.address) {
-      alert('Vui lòng điền đầy đủ thông tin giao hàng');
+    if (!shippingInfo.fullName || !shippingInfo.phone || !shippingInfo.province ||
+        !shippingInfo.commune || !shippingInfo.address) {
+      toast.error('Vui lòng điền đầy đủ thông tin giao hàng');
+      return;
+    }
+
+    // Validate that communes are loaded
+    if (communes.length === 0) {
+      toast.error('Đang tải danh sách phường/xã. Vui lòng thử lại sau.');
+      console.warn('⚠️ Communes not loaded yet:', {
+        communesCount: communes.length,
+        selectedProvince,
+        selectedCommune,
+        shippingInfo
+      });
       return;
     }
 
@@ -104,40 +233,111 @@ const CheckoutPage = () => {
     }
 
     if (!cart?.products || cart.products.length === 0) {
-      alert('Giỏ hàng trống');
+      toast.error('Giỏ hàng trống');
       return;
     }
 
-    // Create order object
-    const order = {
-      shippingInfo,
-      paymentMethod: selectedPayment,
-      products: cart.products,
-      summary: orderSummary,
-      orderDate: new Date().toISOString()
-    };
+    setIsSubmitting(true);
 
-    // Handle different payment methods
-    switch (selectedPayment) {
-      case 'cod':
-        alert('Đơn hàng đã được tạo thành công! Bạn sẽ thanh toán khi nhận hàng.');
-        // Clear cart and redirect
-        router.push('/orders/success');
-        break;
-      case 'paypal':
-        alert('Chuyển hướng đến PayPal...');
-        // Implement PayPal integration
-        break;
-      case 'momo':
-        alert('Chuyển hướng đến Momo...');
-        // Implement Momo integration
-        break;
-      case 'vnpay':
-        alert('Chuyển hướng đến VNPay...');
-        // Implement VNPay integration
-        break;
-      default:
-        alert('Phương thức thanh toán không hợp lệ');
+    try {
+      // Get location IDs
+      const { provinceId, communeId, provinceCode, communeCode } = getLocationIds();
+      
+    // Validate location IDs (should not be fallback values)
+    if (provinceId === 1 || communeId === 1) {
+      toast.error('Không thể xác định địa chỉ. Vui lòng chọn lại tỉnh thành và phường xã.');
+      console.error('❌ Invalid location IDs:', { 
+        provinceId, 
+        communeId, 
+        provinceCode, 
+        communeCode,
+        debugInfo: {
+          provincesCount: provinces.length,
+          communesCount: communes.length,
+          selectedProvince,
+          selectedCommune,
+          shippingInfo
+        }
+      });
+      return;
+    }
+      
+      // Transform cart items to API format
+      const items = transformCartToOrderItems();
+
+      // Create order request
+      const orderRequest: CreateOrderRequest = {
+        totalAmount: orderSummary.subtotal,
+        discountAmount: 0, // No discount for now
+        shippingFee: orderSummary.shippingFee,
+        finalAmount: orderSummary.grandTotal,
+        recipientName: shippingInfo.fullName,
+        recipientPhone: shippingInfo.phone,
+        street: shippingInfo.address,
+        communeId: communeId, // Using ID instead of code
+        provinceId: provinceId, // Using ID instead of code
+        postalCode: '', // Optional field
+        items: items
+      };
+
+      console.log('🚀 Creating order with data:', {
+        ...orderRequest,
+        debugInfo: {
+          provinceCode,
+          communeCode,
+          provinceName: shippingInfo.province,
+          communeName: shippingInfo.commune
+        }
+      });
+
+      // Call API to create order
+      const response = await ordersAPI.createOrder(orderRequest);
+
+      if (response.status === 200 && response.data?.orderId) {
+        toast.success('Đơn hàng đã được tạo thành công!');
+        
+        // Handle different payment methods
+        switch (selectedPayment) {
+          case 'cod':
+            // For COD, redirect to success page immediately
+            router.push(`/orders/success?orderId=${response.data.orderId}`);
+            break;
+          case 'paypal':
+            toast.info('Chuyển hướng đến PayPal...');
+            // TODO: Implement PayPal integration
+            router.push(`/orders/success?orderId=${response.data.orderId}`);
+            break;
+          case 'momo':
+            toast.info('Chuyển hướng đến Momo...');
+            // TODO: Implement Momo integration
+            router.push(`/orders/success?orderId=${response.data.orderId}`);
+            break;
+          case 'vnpay':
+            toast.info('Chuyển hướng đến VNPay...');
+            // TODO: Implement VNPay integration
+            router.push(`/orders/success?orderId=${response.data.orderId}`);
+            break;
+          default:
+            toast.error('Phương thức thanh toán không hợp lệ');
+        }
+      } else {
+        toast.error(response.message || 'Có lỗi xảy ra khi tạo đơn hàng');
+      }
+    } catch (error: any) {
+      console.error('Error creating order:', error);
+      
+      // Handle specific error cases
+      if (error.message.includes('401')) {
+        toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+      } else if (error.message.includes('400')) {
+        toast.error('Dữ liệu đơn hàng không hợp lệ. Vui lòng kiểm tra lại thông tin');
+      } else if (error.message.includes('503')) {
+        toast.error('Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau');
+      } else {
+        toast.error(error.message || 'Có lỗi xảy ra khi tạo đơn hàng');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -184,37 +384,83 @@ const CheckoutPage = () => {
             <h1 className={styles.pageTitle}>Thanh toán</h1>
           </div>
 
-           <form onSubmit={handleSubmitOrder} className={styles.checkoutForm}>
-             <div className={styles.checkoutContent}>
-               {/* Left Column - Form */}
-               <div className={styles.formSection}>
-                 <ShippingForm
-                   shippingInfo={shippingInfo}
-                   phoneError={phoneError}
-                   onInputChange={handleInputChange}
-                 />
-                 
-                 <PaymentMethods
-                   paymentMethods={paymentMethods}
-                   selectedPayment={selectedPayment}
-                   onPaymentChange={setSelectedPayment}
-                 />
-               </div>
+          <form onSubmit={handleSubmitOrder} className={styles.checkoutForm}>
+            <div className={styles.checkoutLayout}>
+              {/* Left Column - Forms */}
+              <div className={styles.leftColumn}>
+                {/* 1. Thông tin giao hàng */}
+                <div className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2>1. Thông tin giao hàng</h2>
+                  </div>
+                  <ShippingForm
+                    shippingInfo={shippingInfo}
+                    phoneError={phoneError}
+                    onInputChange={handleInputChange}
+                    provinces={provinces}
+                    communes={communes}
+                    selectedProvince={selectedProvince}
+                    selectedCommune={selectedCommune}
+                    loading={loading}
+                    onProvinceChange={handleProvinceChange}
+                    onCommuneChange={handleCommuneChange}
+                  />
+                </div>
 
-               {/* Right Column - Order Summary */}
-               <div className={styles.summarySection}>
-                 <OrderSummary
-                   products={cart.products}
-                   orderSummary={orderSummary}
-                   onSubmitOrder={handleSubmitOrder}
-                 />
-               </div>
-             </div>
-           </form>
+                {/* 2. Phương thức thanh toán */}
+                <div className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2>2. Phương thức thanh toán</h2>
+                  </div>
+                  <PaymentMethods
+                    paymentMethods={paymentMethods}
+                    selectedPayment={selectedPayment}
+                    onPaymentChange={setSelectedPayment}
+                  />
+                </div>
+              </div>
+
+              {/* Right Column - Order Summary */}
+              <div className={styles.rightColumn}>
+                {/* 3. Tóm tắt đơn hàng */}
+                <div className={styles.section}>
+                  <div className={styles.sectionHeader}>
+                    <h2>3. Tóm tắt đơn hàng</h2>
+                  </div>
+                  <OrderSummary
+                    products={cart.products}
+                    orderSummary={orderSummary}
+                  />
+                </div>
+
+                {/* 4. Nút xác nhận */}
+                <div className={styles.section}>
+                  <div className={styles.confirmSection}>
+                    <button 
+                      type="submit" 
+                      className={styles.confirmOrderBtn}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Đang xử lý...' : 'Đặt hàng'}
+                    </button>
+                    <p className={styles.confirmNote}>
+                      {selectedPayment === 'cod' 
+                        ? 'Bạn sẽ thanh toán khi nhận hàng'
+                        : `Bạn sẽ được chuyển đến cổng thanh toán ${selectedPayment.toUpperCase()}`
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </>
   );
 };
+
+// Protect the checkout page with authentication
+const CheckoutPage = withAuth(CheckoutPageComponent);
 
 export default CheckoutPage;

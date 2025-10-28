@@ -27,7 +27,7 @@ const Header: FC = () => {
         
         <div className={styles.navigationMenu}>
           <Link href="/" className={styles.navItem}>Trang chủ</Link>
-          <Link href="/category/all" className={styles.navItem}>Sản phẩm</Link>
+          <Link href="/products" className={styles.navItem}>Sản phẩm</Link>
           <Link href="/cart" className={styles.navItem}>Giỏ hàng</Link>
           <Link href="/orders" className={styles.navItem}>Đơn hàng</Link>
           <Link href="/profile" className={styles.navItem}>Tài khoản</Link>
@@ -40,7 +40,7 @@ const Header: FC = () => {
               <div className={styles.userSection}>
                 <span className={styles.welcomeText}>Xin chào, {user?.fullName || user?.username}!</span>
                 <button 
-                  onClick={logout} 
+                  onClick={() => logout()} 
                   className={styles.logoutBtn}
                 >
                   Đăng xuất

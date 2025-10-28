@@ -1,0 +1,323 @@
+// Desktop sidebar styles
+.sidebarFilter {
+  width: 100%;
+  max-width: 300px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+
+  .activeFiltersContainer {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e5e5;
+
+    .activeFilters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+
+      .activeFiltersLabel {
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        margin-right: 8px;
+      }
+
+      .activeFilterBadge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: #007bff;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+
+        .removeFilterBtn {
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+          padding: 0;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.2);
+          }
+        }
+      }
+
+      .clearAllBtn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: #c82333;
+        }
+      }
+    }
+  }
+
+  .filterSection {
+    margin-bottom: 20px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .filterHeader {
+      padding: 15px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e5e5e5;
+
+      .filterTitle {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+      }
+    }
+  }
+}
+
+// Mobile styles (reused from original filter)
+.filterWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.15);
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+    flex: 1;
+
+    .filterCount {
+      color: #007bff;
+      font-weight: 600;
+    }
+  }
+}
+
+.modalHeader {
+  padding: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+}
+
+.modalBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+
+  .filterColumn {
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+
+    .filterHeader {
+      padding: 15px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e5e5e5;
+
+      .filterTitle {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin: 0;
+      }
+    }
+  }
+
+  .advancedFilterMobile {
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+}
+
+// Active filters for mobile
+.activeFiltersContainer {
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+
+  .activeFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+
+    .activeFiltersLabel {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-right: 8px;
+    }
+
+    .activeFilterBadge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #007bff;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+
+      .removeFilterBtn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+
+    .clearAllBtn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background: #c82333;
+      }
+    }
+  }
+}
+
+// Large screens - wider sidebar
+@media (min-width: 1200px) {
+  .sidebarFilter {
+    max-width: 320px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .sidebarFilter {
+    display: none; // Hide sidebar on mobile
+  }
+
+  .filterWrapper {
+    padding: 10px 14px;
+
+    .title {
+      font-size: 13px;
+    }
+  }
+
+  .modalHeader {
+    padding: 15px;
+
+    h3 {
+      font-size: 16px;
+    }
+  }
+
+  .modalBody {
+    padding: 15px;
+    gap: 15px;
+
+    .filterColumn {
+      .filterHeader {
+        padding: 12px 15px;
+
+        .filterTitle {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .activeFiltersContainer {
+    margin-bottom: 12px;
+    padding: 12px;
+
+    .activeFilters {
+      gap: 6px;
+
+      .activeFiltersLabel {
+        font-size: 13px;
+      }
+
+      .activeFilterBadge {
+        padding: 3px 6px;
+        font-size: 11px;
+
+        .removeFilterBtn {
+          width: 14px;
+          height: 14px;
+        }
+      }
+
+      .clearAllBtn {
+        padding: 3px 6px;
+        font-size: 11px;
+      }
+    }
+  }
+}

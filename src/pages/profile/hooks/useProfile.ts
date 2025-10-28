@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { UserProfile, PasswordChange, ProfileTab } from '../profile.types';
 import { PROFILE_MESSAGES } from '../constants/profileMessages';
+import { customerAPI } from '@/utils/api/customer';
 
 export const useProfile = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -14,10 +15,14 @@ export const useProfile = () => {
   // Personal Info State
   const [personalInfo, setPersonalInfo] = useState<UserProfile>({
     fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     address: '',
-    avatar: ''
+    avatar: '',
+    dateOfBirth: '',
+    pointsBalance: 0
   });
 
   // Password Change State
@@ -34,18 +39,39 @@ export const useProfile = () => {
     }
   }, [isAuthenticated, router]);
 
-  // Load user data
+  // Load user data from API
   useEffect(() => {
-    if (user) {
-      setPersonalInfo({
-        fullName: user.fullName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        address: user.address || '',
-        avatar: user.avatar || ''
-      });
-    }
-  }, [user]);
+    const fetchCustomerData = async () => {
+      if (isAuthenticated) {
+        try {
+          setIsLoading(true);
+          const response = await customerAPI.getMe();
+          
+          if (response.status === 200 && response.data) {
+            const { data } = response;
+            setPersonalInfo({
+              fullName: `${data.firstName} ${data.lastName}`,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              email: data.user.email,
+              phone: data.user.phone,
+              address: '', // API không trả về address, có thể thêm sau
+              avatar: '', // API không trả về avatar, có thể thêm sau
+              dateOfBirth: data.dateOfBirth,
+              pointsBalance: data.pointsBalance
+            });
+          }
+        } catch (error: any) {
+          console.error('Error fetching customer data:', error);
+          toast.error(error.message || 'Không thể lấy thông tin người dùng');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchCustomerData();
+  }, [isAuthenticated]);
 
   const handlePersonalInfoChange = (field: keyof UserProfile, value: string) => {
     setPersonalInfo(prev => ({
@@ -64,11 +90,33 @@ export const useProfile = () => {
   const handleUpdatePersonalInfo = async () => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success(PROFILE_MESSAGES.SUCCESS.UPDATE_INFO);
-    } catch (error) {
-      toast.error(PROFILE_MESSAGES.ERROR.UPDATE_INFO);
+      // Prepare update data
+      const updateData = {
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
+        phone: personalInfo.phone,
+        dateOfBirth: personalInfo.dateOfBirth
+      };
+
+      // Call API to update customer info
+      const response = await customerAPI.updateMe(updateData);
+      
+      if (response.status === 200 && response.data) {
+        const { data } = response;
+        setPersonalInfo(prev => ({
+          ...prev,
+          fullName: `${data.firstName} ${data.lastName}`,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.user.phone,
+          dateOfBirth: data.dateOfBirth,
+          pointsBalance: data.pointsBalance
+        }));
+        toast.success(PROFILE_MESSAGES.SUCCESS.UPDATE_INFO);
+      }
+    } catch (error: any) {
+      console.error('Error updating customer info:', error);
+      toast.error(error.message || PROFILE_MESSAGES.ERROR.UPDATE_INFO);
     } finally {
       setIsLoading(false);
     }

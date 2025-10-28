@@ -10,6 +10,7 @@ import { useScrollLock } from "@/utils/hooks";
 import Modal from "@/component/modal";
 
 import CheckBox from "./checkBox";
+import RadioButton from "./radioButton";
 
 import { FilterProps } from "./filter.types";
 
@@ -20,6 +21,7 @@ const Filter: FC<FilterProps> = ({
   setFilterQuery,
   isOpenFilter,
   setIsOpenFilter,
+  onAdvancedFiltersChange,
 }) => {
   const { lockScroll, unlockScroll } = useScrollLock();
   const { width } = useWindowSize();
@@ -29,14 +31,14 @@ const Filter: FC<FilterProps> = ({
 
   // Track active filters
   useEffect(() => {
-    const active = filters?.flatMap(filter => 
+    const regularActive = filters?.flatMap(filter => 
       filter.options.filter(option => option.active).map(option => option.label)
     ) || [];
-    setActiveFilters(active);
+    
+    setActiveFilters(regularActive);
   }, [filters]);
 
   const removeFilter = (filterLabel: string) => {
-    // Find and deactivate the filter
     const filterToRemove = filters?.find(filter => 
       filter.options.some(option => option.label === filterLabel)
     );
@@ -44,7 +46,6 @@ const Filter: FC<FilterProps> = ({
     if (filterToRemove) {
       const optionToRemove = filterToRemove.options.find(option => option.label === filterLabel);
       if (optionToRemove) {
-        // Toggle the filter off
         setFilterQuery(optionToRemove.filterQuery);
       }
     }
@@ -115,28 +116,23 @@ const Filter: FC<FilterProps> = ({
           <h3>Bộ lọc sản phẩm</h3>
         </div>
         
-        <div className={isDeskTop ? styles.row : ""}>
+        <div className={`${styles.modalBody} ${isDeskTop ? styles.row : ''}`}>
+          {/* Existing filters */}
           {filters?.map((filter, idx) => {
             return (
               filter.display && (
                 <div className={styles.filterColumn} key={idx}>
                   <div className={styles.filterHeader}>
                     <p className={styles.filterTitle}>{filter.label}</p>
-                    {filter.type === "range" && (
-                      <span className={styles.priceFilterLabel}>💰 Khoảng giá</span>
-                    )}
-                    {filter.type === "color" && (
-                      <span className={styles.colorFilterLabel}>🎨 Màu sắc</span>
-                    )}
-                    {filter.type === "checkbox" && filter.label === "Thương hiệu" && (
-                      <span className={styles.brandFilterLabel}>🏷️ Thương hiệu</span>
-                    )}
-                    {filter.type === "checkbox" && filter.label === "Bộ nhớ" && (
-                      <span className={styles.storageFilterLabel}>💾 Bộ nhớ</span>
-                    )}
                   </div>
                   {filter.options.map((option, optionIdx) => {
-                    return (
+                    return filter.type === "radio" ? (
+                      <RadioButton
+                        filter={option}
+                        setFilterQuery={setFilterQuery}
+                        key={optionIdx}
+                      />
+                    ) : (
                       <CheckBox
                         filter={option}
                         setFilterQuery={setFilterQuery}
@@ -148,12 +144,16 @@ const Filter: FC<FilterProps> = ({
               )
             );
           })}
-          <button
-            className={styles.clearFilter}
-            onClick={clearAllFilters}
-          >
-            {t("category.clearAll")}
-          </button>
+
+          {/* TODO: Advanced filters will be implemented here */}
+          <div className={styles.filterColumn}>
+            <div className={styles.filterHeader}>
+              <p className={styles.filterTitle}>Bộ lọc nâng cao</p>
+            </div>
+            <div className={styles.placeholder}>
+              <p>Bộ lọc nâng cao sẽ được triển khai sau</p>
+            </div>
+          </div>
         </div>
       </Modal>
     </>

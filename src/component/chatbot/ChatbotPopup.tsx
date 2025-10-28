@@ -2,6 +2,7 @@ import React, { FC, useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPaperPlane, faRobot, faUser } from "@fortawesome/free-solid-svg-icons";
 import styles from "./chatbot.module.scss";
+import { sendAIChatStream } from "@/utils/api/ai";
 
 interface Message {
   id: string;
@@ -43,60 +44,122 @@ const ChatbotPopup: FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userQuery = inputMessage;
     setInputMessage("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(inputMessage);
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: aiResponse,
+    // Create a temporary AI message for streaming updates
+    const aiMessageId = (Date.now() + 1).toString();
+    let accumulatedContent = "";
+
+    try {
+      await sendAIChatStream(userQuery, {
+        onStart: () => {
+          console.log("AI stream started");
+        },
+        onPartialMessage: (content) => {
+          // Accumulate partial content
+          accumulatedContent += content;
+          
+          // Update or create the AI message with accumulated content
+          setMessages(prev => {
+            const existingIndex = prev.findIndex(m => m.id === aiMessageId);
+            if (existingIndex >= 0) {
+              // Update existing message
+              const updated = [...prev];
+              updated[existingIndex] = {
+                ...updated[existingIndex],
+                text: accumulatedContent
+              };
+              return updated;
+            } else {
+              // Create new message
+              return [...prev, {
+                id: aiMessageId,
+                text: accumulatedContent,
+                isUser: false,
+                timestamp: new Date()
+              }];
+            }
+          });
+        },
+        onCompleteMessage: (content) => {
+          // Update with final complete message
+          setMessages(prev => {
+            const existingIndex = prev.findIndex(m => m.id === aiMessageId);
+            if (existingIndex >= 0) {
+              const updated = [...prev];
+              updated[existingIndex] = {
+                ...updated[existingIndex],
+                text: content
+              };
+              return updated;
+            } else {
+              return [...prev, {
+                id: aiMessageId,
+                text: content,
+                isUser: false,
+                timestamp: new Date()
+              }];
+            }
+          });
+          setIsTyping(false);
+        },
+        onComplete: () => {
+          console.log("AI stream completed");
+          setIsTyping(false);
+        },
+        onError: (error) => {
+          console.error("AI stream error:", error);
+          setIsTyping(false);
+          
+          // Show error message
+          const errorMessage: Message = {
+            id: aiMessageId,
+            text: `Xin lỗi, đã có lỗi xảy ra: ${error}. Vui lòng thử lại sau.`,
+            isUser: false,
+            timestamp: new Date()
+          };
+          
+          setMessages(prev => {
+            const existingIndex = prev.findIndex(m => m.id === aiMessageId);
+            if (existingIndex >= 0) {
+              const updated = [...prev];
+              updated[existingIndex] = errorMessage;
+              return updated;
+            } else {
+              return [...prev, errorMessage];
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setIsTyping(false);
+      
+      // Show error message
+      const errorMessage: Message = {
+        id: aiMessageId,
+        text: "Xin lỗi, không thể kết nối đến AI. Vui lòng thử lại sau.",
         isUser: false,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 1500);
+      
+      setMessages(prev => {
+        const existingIndex = prev.findIndex(m => m.id === aiMessageId);
+        if (existingIndex >= 0) {
+          const updated = [...prev];
+          updated[existingIndex] = errorMessage;
+          return updated;
+        } else {
+          return [...prev, errorMessage];
+        }
+      });
+    }
   };
 
-  const generateAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes("iphone") || input.includes("apple")) {
-      return "Chúng tôi có nhiều mẫu iPhone mới nhất như iPhone 15 Pro Max, iPhone 15 Pro, iPhone 15. Bạn quan tâm đến model nào? Tôi có thể tư vấn chi tiết về tính năng và giá cả.";
-    }
-    
-    if (input.includes("samsung") || input.includes("galaxy")) {
-      return "Samsung Galaxy S24 series là những sản phẩm flagship mới nhất với camera 200MP, chip Snapdragon 8 Gen 3. Bạn muốn tìm hiểu về Galaxy S24 Ultra, S24+ hay S24?";
-    }
-    
-    if (input.includes("giá") || input.includes("price")) {
-      return "Chúng tôi có đa dạng mức giá từ 3-30 triệu đồng. Bạn có ngân sách bao nhiêu? Tôi sẽ gợi ý những sản phẩm phù hợp nhất.";
-    }
-    
-    if (input.includes("giảm giá") || input.includes("sale")) {
-      return "Hiện tại chúng tôi có nhiều chương trình khuyến mãi hấp dẫn! iPhone 15 Pro Max giảm 3 triệu, Samsung Galaxy S24 Ultra giảm 2 triệu. Bạn muốn xem chi tiết sản phẩm nào?";
-    }
-    
-    if (input.includes("mới") || input.includes("new")) {
-      return "Sản phẩm mới nhất của chúng tôi bao gồm iPhone 15 series, Samsung Galaxy S24 series, Xiaomi 14 series. Tất cả đều có thiết kế hiện đại và tính năng tiên tiến.";
-    }
-    
-    if (input.includes("camera") || input.includes("chụp ảnh")) {
-      return "Các sản phẩm flagship hiện tại đều có camera rất tốt. iPhone 15 Pro Max có camera 48MP, Samsung S24 Ultra có camera 200MP. Bạn ưu tiên chụp ảnh hay quay video?";
-    }
-    
-    if (input.includes("pin") || input.includes("battery")) {
-      return "Thời lượng pin của các sản phẩm mới đều được cải thiện đáng kể. iPhone 15 Pro Max có thể sử dụng cả ngày, Samsung S24 Ultra có pin 5000mAh. Bạn có nhu cầu sử dụng pin như thế nào?";
-    }
-    
-    if (input.includes("mua") || input.includes("order")) {
-      return "Để mua hàng, bạn có thể: 1) Thêm vào giỏ hàng và thanh toán online, 2) Đến cửa hàng để trải nghiệm trực tiếp, 3) Gọi hotline 1900-xxxx để đặt hàng. Bạn muốn mua sản phẩm nào?";
-    }
-    
-    return "Cảm ơn bạn đã liên hệ! Tôi có thể tư vấn về sản phẩm điện thoại, so sánh tính năng, giá cả, hoặc hướng dẫn mua hàng. Bạn cần hỗ trợ gì cụ thể?";
-  };
+  // Note: AI response is now handled by the streaming API in handleSendMessage
+  // The old generateAIResponse function has been replaced with real AI integration
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {

@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/context/authContext';
+import { validateRegisterForm } from '@/utils/validation';
+import toast from 'react-hot-toast';
 import styles from './auth.module.scss';
 
 const RegisterForm: React.FC = () => {
   const router = useRouter();
+  const { register, isLoading } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     username: "",
     password: "",
     confirmPassword: "",
+    phone: "",
+    dateOfBirth: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -22,16 +29,31 @@ const RegisterForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
+    // Validate form data
+    const validation = validateRegisterForm(formData);
+    
+    if (!validation.isValid) {
+      // Show first error
+      toast.error(validation.errors[0]);
       return;
     }
     
-    alert("Tính năng đăng ký sẽ được phát triển trong tương lai");
+    // Prepare data for API
+    const registerData = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      roleId: 1, // Default role for regular users
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formData.dateOfBirth,
+    };
+
+    await register(registerData);
   };
 
   const handleLogin = () => {
@@ -42,26 +64,40 @@ const RegisterForm: React.FC = () => {
     alert("Tính năng đăng ký Google sẽ được phát triển trong tương lai");
   };
 
-  const handleFacebookRegister = () => {
-    alert("Tính năng đăng ký Facebook sẽ được phát triển trong tương lai");
-  };
+
 
   return (
     <>
       {/* Registration Form */}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.inputGroup}>
-          <label htmlFor="fullName" className={styles.label}>
-            Họ và tên
+          <label htmlFor="firstName" className={styles.label}>
+            Tên
           </label>
           <input
             type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
             onChange={handleInputChange}
             className={styles.input}
-            placeholder="Nhập họ và tên"
+            placeholder="Nhập tên"
+            required
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label htmlFor="lastName" className={styles.label}>
+            Họ
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            className={styles.input}
+            placeholder="Nhập họ"
             required
           />
         </div>
@@ -94,6 +130,37 @@ const RegisterForm: React.FC = () => {
             onChange={handleInputChange}
             className={styles.input}
             placeholder="Nhập tên đăng nhập"
+            required
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label htmlFor="phone" className={styles.label}>
+            Số điện thoại
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleInputChange}
+            className={styles.input}
+            placeholder="Nhập số điện thoại"
+            required
+          />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label htmlFor="dateOfBirth" className={styles.label}>
+            Ngày sinh
+          </label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            name="dateOfBirth"
+            value={formData.dateOfBirth}
+            onChange={handleInputChange}
+            className={styles.input}
             required
           />
         </div>
@@ -148,8 +215,12 @@ const RegisterForm: React.FC = () => {
           </div>
         </div>
 
-        <button type="submit" className={styles.submitButton}>
-          Đăng ký
+        <button 
+          type="submit" 
+          className={styles.submitButton}
+          disabled={isLoading}
+        >
+          {isLoading ? "Đang đăng ký..." : "Đăng ký"}
         </button>
       </form>
 
@@ -167,15 +238,6 @@ const RegisterForm: React.FC = () => {
           >
             <span className={styles.socialIcon}>🔍</span>
             Google
-          </button>
-          
-          <button
-            type="button"
-            className={`${styles.socialButton} ${styles.facebook}`}
-            onClick={handleFacebookRegister}
-          >
-            <span className={styles.socialIcon}>📘</span>
-            Facebook
           </button>
         </div>
       </div>

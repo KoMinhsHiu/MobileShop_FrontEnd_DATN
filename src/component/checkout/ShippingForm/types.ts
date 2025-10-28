@@ -2,8 +2,7 @@ export interface ShippingInfo {
   fullName: string;
   phone: string;
   province: string;
-  district: string;
-  ward: string;
+  commune: string;
   address: string;
   note: string;
 }

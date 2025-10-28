@@ -8,5 +8,4 @@ export interface OrderSummaryData {
 export interface OrderSummaryProps {
   products: any[];
   orderSummary: OrderSummaryData;
-  onSubmitOrder: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }

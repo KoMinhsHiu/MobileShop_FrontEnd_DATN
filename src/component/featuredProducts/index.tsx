@@ -2,12 +2,31 @@ import React, { FC, useState } from "react";
 import Link from "next/link";
 import { featuredProducts, newProducts } from "@/const/mockData";
 import { CategoryProducts } from "@/utils/type";
+import { useFetchPhoneVariants } from "@/utils/hooks/api/useFetchPhoneVariants";
 import styles from "./featuredProducts.module.scss";
 
 const FeaturedProducts: FC = () => {
   const [activeTab, setActiveTab] = useState<'featured' | 'new'>('featured');
   
-  const currentProducts = activeTab === 'featured' ? featuredProducts : newProducts;
+  // Fetch featured products from API
+  const { data: featuredApiData } = useFetchPhoneVariants({
+    page: 1,
+    limit: 8,
+    order: 'rating_desc', // Featured products by rating
+  });
+
+  // Fetch new products from API
+  const { data: newApiData } = useFetchPhoneVariants({
+    page: 1,
+    limit: 8,
+    order: 'created_desc', // New products by creation date
+  });
+
+  // Use API data if available, otherwise fall back to mock data
+  const currentProducts = activeTab === 'featured' 
+    ? (featuredApiData?.products || featuredProducts)
+    : (newApiData?.products || newProducts);
+  
   const displayProducts = currentProducts.slice(0, 8); // Show first 8 products
 
   const formatPrice = (price: string) => {
@@ -45,82 +64,91 @@ const FeaturedProducts: FC = () => {
             </button>
           </div>
           <div className={styles.viewAllButtons}>
-            <Link href="/category/featured" className={styles.viewAllBtn}>
-              Xem tất cả
-            </Link>
-            <Link href="/category/all" className={styles.viewAllProductsBtn}>
+            <Link href="/products" className={styles.viewAllProductsBtn}>
               Tất cả sản phẩm
             </Link>
           </div>
         </div>
 
         <div className={styles.productsGrid}>
-          {displayProducts.map((product) => (
-            <div key={product.id_product} className={styles.productCard}>
-              <Link href={`/product/${product.id_product}`} className={styles.productLink}>
-                <div className={styles.imageContainer}>
-                  <img
-                    src={product.cover.url}
-                    alt={product.name}
-                    className={styles.productImage}
-                  />
-                  {product.discount_amount > 0 && (
-                    <div className={styles.discountBadge}>
-                      -{Math.round((product.discount_amount / parseInt(product.price.replace(/\./g, ''))) * 100)}%
-                    </div>
-                  )}
-                  {activeTab === 'new' && (
-                    <div className={styles.newBadge}>Mới</div>
-                  )}
-                </div>
-                
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productName}>{product.name}</h3>
-                  
-                  <div className={styles.rating}>
-                    <div className={styles.stars}>
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={`${styles.star} ${
-                            i < Math.floor(parseFloat(product.rate)) ? styles.filled : ''
-                          }`}
-                        >
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                    <span className={styles.ratingText}>({product.rate})</span>
-                  </div>
-                  
-                  <div className={styles.priceContainer}>
-                    {product.discount_amount > 0 ? (
-                      <>
-                        <span className={styles.discountPrice}>
-                          {calculateDiscountPrice(product.price, product.discount_amount)}
-                        </span>
-                        <span className={styles.originalPrice}>
-                          {formatPrice(product.price)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className={styles.price}>
-                        {formatPrice(product.price)}
-                      </span>
+          {displayProducts.map((product) => {
+            // Handle both API data format and mock data format
+            const isApiData = 'id' in product;
+            const productId = isApiData ? product.id : product.id_product;
+            const productName = product.name;
+            const productPrice = isApiData ? product.price : product.price;
+            const productImage = isApiData ? product.image : product.cover.url;
+            const productRate = isApiData ? product.rate : parseFloat(product.rate);
+            const productQuantity = isApiData ? parseInt(product.quantity) : product.quantity;
+            const discountAmount = isApiData ? 0 : product.discount_amount;
+
+            return (
+              <div key={productId} className={styles.productCard}>
+                <Link href={`/product/${productId}`} className={styles.productLink}>
+                  <div className={styles.imageContainer}>
+                    <img
+                      src={productImage}
+                      alt={productName}
+                      className={styles.productImage}
+                    />
+                    {discountAmount > 0 && (
+                      <div className={styles.discountBadge}>
+                        -{Math.round((discountAmount / parseInt(productPrice.replace(/\./g, ''))) * 100)}%
+                      </div>
+                    )}
+                    {activeTab === 'new' && (
+                      <div className={styles.newBadge}>Mới</div>
                     )}
                   </div>
                   
-                  <div className={styles.stockInfo}>
-                    {product.quantity > 0 ? (
-                      <span className={styles.inStock}>Còn {product.quantity} sản phẩm</span>
-                    ) : (
-                      <span className={styles.outOfStock}>Hết hàng</span>
-                    )}
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productName}>{productName}</h3>
+                    
+                    <div className={styles.rating}>
+                      <div className={styles.stars}>
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={`${styles.star} ${
+                              i < Math.floor(productRate) ? styles.filled : ''
+                            }`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <span className={styles.ratingText}>({productRate})</span>
+                    </div>
+                    
+                    <div className={styles.priceContainer}>
+                      {discountAmount > 0 ? (
+                        <>
+                          <span className={styles.discountPrice}>
+                            {calculateDiscountPrice(productPrice, discountAmount)}
+                          </span>
+                          <span className={styles.originalPrice}>
+                            {formatPrice(productPrice)}
+                          </span>
+                        </>
+                      ) : (
+                        <span className={styles.price}>
+                          {formatPrice(productPrice)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className={styles.stockInfo}>
+                      {productQuantity > 0 ? (
+                        <span className={styles.inStock}>Còn {productQuantity} sản phẩm</span>
+                      ) : (
+                        <span className={styles.outOfStock}>Hết hàng</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

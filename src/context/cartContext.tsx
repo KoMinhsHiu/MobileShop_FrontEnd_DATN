@@ -3,7 +3,10 @@ import toast from "react-hot-toast";
 import { CardAPI } from "@/const/endPoint";
 import { CartTransformer } from "@/utils/api/transformer/cart";
 import { getData } from "@/utils/api/fetchData/apiCall";
-import { CartContextType, AddToCartItem, RemoveFromCart } from "@/utils/type";
+import { CartContextType, AddToCartItem, AddToCartApiItem, RemoveFromCart } from "@/utils/type";
+import { cartAPI, AddToCartRequest, CartApiError } from "@/utils/api/cart";
+import { useAuth } from "./authContext";
+import { useFetchCart } from "@/utils/hooks/api/useFetchCart";
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -15,123 +18,44 @@ export const useCart = () => {
   return context;
 };
 
-// Mock data for testing UI/UX
-const mockCartData = {
-  totalProduct: 8,
-  products: [
-    {
-      id: "1",
-      productAttributeId: "11",
-      quantity: 2,
-      name: "iPhone 15 Pro Max",
-      image: "/images/brands/Apple.jpg",
-      price: "29,990,000₫",
-      attributes: {
-        "Màu sắc": "Titan Tự nhiên",
-        "Dung lượng": "256GB"
-      }
-    },
-    {
-      id: "2", 
-      productAttributeId: "22",
-      quantity: 1,
-      name: "Samsung Galaxy S24 Ultra",
-      image: "/images/brands/Samsung.avif",
-      price: "26,990,000₫",
-      attributes: {
-        "Màu sắc": "Titanium Gray",
-        "Dung lượng": "512GB"
-      }
-    },
-    {
-      id: "3",
-      productAttributeId: "33", 
-      quantity: 3,
-      name: "Xiaomi 14 Pro",
-      image: "/images/brands/Xiaomi.jpg",
-      price: "18,990,000₫",
-      attributes: {
-        "Màu sắc": "Đen",
-        "Dung lượng": "256GB"
-      }
-    },
-    {
-      id: "4",
-      productAttributeId: "44",
-      quantity: 1,
-      name: "OnePlus 12",
-      image: "/images/brands/Oneplus.jpg",
-      price: "22,990,000₫",
-      attributes: {
-        "Màu sắc": "Flowy Emerald",
-        "Dung lượng": "512GB",
-        "RAM": "16GB"
-      }
-    },
-    {
-      id: "5",
-      productAttributeId: "55",
-      quantity: 4,
-      name: "OPPO Find X7",
-      image: "/images/brands/Oppo.jpg",
-      price: "15,990,000₫",
-      attributes: {
-        "Màu sắc": "Ocean Blue",
-        "Dung lượng": "256GB"
-      }
-    },
-    {
-      id: "6",
-      productAttributeId: "66",
-      quantity: 1,
-      name: "Realme GT 5 Pro",
-      image: "/images/brands/Realme.jpg",
-      price: "12,990,000₫",
-      attributes: {
-        "Màu sắc": "Snapdragon White",
-        "Dung lượng": "256GB",
-        "RAM": "12GB"
-      }
-    },
-    {
-      id: "7",
-      productAttributeId: "77",
-      quantity: 2,
-      name: "Vivo X100 Pro",
-      image: "/images/brands/Vivo.jpg",
-      price: "24,990,000₫",
-      attributes: {
-        "Màu sắc": "Asteroid Black",
-        "Dung lượng": "512GB"
-      }
-    },
-    {
-      id: "8",
-      productAttributeId: "88",
-      quantity: 1,
-      name: "Huawei Mate 60 Pro",
-      image: "/images/brands/Huawei.jpg",
-      price: "28,990,000₫",
-      attributes: {
-        "Màu sắc": "Space Black",
-        "Dung lượng": "512GB",
-        "Kết nối": "5G"
-      }
-    }
-  ]
-};
+// Removed mock data - use real API data only
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // Initialize with mock data immediately
-  const [cart, setCart] = useState<any>(mockCartData);
+  // Initialize with null - wait for API data
+  const [cart, setCart] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
 
+  // Fetch cart data from API when authenticated
+  const { data: apiCartData, isLoading: isApiLoading, refetch: refetchCart } = useFetchCart();
+
+  // Update cart when API data changes
   useEffect(() => {
-    // Initialize with mock data for development
-    setCart(mockCartData);
-  }, []);
+    if (apiCartData && isAuthenticated && typeof apiCartData === 'object' && apiCartData !== null && 'items' in apiCartData) {
+      // Transform API cart data to match existing cart structure
+      const transformedCart = {
+        totalProduct: (apiCartData as any).items.length,
+        products: (apiCartData as any).items.map((item: any) => ({
+          id: item.variant.id.toString(),
+          productAttributeId: item.variant.id,
+          quantity: item.quantity,
+          name: `${item.variant.name} ${item.variant.variantName}`,
+          image: item.variant.imageUrl || "/images/brands/Apple.jpg",
+          price: `${item.price.toLocaleString('vi-VN')}₫`,
+          attributes: {
+            "Màu sắc": item.variant.color,
+            "Số lượng": item.quantity.toString()
+          }
+        }))
+      };
+      setCart(transformedCart);
+    } else if (isAuthenticated && apiCartData && (apiCartData as any).items?.length === 0) {
+      // Empty cart from API
+      setCart({ totalProduct: 0, products: [] });
+    }
+  }, [apiCartData, isAuthenticated]);
 
   const addToCart = useCallback(async (item: AddToCartItem) => {
     setIsLoading(true);
@@ -146,6 +70,75 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsLoading(false);
     }
   }, []);
+
+  const addToCartApi = useCallback(async (item: AddToCartApiItem) => {
+    if (!isAuthenticated) {
+      toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await cartAPI.addToCart(item);
+      
+      if (response.status === 200) {
+        toast.success(response.message || "Đã thêm vào giỏ hàng thành công");
+        // Refresh cart data from API
+        refetchCart();
+      } else {
+        toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
+      }
+    } catch (error: any) {
+      console.error('Add to cart error:', error);
+      console.log('Error details:', {
+        status: error.status,
+        statusCode: error.statusCode,
+        message: error.message,
+        response: error.response
+      });
+      
+      if (error.status === 404 || error.statusCode === 404) {
+        // API endpoint not implemented yet - use fallback
+        console.log('Cart API not implemented, using fallback logic');
+        toast.success("Đã thêm vào giỏ hàng (Demo mode - API chưa được implement)");
+        
+        // Simulate adding to cart with mock data
+        if (cart?.products) {
+          const mockCartItem = {
+            id: item.variantId.toString(),
+            productAttributeId: item.variantId,
+            quantity: item.quantity,
+            name: `Phone Variant ${item.variantId}`,
+            image: "/images/brands/Apple.jpg",
+            price: `${item.price.toLocaleString('vi-VN')}₫`,
+            attributes: {
+              "Màu sắc": `Color ID: ${item.colorId}`,
+              "Số lượng": item.quantity.toString()
+            }
+          };
+          
+          setCart({
+            ...cart,
+            products: [...cart.products, mockCartItem],
+            totalProduct: cart.products.length + 1
+          });
+        }
+      } else if (error.status === 401 || error.statusCode === 401) {
+        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
+        // TODO: Redirect to login
+      } else if (error.status === 400 || error.statusCode === 400) {
+        const errorMessage = error.message || "Dữ liệu không hợp lệ";
+        toast.error(errorMessage);
+      } else if (error.status === 503 || error.statusCode === 503) {
+        toast.error("Dịch vụ tạm thời không khả dụng. Vui lòng thử lại sau");
+      } else {
+        toast.error(error.message || "Có lỗi xảy ra khi thêm vào giỏ hàng");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, cart, refetchCart]);
 
   const removeFromCart = useCallback(async (item: RemoveFromCart) => {
     setIsLoading(true);
@@ -202,7 +195,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, isLoading }}
+      value={{ cart, addToCart, addToCartApi, removeFromCart, updateQuantity, isLoading: isLoading || isApiLoading }}
     >
       {children}
     </CartContext.Provider>

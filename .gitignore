@@ -36,3 +36,25 @@ yarn-error.log*
 next-env.d.ts
 
 .idea/
+
+# Documentation and debug files
+*_API_*.md
+*_DEBUG*.md
+*_FIX*.md
+*_INTEGRATION*.md
+*_FLOW*.md
+*_PROCESSING.md
+*_AUTO_*.md
+*_REMOVAL.md
+*_REDIRECT*.md
+*_DECODE*.md
+*_SYNC.md
+/src/pages/debug-*.tsx
+/src/pages/test-*.tsx
+/src/pages/admin/test-*.tsx
+/src/utils/api/testLocations.ts
+/src/utils/api/fetchData/testApi.ts
+/src/utils/api/fetchData/testTransformer.ts
+/src/utils/api/fetchData/debugApi.ts
+/src/component/admin/products/ColorTestComponent.tsx
+/src/component/admin/products/InventoryTestComponent.tsx

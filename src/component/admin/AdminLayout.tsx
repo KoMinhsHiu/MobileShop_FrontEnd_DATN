@@ -7,16 +7,64 @@ import {
   faChevronDown,
   faSignOutAlt,
   faUser,
-  faCog
+  faCog,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { MENU_ITEMS, NOTIFICATIONS } from './admin.constants';
 import { AdminLayoutProps } from './admin.types';
+import { useAuth } from '@/context/authContext';
+import { useToast } from '@/component/common/ToastContainer';
 import styles from './AdminLayout.module.scss';
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/admin' }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { logout } = useAuth();
+  const { showSuccess, showError, ToastContainer } = useToast();
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent multiple clicks
+    
+    setIsLoggingOut(true);
+    setProfileMenuOpen(false); // Close profile menu
+    
+    try {
+      // Use AuthContext logout function
+      await logout();
+      
+      // Show success message
+      showSuccess('Đăng xuất thành công!');
+      
+      // Clear all storage immediately before redirect
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Use window.location.replace to avoid history issues
+      setTimeout(() => {
+        window.location.replace('/LoginSignup');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Logout failed:', error);
+      
+      // Show error message to user
+      showError('Đăng xuất thất bại. Vui lòng thử lại.');
+      
+      // Clear all storage immediately before redirect
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Redirect to login page anyway
+      setTimeout(() => {
+        window.location.replace('/LoginSignup');
+      }, 2000);
+      
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div className={styles.adminLayout}>
@@ -72,7 +120,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
                 className={styles.notificationBtn}
                 onClick={() => setNotificationOpen(!notificationOpen)}
               >
-                <FontAwesomeIcon icon={faBell} />
+                <FontAwesomeIcon icon={faBell} className={styles.bellIcon} />
                 <span className={styles.notificationBadge}>{NOTIFICATIONS.length}</span>
               </button>
               
@@ -122,9 +170,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
                     <FontAwesomeIcon icon={faCog} />
                     Cài đặt
                   </a>
-                  <button className={styles.menuItem}>
-                    <FontAwesomeIcon icon={faSignOutAlt} />
-                    Đăng xuất
+                  <button 
+                    className={styles.menuItem}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? (
+                      <FontAwesomeIcon icon={faSpinner} className={styles.spinner} />
+                    ) : (
+                      <FontAwesomeIcon icon={faSignOutAlt} />
+                    )}
+                    {isLoggingOut ? 'Đang đăng xuất...' : 'Đăng xuất'}
                   </button>
                 </div>
               )}
@@ -145,6 +201,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 };

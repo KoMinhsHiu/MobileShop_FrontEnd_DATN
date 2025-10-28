@@ -9,7 +9,9 @@ import {
   faClock,
   faTruck,
   faCheckCircle,
-  faTimesCircle
+  faTimesCircle,
+  faMobileAlt,
+  faLayerGroup
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   MenuItem, 
@@ -23,7 +25,8 @@ import {
 
 export const MENU_ITEMS: MenuItem[] = [
   { icon: faTachometerAlt, label: 'Dashboard', href: '/admin', active: false },
-  { icon: faBox, label: 'Quản lý sản phẩm', href: '/admin/products', active: false },
+  { icon: faBox, label: 'Quản lý biến thể điện thoại', href: '/admin/products', active: false },
+  { icon: faLayerGroup, label: 'Quản lý dòng điện thoại', href: '/admin/phone-lines', active: false },
   { icon: faShoppingCart, label: 'Quản lý đơn hàng', href: '/admin/orders', active: false },
   { icon: faUsers, label: 'Quản lý khách hàng', href: '/admin/customers', active: false },
   { icon: faChartBar, label: 'Thống kê doanh thu', href: '/admin/reports', active: false },

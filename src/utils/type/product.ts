@@ -6,6 +6,8 @@ export interface Product {
   disconnect: string;
   quantity: string;
   rate: number;
+  color?: string;
+  colorId?: number | null;
 }
 
 export interface ProductOptions {
@@ -62,4 +64,9 @@ export interface ProductType {
   shortDescription?: string;
   id: string;
   productAttributeId: number;
+  specifications?: { label: string; value: string }[];
+  reviews?: { name: string; rating: number; comment: string; date: string }[];
+  averageRating?: number;
+  brand?: string;
+  category?: string;
 }

@@ -115,6 +115,29 @@ export interface ProductVariant {
   images?: (File | string)[];
 }
 
+// New Variant Schema Types
+export interface VariantColor {
+  colorId: number;
+  imageUrl: string;
+}
+
+export interface VariantSpecification {
+  specId: number;
+  info: string;
+  unit?: string;
+}
+
+export interface VariantFormData {
+  phoneId: number;
+  variantName: string;
+  description: string;
+  colors: VariantColor[];
+  price: number;
+  discountPercent?: number;
+  images?: string[];
+  specifications: VariantSpecification[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -123,6 +146,8 @@ export interface Product {
   supplier: string;
   status: 'visible' | 'hidden';
   mainImage: string;
+  color?: string;
+  colorId?: number | null;
   variants: ProductVariant[];
   createdAt: string;
   updatedAt: string;

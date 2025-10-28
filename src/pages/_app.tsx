@@ -14,6 +14,7 @@ import "./../../i18n";
 import { useRouter } from "next/router";
 import { QueryClientProvider, HydrationBoundary } from "@tanstack/react-query";
 import { queryClient } from "@/const/queryClient";
+import "@/lib/fontawesome";
 
 const inter = Raleway({ subsets: ["latin"] });
 
@@ -38,6 +39,19 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     // Check if it's an admin page
     if (router.pathname.startsWith('/admin')) {
       return page;
+    }
+    
+    // Check if it's the products page - don't wrap in container
+    if (router.pathname === '/products') {
+      return (
+        <main className={inter.className}>
+          <Header />
+          {page}
+          <NavigationBar />
+          <Footer />
+          <ChatbotPopup />
+        </main>
+      );
     }
     
     return (

@@ -2,10 +2,11 @@ import React from 'react';
 import Head from 'next/head';
 import AdminLayout from '../../component/admin/AdminLayout';
 import CustomerManagement from '../../component/admin/customers/CustomerManagement';
+import AdminGuard from '@/component/auth/AdminGuard';
 
 const AdminCustomersPage: React.FC = () => {
   return (
-    <>
+    <AdminGuard>
       <Head>
         <title>Quản lý khách hàng - Admin Dashboard</title>
         <meta name="description" content="Quản lý khách hàng trong hệ thống admin" />
@@ -16,7 +17,7 @@ const AdminCustomersPage: React.FC = () => {
       <AdminLayout currentPage="/admin/customers">
         <CustomerManagement />
       </AdminLayout>
-    </>
+    </AdminGuard>
   );
 };
 

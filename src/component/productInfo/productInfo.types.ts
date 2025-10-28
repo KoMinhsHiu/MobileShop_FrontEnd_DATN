@@ -15,4 +15,5 @@ export interface productInfoProps {
   shortDescription?: string;
   specifications?: Specification[];
   productAttributeId: number;
+  onDebugInfo?: (info: any) => void;
 }

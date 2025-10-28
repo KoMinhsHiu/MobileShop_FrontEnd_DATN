@@ -6,4 +6,5 @@ export type FilterProps = {
   setFilterQuery: (value: string) => void;
   isOpenFilter: boolean;
   setIsOpenFilter: (Value: boolean) => void;
+  onAdvancedFiltersChange?: (filters: any) => void;
 };

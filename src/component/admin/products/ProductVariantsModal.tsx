@@ -24,6 +24,13 @@ const ProductVariantsModal: React.FC<ProductVariantsModalProps> = ({
     }).format(price);
   };
 
+  const getStockClass = (quantity: number) => {
+    if (quantity === 0) return styles.stockEmpty;
+    if (quantity < 10) return styles.stockLow;
+    if (quantity < 50) return styles.stockMedium;
+    return styles.stockHigh;
+  };
+
   const getStatusClass = (quantity: number) => {
     return quantity > 0 ? styles.inStock : styles.outOfStock;
   };
@@ -118,7 +125,11 @@ const ProductVariantsModal: React.FC<ProductVariantsModalProps> = ({
                       </td>
                       <td className={styles.storage}>{variant.storage}</td>
                       <td className={styles.price}>{formatPrice(variant.price)}</td>
-                      <td className={styles.quantity}>{variant.quantity}</td>
+                      <td className={styles.quantity}>
+                        <span className={`${styles.stockBadge} ${getStockClass(variant.quantity)}`}>
+                          {variant.quantity}
+                        </span>
+                      </td>
                       <td>
                         <span className={`${styles.status} ${getStatusClass(variant.quantity)}`}>
                           {getStatusText(variant.quantity)}
@@ -138,31 +149,9 @@ const ProductVariantsModal: React.FC<ProductVariantsModalProps> = ({
 
           <div className={styles.summary}>
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Tổng số biến thể:</span>
-              <span className={styles.summaryValue}>{product.variants.length}</span>
-            </div>
-            <div className={styles.summaryItem}>
               <span className={styles.summaryLabel}>Tổng số lượng tồn:</span>
               <span className={styles.summaryValue}>
                 {product.variants.reduce((sum, variant) => sum + variant.quantity, 0)}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Giá từ:</span>
-              <span className={styles.summaryValue}>
-                {product.variants.length > 0 
-                  ? formatPrice(Math.min(...product.variants.map(v => v.price)))
-                  : 'N/A'
-                }
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Giá đến:</span>
-              <span className={styles.summaryValue}>
-                {product.variants.length > 0 
-                  ? formatPrice(Math.max(...product.variants.map(v => v.price)))
-                  : 'N/A'
-                }
               </span>
             </div>
           </div>

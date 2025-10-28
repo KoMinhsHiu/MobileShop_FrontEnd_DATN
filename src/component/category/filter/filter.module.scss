@@ -29,6 +29,8 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: 500;
+      max-width: 200px;
+      word-wrap: break-word;
       
       .removeFilterBtn {
         background: none;
@@ -43,6 +45,7 @@
         align-items: center;
         justify-content: center;
         font-size: 10px;
+        flex-shrink: 0;
         
         &:hover {
           background-color: rgba(255, 255, 255, 0.2);
@@ -109,17 +112,7 @@
     min-width: 170px;
   }
 }
-.filterBox {
-  width: calc(100vh - 100px);
-  overflow: scroll;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-  }
-}
+
 // Modal Header
 .modalHeader {
   display: flex;
@@ -137,6 +130,18 @@
   }
 }
 
+// Modal Body
+.modalBody {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  margin: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 2;
+}
+
 // Filter Column Header
 .filterHeader {
   display: flex;
@@ -151,47 +156,8 @@
     color: #333;
     margin: 0;
   }
-  
-  .priceFilterLabel {
-    font-size: 12px;
-    color: #28a745;
-    background-color: #d4edda;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 500;
-    align-self: flex-start;
-  }
-  
-  .colorFilterLabel {
-    font-size: 12px;
-    color: #6f42c1;
-    background-color: #e2d9f3;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 500;
-    align-self: flex-start;
-  }
-  
-  .brandFilterLabel {
-    font-size: 12px;
-    color: #fd7e14;
-    background-color: #ffeaa7;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 500;
-    align-self: flex-start;
-  }
-  
-  .storageFilterLabel {
-    font-size: 12px;
-    color: #20c997;
-    background-color: #d1ecf1;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-weight: 500;
-    align-self: flex-start;
-  }
 }
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -201,20 +167,14 @@
     width: 48%;
   }
 }
-.clearFilter {
-  width: 100px;
-  height: 50px;
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  background-color: #2ba0d0;
-  color: #fff;
+
+// Placeholder for advanced filters
+.placeholder {
+  padding: 20px;
   text-align: center;
-  border: none;
-  border-radius: 16px;
-  font-size: 16px;
-  @media screen and (max-width: 768px) {
-    position: static;
-    margin: 15px 0;
-  }
+  background-color: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  color: #6c757d;
+  font-style: italic;
 }

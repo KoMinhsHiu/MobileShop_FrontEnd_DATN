@@ -7,14 +7,30 @@ import { ProductPageProps } from "@/utils/type";
 import { ProductTransformer } from "@/utils/api/transformer/product";
 import ProductPlaceholder from "./placeholder";
 import { useFetchProductData } from "@/utils/hooks/api/useFetchProductData";
+import { useFetchPhoneVariantDetail } from "@/utils/hooks/api/useFetchPhoneVariantDetail";
 import MetaTags from "@/component/metaTags";
 import { MegaMenuTransformer } from "@/utils/api/transformer/megaMenu";
 
 const ProductPage: FC<ProductPageProps> = ({ initialProduct, productId }) => {
-  const { data: product, isLoading } = useFetchProductData({
+  // Try to parse productId as variantId (number)
+  const variantId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+  const isValidVariantId = !isNaN(variantId) && variantId > 0;
+
+  // Use new phone variant API if productId is a valid number
+  const { data: phoneVariant, isLoading: isPhoneVariantLoading } = useFetchPhoneVariantDetail({
+    variantId: isValidVariantId ? variantId : 0,
+    initialData: initialProduct,
+  });
+
+  // Fallback to old product API if productId is not a valid number
+  const { data: product, isLoading: isProductLoading } = useFetchProductData({
     productId,
     initialProduct,
   });
+
+  // Determine which data to use
+  const currentProduct = isValidVariantId ? phoneVariant : product;
+  const isLoading = isValidVariantId ? isPhoneVariantLoading : isProductLoading;
 
   if (isLoading) {
     return <ProductPlaceholder />;
@@ -22,8 +38,8 @@ const ProductPage: FC<ProductPageProps> = ({ initialProduct, productId }) => {
 
   return (
     <>
-      <MetaTags title={product?.title} />
-      {product && <ProductDetails product={product} />}
+      <MetaTags title={currentProduct?.title} />
+      {currentProduct && <ProductDetails product={currentProduct} />}
     </>
   );
 };
@@ -31,13 +47,28 @@ const ProductPage: FC<ProductPageProps> = ({ initialProduct, productId }) => {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const productId = context.query.slug;
   const referer = context.req.headers.referer || null;
+  
+  // Try to parse productId as variantId (number)
+  const variantId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
+  const isValidVariantId = !isNaN(variantId) && variantId > 0;
+  
   if (!referer) {
-    const productData =
-      productId && (await getData(ProductDetailAPI, { product_id: productId }));
-    const data = ProductTransformer(productData);
+    let initialProduct = null;
+    
+    // For now, let's skip server-side phone variant API and let client-side handle it
+    // This avoids potential issues with axios in server-side rendering
+    if (isValidVariantId) {
+      // Don't fetch phone variant data on server-side, let client-side handle it
+      initialProduct = null;
+    } else {
+      // Use old API for non-numeric productIds
+      const productData = productId && (await getData(ProductDetailAPI, { product_id: productId }));
+      initialProduct = ProductTransformer(productData);
+    }
+    
     const megaMenuData = await getData(MegaMenuAPI);
     const menu = MegaMenuTransformer(megaMenuData).menuItems;
-    return { props: { initialProduct: data, productId, menu } };
+    return { props: { initialProduct, productId, menu } };
   }
   return { props: { initialProduct: null, productId } };
 }

@@ -46,14 +46,26 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
 
         {/* Personal Info Form */}
         <div className={styles.formGroup}>
-          <label htmlFor="fullName">Họ tên *</label>
+          <label htmlFor="firstName">Tên *</label>
           <input
             type="text"
-            id="fullName"
-            value={personalInfo.fullName}
-            onChange={(e) => onFieldChange('fullName', e.target.value)}
+            id="firstName"
+            value={personalInfo.firstName}
+            onChange={(e) => onFieldChange('firstName', e.target.value)}
             className={styles.input}
-            placeholder="Nhập họ tên của bạn"
+            placeholder="Nhập tên của bạn"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="lastName">Họ *</label>
+          <input
+            type="text"
+            id="lastName"
+            value={personalInfo.lastName}
+            onChange={(e) => onFieldChange('lastName', e.target.value)}
+            className={styles.input}
+            placeholder="Nhập họ của bạn"
           />
         </div>
 
@@ -81,6 +93,29 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
             className={styles.input}
             placeholder="Nhập số điện thoại"
           />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="dateOfBirth">Ngày sinh</label>
+          <input
+            type="date"
+            id="dateOfBirth"
+            value={personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toISOString().split('T')[0] : ''}
+            onChange={(e) => onFieldChange('dateOfBirth', e.target.value)}
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="pointsBalance">Điểm tích lũy</label>
+          <input
+            type="text"
+            id="pointsBalance"
+            value={personalInfo.pointsBalance?.toLocaleString() || '0'}
+            className={`${styles.input} ${styles.disabled}`}
+            disabled
+          />
+          <small className={styles.helpText}>Điểm tích lũy không thể thay đổi</small>
         </div>
 
         <div className={styles.formGroup}>

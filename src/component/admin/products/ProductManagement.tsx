@@ -12,112 +12,51 @@ import {
   faSortUp,
   faSortDown,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { Product, ProductFilters, ProductFormData, PaginationInfo } from '../admin.types';
 import ProductForm from './ProductForm';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import ProductVariantsModal from './ProductVariantsModal';
+import { useFetchPhoneVariants } from '@/utils/hooks/api/useFetchPhoneVariants';
+import { PhoneVariantsParams } from '@/utils/type/phoneVariant';
 import styles from './ProductManagement.module.scss';
 
-// Mock data - trong thực tế sẽ fetch từ API
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'iPhone 15 Pro Max',
-    description: 'iPhone 15 Pro Max với chip A17 Pro mạnh mẽ',
-    category: 'Điện thoại',
-    supplier: 'Apple',
-    status: 'visible',
-    mainImage: '/images/products/iphone15.jpg',
+// Helper function to transform API data to admin Product format
+const transformApiDataToAdminProduct = (apiProduct: any): Product => {
+  // Use the quantity that was already calculated by PhoneVariantTransformer
+  const totalStock = parseInt(apiProduct.quantity) || 0;
+
+  // Determine status based on stock quantity
+  const status = totalStock > 0 ? 'visible' : 'hidden';
+  
+  console.log(`[Admin] Product ${apiProduct.id} total stock:`, totalStock, 'Status:', status);
+
+  return {
+    id: apiProduct.id,
+    name: apiProduct.name,
+    description: apiProduct.description || 'Không có mô tả',
+    category: apiProduct.category || 'Điện thoại',
+    supplier: apiProduct.brand || 'Không xác định',
+    status: status,
+    mainImage: apiProduct.image || '/images/placeholder.png',
+    color: apiProduct.color || 'Không xác định',
+    colorId: apiProduct.colorId || null,
     variants: [
-      { 
-        id: '1-1', 
-        color: 'Titan Xanh', 
-        storage: '256GB', 
-        price: 29990000, 
-        quantity: 20, 
-        images: [
-          '/images/products/iphone15-blue-1.jpg',
-          '/images/products/iphone15-blue-2.jpg',
-          '/images/products/iphone15-blue-3.jpg'
-        ]
-      },
-      { 
-        id: '1-2', 
-        color: 'Titan Trắng', 
-        storage: '512GB', 
-        price: 33990000, 
-        quantity: 15, 
-        images: [
-          '/images/products/iphone15-white-1.jpg',
-          '/images/products/iphone15-white-2.jpg'
-        ]
-      },
-      { 
-        id: '1-3', 
-        color: 'Titan Đen', 
-        storage: '1TB', 
-        price: 37990000, 
-        quantity: 10, 
-        images: [
-          '/images/products/iphone15-black-1.jpg'
-        ]
+      {
+        id: `${apiProduct.id}-1`,
+        color: apiProduct.color || 'Mặc định',
+        storage: '128GB',
+        price: parseFloat(apiProduct.price.replace(/[^\d]/g, '')) || 0,
+        quantity: totalStock,
+        images: [apiProduct.image || '/images/placeholder.png']
       }
     ],
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Samsung Galaxy S24 Ultra',
-    description: 'Samsung Galaxy S24 Ultra với camera 200MP',
-    category: 'Điện thoại',
-    supplier: 'Samsung',
-    status: 'visible',
-    mainImage: '/images/products/samsung-s24.jpg',
-    variants: [
-      { 
-        id: '2-1', 
-        color: 'Titan Đen', 
-        storage: '256GB', 
-        price: 25990000, 
-        quantity: 25, 
-        images: [
-          '/images/products/samsung-s24-black-1.jpg',
-          '/images/products/samsung-s24-black-2.jpg'
-        ]
-      },
-      { 
-        id: '2-2', 
-        color: 'Titan Vàng', 
-        storage: '512GB', 
-        price: 28990000, 
-        quantity: 18,
-        images: [
-          '/images/products/samsung-s24-gold-1.jpg'
-        ]
-      }
-    ],
-    createdAt: '2024-01-02',
-    updatedAt: '2024-01-14'
-  },
-  {
-    id: '3',
-    name: 'MacBook Pro M3',
-    description: 'MacBook Pro với chip M3 mạnh mẽ',
-    category: 'Laptop',
-    supplier: 'Apple',
-    status: 'hidden',
-    mainImage: '/images/products/macbook-pro.jpg',
-    variants: [
-      { id: '3-1', color: 'Xám Space', storage: '512GB', price: 45990000, quantity: 8 },
-      { id: '3-2', color: 'Bạc', storage: '1TB', price: 51990000, quantity: 5 }
-    ],
-    createdAt: '2024-01-03',
-    updatedAt: '2024-01-13'
-  }
-];
+    createdAt: new Date().toISOString().split('T')[0],
+    updatedAt: new Date().toISOString().split('T')[0]
+  };
+};
 
 const CATEGORIES = [
   'Tất cả',
@@ -139,8 +78,6 @@ const SUPPLIERS = [
 ];
 
 const ProductManagement: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(MOCK_PRODUCTS);
   const [filters, setFilters] = useState<ProductFilters>({
     search: '',
     category: 'Tất cả',
@@ -162,66 +99,34 @@ const ProductManagement: React.FC = () => {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
-  // Filter and sort products
+  // Prepare API parameters
+  const apiParams: PhoneVariantsParams = {
+    page: pagination.currentPage,
+    limit: pagination.itemsPerPage,
+    order: filters.sortOrder,
+    search: filters.search || undefined,
+    brand: filters.supplier !== 'Tất cả' ? filters.supplier : undefined,
+    sort: filters.sortBy === 'createdAt' ? 'name' : filters.sortBy,
+  };
+
+  // Fetch data from API
+  const { data: apiData, isLoading, error } = useFetchPhoneVariants(apiParams);
+
+  // Transform API data to admin format
+  const products = (apiData as any)?.products?.map(transformApiDataToAdminProduct) || [];
+  const filteredProducts = products; // API already handles filtering
+
+  // Update pagination from API response
   useEffect(() => {
-    let filtered = products;
-
-    // Search filter
-    if (filters.search) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(filters.search.toLowerCase())
-      );
+    if (apiData && typeof apiData === 'object' && 'currentPage' in apiData) {
+      setPagination(prev => ({
+        ...prev,
+        currentPage: (apiData as any).currentPage || 1,
+        totalPages: (apiData as any).totalPages || 1,
+        totalItems: (apiData as any).totalProducts || 0
+      }));
     }
-
-    // Category filter
-    if (filters.category !== 'Tất cả') {
-      filtered = filtered.filter(product => product.category === filters.category);
-    }
-
-    // Supplier filter
-    if (filters.supplier !== 'Tất cả') {
-      filtered = filtered.filter(product => product.supplier === filters.supplier);
-    }
-
-    // Status filter
-    if (filters.status !== 'Tất cả') {
-      const statusValue = filters.status === 'Hiển thị' ? 'visible' : 'hidden';
-      filtered = filtered.filter(product => product.status === statusValue);
-    }
-
-    // Sort products
-    filtered.sort((a, b) => {
-      let aValue: any, bValue: any;
-      
-      if (filters.sortBy === 'createdAt') {
-        aValue = new Date(a.createdAt).getTime();
-        bValue = new Date(b.createdAt).getTime();
-      } else if (filters.sortBy === 'quantity') {
-        aValue = a.variants.reduce((sum, variant) => sum + variant.quantity, 0);
-        bValue = b.variants.reduce((sum, variant) => sum + variant.quantity, 0);
-      }
-
-      if (filters.sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
-      } else {
-        return aValue < bValue ? 1 : -1;
-      }
-    });
-
-    // Update pagination
-    const totalItems = filtered.length;
-    const totalPages = Math.ceil(totalItems / pagination.itemsPerPage);
-    const startIndex = (pagination.currentPage - 1) * pagination.itemsPerPage;
-    const endIndex = startIndex + pagination.itemsPerPage;
-    const paginatedProducts = filtered.slice(startIndex, endIndex);
-
-    setFilteredProducts(paginatedProducts);
-    setPagination(prev => ({
-      ...prev,
-      totalItems,
-      totalPages
-    }));
-  }, [products, filters, pagination.currentPage, pagination.itemsPerPage]);
+  }, [apiData]);
 
   const handleAddProduct = () => {
     setEditingProduct(null);
@@ -245,37 +150,16 @@ const ProductManagement: React.FC = () => {
 
   const confirmDelete = () => {
     if (deletingProduct) {
-      setProducts(products.filter(p => p.id !== deletingProduct.id));
+      // TODO: Implement API call to delete product
+      console.log('Delete product:', deletingProduct.id);
       setShowDeleteModal(false);
       setDeletingProduct(null);
     }
   };
 
   const handleSaveProduct = (formData: ProductFormData) => {
-    if (editingProduct) {
-      // Update existing product
-      const updatedProduct: Product = {
-        ...editingProduct,
-        ...formData,
-        mainImage: typeof formData.mainImage === 'string' 
-          ? formData.mainImage 
-          : URL.createObjectURL(formData.mainImage as File),
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      setProducts(products.map(p => p.id === editingProduct.id ? updatedProduct : p));
-    } else {
-      // Add new product
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        ...formData,
-        mainImage: typeof formData.mainImage === 'string' 
-          ? formData.mainImage 
-          : URL.createObjectURL(formData.mainImage as File),
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0]
-      };
-      setProducts([...products, newProduct]);
-    }
+    // TODO: Implement API call to save product
+    console.log('Save product:', formData);
     setShowProductForm(false);
     setEditingProduct(null);
   };
@@ -290,6 +174,20 @@ const ProductManagement: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setPagination(prev => ({ 
+      ...prev, 
+      itemsPerPage,
+      currentPage: 1 // Reset to first page when changing items per page
+    }));
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (key: keyof ProductFilters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setPagination(prev => ({ ...prev, currentPage: 1 })); // Reset to first page
   };
 
   const formatPrice = (price: number) => {
@@ -311,6 +209,13 @@ const ProductManagement: React.FC = () => {
     return variants.reduce((sum, variant) => sum + variant.quantity, 0);
   };
 
+  const getStockClass = (quantity: number) => {
+    if (quantity === 0) return styles.stockEmpty;
+    if (quantity < 10) return styles.stockLow;
+    if (quantity < 50) return styles.stockMedium;
+    return styles.stockHigh;
+  };
+
   const getSortIcon = (column: 'createdAt' | 'quantity') => {
     if (filters.sortBy !== column) {
       return <FontAwesomeIcon icon={faSort} className={styles.sortIcon} />;
@@ -320,17 +225,44 @@ const ProductManagement: React.FC = () => {
       : <FontAwesomeIcon icon={faSortDown} className={styles.sortIcon} />;
   };
 
+  // Show loading state
+  if (isLoading && !apiData) {
+    return (
+      <div className={styles.productManagement}>
+        <div className={styles.loadingContainer}>
+          <FontAwesomeIcon icon={faSpinner} className={styles.spinner} />
+          <p>Đang tải danh sách biến thể...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className={styles.productManagement}>
+        <div className={styles.errorContainer}>
+          <h2>Lỗi tải dữ liệu</h2>
+          <p>Không thể tải danh sách biến thể. Vui lòng thử lại sau.</p>
+          <button onClick={() => window.location.reload()}>
+            Tải lại trang
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.productManagement}>
       {/* Header */}
       <div className={styles.header}>
-        <h1 className={styles.title}>Quản lý sản phẩm</h1>
+        <h1 className={styles.title}>Quản lý biến thể điện thoại</h1>
         <button 
           className={styles.addButton}
           onClick={handleAddProduct}
         >
           <FontAwesomeIcon icon={faPlus} />
-          Thêm sản phẩm mới
+          Thêm biến thể mới
         </button>
       </div>
 
@@ -340,7 +272,7 @@ const ProductManagement: React.FC = () => {
           <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên sản phẩm..."
+            placeholder="Tìm kiếm theo tên biến thể..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             className={styles.searchInput}
@@ -407,11 +339,20 @@ const ProductManagement: React.FC = () => {
           <thead>
             <tr>
               <th>Ảnh</th>
-              <th>Tên sản phẩm</th>
+              <th>Tên biến thể</th>
               <th className={styles.desktopOnly}>Danh mục</th>
               <th className={styles.desktopOnly}>Nhà cung cấp</th>
               <th>Trạng thái</th>
-              <th className={styles.desktopOnly}>Số biến thể</th>
+              <th className={styles.desktopOnly}>
+                <button 
+                  className={styles.sortableHeader}
+                  onClick={() => handleSort('quantity')}
+                >
+                  Tồn kho
+                  {getSortIcon('quantity')}
+                </button>
+              </th>
+              <th className={styles.desktopOnly}>Màu sắc</th>
               <th className={styles.desktopOnly}>
                 <button 
                   className={styles.sortableHeader}
@@ -425,7 +366,15 @@ const ProductManagement: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map(product => (
+            {isLoading && apiData ? (
+              <tr>
+                <td colSpan={9} className={styles.loadingRow}>
+                  <FontAwesomeIcon icon={faSpinner} className={styles.spinner} />
+                  <span>Đang tải...</span>
+                </td>
+              </tr>
+            ) : filteredProducts.length > 0 ? (
+              filteredProducts.map((product: Product) => (
               <tr key={product.id}>
                 <td>
                   <div className={styles.imageCell}>
@@ -450,7 +399,14 @@ const ProductManagement: React.FC = () => {
                     {getStatusText(product.status)}
                   </span>
                 </td>
-                <td className={`${styles.variantCount} ${styles.desktopOnly}`}>{product.variants.length}</td>
+                <td className={`${styles.stockQuantity} ${styles.desktopOnly}`}>
+                  <span className={`${styles.stockBadge} ${getStockClass(product.variants[0]?.quantity || 0)}`}>
+                    {product.variants[0]?.quantity || 0}
+                  </span>
+                </td>
+                <td className={`${styles.colorCell} ${styles.desktopOnly}`}>
+                  <span>{product.color}</span>
+                </td>
                 <td className={`${styles.createdDate} ${styles.desktopOnly}`}>{product.createdAt}</td>
                 <td>
                   <div className={styles.actions}>
@@ -485,58 +441,165 @@ const ProductManagement: React.FC = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={9} className={styles.noData}>
+                  <p>Không tìm thấy biến thể nào</p>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
-
-        {filteredProducts.length === 0 && (
-          <div className={styles.noData}>
-            <p>Không tìm thấy sản phẩm nào</p>
-          </div>
-        )}
       </div>
 
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div className={styles.pagination}>
-          <div className={styles.paginationInfo}>
-            Hiển thị {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} - {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} trong tổng số {pagination.totalItems} sản phẩm
-          </div>
-          <div className={styles.paginationControls}>
-            <button
-              className={styles.paginationButton}
-              onClick={() => handlePageChange(pagination.currentPage - 1)}
-              disabled={pagination.currentPage === 1}
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-            </button>
-            
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                className={`${styles.paginationButton} ${page === pagination.currentPage ? styles.active : ''}`}
-                onClick={() => handlePageChange(page)}
-              >
-                {page}
-              </button>
-            ))}
-            
-            <button
-              className={styles.paginationButton}
-              onClick={() => handlePageChange(pagination.currentPage + 1)}
-              disabled={pagination.currentPage === pagination.totalPages}
-            >
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
+      <div className={styles.pagination}>
+        <div className={styles.paginationInfo}>
+          Hiển thị {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} - {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} trong tổng số {pagination.totalItems} biến thể
         </div>
-      )}
+        
+        <div className={styles.paginationControls}>
+          <div className={styles.itemsPerPage}>
+            <label>Hiển thị:</label>
+            <select
+              value={pagination.itemsPerPage}
+              onChange={(e) => handleItemsPerPageChange(parseInt(e.target.value))}
+              className={styles.itemsPerPageSelect}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span>biến thể/trang</span>
+          </div>
+          
+          {pagination.totalPages > 1 && (
+            <div className={styles.pageControls}>
+              <button
+                className={styles.paginationButton}
+                onClick={() => handlePageChange(1)}
+                disabled={pagination.currentPage === 1}
+                title="Trang đầu"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              
+              <button
+                className={styles.paginationButton}
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                disabled={pagination.currentPage === 1}
+                title="Trang trước"
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              
+              {/* Show page numbers with ellipsis for large page counts */}
+              {(() => {
+                const totalPages = pagination.totalPages;
+                const currentPage = pagination.currentPage;
+                const pages = [];
+                
+                if (totalPages <= 7) {
+                  // Show all pages if 7 or fewer
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(
+                      <button
+                        key={i}
+                        className={`${styles.paginationButton} ${i === currentPage ? styles.active : ''}`}
+                        onClick={() => handlePageChange(i)}
+                      >
+                        {i}
+                      </button>
+                    );
+                  }
+                } else {
+                  // Show first page
+                  pages.push(
+                    <button
+                      key={1}
+                      className={`${styles.paginationButton} ${1 === currentPage ? styles.active : ''}`}
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </button>
+                  );
+                  
+                  // Show ellipsis if current page is far from start
+                  if (currentPage > 4) {
+                    pages.push(<span key="start-ellipsis" className={styles.ellipsis}>...</span>);
+                  }
+                  
+                  // Show pages around current page
+                  const start = Math.max(2, currentPage - 1);
+                  const end = Math.min(totalPages - 1, currentPage + 1);
+                  
+                  for (let i = start; i <= end; i++) {
+                    pages.push(
+                      <button
+                        key={i}
+                        className={`${styles.paginationButton} ${i === currentPage ? styles.active : ''}`}
+                        onClick={() => handlePageChange(i)}
+                      >
+                        {i}
+                      </button>
+                    );
+                  }
+                  
+                  // Show ellipsis if current page is far from end
+                  if (currentPage < totalPages - 3) {
+                    pages.push(<span key="end-ellipsis" className={styles.ellipsis}>...</span>);
+                  }
+                  
+                  // Show last page
+                  if (totalPages > 1) {
+                    pages.push(
+                      <button
+                        key={totalPages}
+                        className={`${styles.paginationButton} ${totalPages === currentPage ? styles.active : ''}`}
+                        onClick={() => handlePageChange(totalPages)}
+                      >
+                        {totalPages}
+                      </button>
+                    );
+                  }
+                }
+                
+                return pages;
+              })()}
+              
+              <button
+                className={styles.paginationButton}
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                disabled={pagination.currentPage === pagination.totalPages}
+                title="Trang sau"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+              
+              <button
+                className={styles.paginationButton}
+                onClick={() => handlePageChange(pagination.totalPages)}
+                disabled={pagination.currentPage === pagination.totalPages}
+                title="Trang cuối"
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Product Form Modal */}
       {showProductForm && (
         <ProductForm
-          product={editingProduct}
-          onSave={handleSaveProduct}
+          onSave={() => {
+            setShowProductForm(false);
+            setEditingProduct(null);
+          }}
           onClose={() => {
             setShowProductForm(false);
             setEditingProduct(null);

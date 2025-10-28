@@ -11,6 +11,19 @@ const LoginForm: React.FC = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Get returnUrl from query params
+  const returnUrl = router.query.returnUrl as string;
+  
+  // Map returnUrl to friendly page name
+  const getPageName = (url: string): string => {
+    if (!url) return '';
+    if (url.includes('/cart')) return 'Giỏ hàng';
+    if (url.includes('/orders')) return 'Đơn hàng';
+    if (url.includes('/profile')) return 'Tài khoản';
+    if (url.includes('/checkout')) return 'Thanh toán';
+    return 'trang yêu cầu';
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,17 +55,31 @@ const LoginForm: React.FC = () => {
     alert("Tính năng đăng nhập Google sẽ được phát triển trong tương lai");
   };
 
-  const handleFacebookLogin = () => {
-    alert("Tính năng đăng nhập Facebook sẽ được phát triển trong tương lai");
-  };
 
   return (
     <>
+      {/* Show notification if redirected from protected page */}
+      {returnUrl && (
+        <div style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffc107',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          color: '#856404'
+        }}>
+          <strong>⚠️ Yêu cầu đăng nhập</strong>
+          <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>
+            Bạn cần đăng nhập để truy cập <strong>{getPageName(returnUrl)}</strong>
+          </p>
+        </div>
+      )}
+      
       {/* Login Form */}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.inputGroup}>
           <label htmlFor="username" className={styles.label}>
-            Tên đăng nhập
+            Username hoặc Email
           </label>
           <input
             type="text"
@@ -61,7 +88,7 @@ const LoginForm: React.FC = () => {
             value={formData.username}
             onChange={handleInputChange}
             className={styles.input}
-            placeholder="Nhập tên đăng nhập"
+            placeholder="Nhập username hoặc email"
             required
           />
         </div>
@@ -125,15 +152,6 @@ const LoginForm: React.FC = () => {
           >
             <span className={styles.socialIcon}>🔍</span>
             Google
-          </button>
-          
-          <button
-            type="button"
-            className={`${styles.socialButton} ${styles.facebook}`}
-            onClick={handleFacebookLogin}
-          >
-            <span className={styles.socialIcon}>📘</span>
-            Facebook
           </button>
         </div>
       </div>

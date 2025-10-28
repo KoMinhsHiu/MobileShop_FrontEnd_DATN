@@ -1,0 +1,54 @@
+import { useState, useEffect } from 'react';
+import { fetchPhoneList, PhoneListParams, PhoneListResponse } from '@/utils/api/phone';
+
+export interface UsePhoneListReturn {
+  phones: PhoneListResponse['data']['data'];
+  total: number;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
+
+export const usePhoneList = (params: PhoneListParams = {}): UsePhoneListReturn => {
+  const [phones, setPhones] = useState<PhoneListResponse['data']['data']>([]);
+  const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetchPhoneList(params);
+      
+      if (response.status === 200) {
+        setPhones(response.data.data);
+        setTotal(response.data.total);
+      } else {
+        setError(response.message || 'Failed to fetch phones');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      console.error('Error fetching phone list:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [params.page, params.limit, params.order]);
+
+  const refetch = () => {
+    fetchData();
+  };
+
+  return {
+    phones,
+    total,
+    isLoading,
+    error,
+    refetch
+  };
+};

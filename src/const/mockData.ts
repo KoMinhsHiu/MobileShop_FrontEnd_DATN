@@ -598,7 +598,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "iPhone 15 Pro Max - Hot Deal",
     price: "29.990.000",
     cover: {
-      url: "/images/products/featured/iphone-15-pro-max.jpg"
+      url: "/images/brands/Apple.jpg"
     },
     discount_amount: 3000000,
     quantity: 15,
@@ -609,7 +609,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "Samsung Galaxy S24 Ultra - New",
     price: "28.990.000",
     cover: {
-      url: "/images/products/featured/galaxy-s24-ultra.jpg"
+      url: "/images/brands/Samsung.avif"
     },
     discount_amount: 0,
     quantity: 25,
@@ -620,7 +620,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "Xiaomi 14 Ultra - Best Seller",
     price: "22.990.000",
     cover: {
-      url: "/images/products/featured/mi-14-ultra.jpg"
+      url: "/images/brands/Xiaomi.jpg"
     },
     discount_amount: 2000000,
     quantity: 30,
@@ -631,7 +631,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "OPPO Find X7 Ultra - Limited",
     price: "24.990.000",
     cover: {
-      url: "/images/products/featured/find-x7-ultra.jpg"
+      url: "/images/brands/Oppo.jpg"
     },
     discount_amount: 1500000,
     quantity: 10,
@@ -642,7 +642,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "Vivo X100 Pro - Trending",
     price: "21.990.000",
     cover: {
-      url: "/images/products/featured/x100-pro.jpg"
+      url: "/images/brands/Vivo.jpg"
     },
     discount_amount: 1000000,
     quantity: 20,
@@ -653,7 +653,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "OnePlus 12 - Flash Sale",
     price: "20.990.000",
     cover: {
-      url: "/images/products/featured/oneplus-12.jpg"
+      url: "/images/brands/Oneplus.jpg"
     },
     discount_amount: 2500000,
     quantity: 12,
@@ -664,7 +664,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "Huawei Mate 60 Pro - Premium",
     price: "23.990.000",
     cover: {
-      url: "/images/products/featured/mate-60-pro.jpg"
+      url: "/images/brands/Huawei.jpg"
     },
     discount_amount: 0,
     quantity: 8,
@@ -675,7 +675,7 @@ export const featuredProducts: CategoryProducts[] = [
     name: "Realme GT 5 Pro - Value",
     price: "14.990.000",
     cover: {
-      url: "/images/products/featured/gt-5-pro.jpg"
+      url: "/images/brands/Realme.jpg"
     },
     discount_amount: 1000000,
     quantity: 35,

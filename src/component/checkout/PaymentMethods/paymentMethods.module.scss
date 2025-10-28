@@ -1,79 +1,154 @@
-.payment-methods {
-  .section {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.paymentMethods {
+  padding: 24px;
 
-    .section-header {
-      margin-bottom: 24px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #f0f0f0;
+  .paymentOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 
-      h2 {
-        font-size: 20px;
-        font-weight: 600;
-        color: #333;
-        margin: 0;
+    .paymentOption {
+      position: relative;
+
+      input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 20px 24px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        color: #374151;
+        background: #fafafa;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+          border-color: #3b82f6;
+          background: #f0f9ff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .radioButton {
+          width: 24px;
+          height: 24px;
+          border: 3px solid #d1d5db;
+          border-radius: 50%;
+          margin-right: 16px;
+          position: relative;
+          transition: all 0.3s ease;
+          background: white;
+          flex-shrink: 0;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+          }
+        }
+
+        .paymentIcon {
+          margin-left: auto;
+          font-size: 20px;
+          opacity: 0.7;
+          transition: opacity 0.3s ease;
+        }
+
+        .paymentLabel {
+          font-size: 16px;
+          font-weight: 600;
+        }
+
+        .paymentDescription {
+          font-size: 14px;
+          color: #6b7280;
+          margin-top: 2px;
+        }
+      }
+
+      input[type="radio"]:checked + label {
+        border-color: #3b82f6;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+        transform: translateY(-2px);
+
+        .radioButton {
+          border-color: #3b82f6;
+          background: #3b82f6;
+
+          &::after {
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        .paymentIcon {
+          opacity: 1;
+        }
+      }
+
+      // Specific styling for each payment method
+      &:nth-child(1) label { // COD
+        .paymentIcon::before {
+          content: '💰';
+        }
+      }
+
+      &:nth-child(2) label { // PayPal
+        .paymentIcon::before {
+          content: '💳';
+        }
+      }
+
+      &:nth-child(3) label { // Momo
+        .paymentIcon::before {
+          content: '📱';
+        }
+      }
+
+      &:nth-child(4) label { // VNPay
+        .paymentIcon::before {
+          content: '🏦';
+        }
       }
     }
+  }
 
-    // Payment Methods
-    .payment-options {
-      .payment-option {
-        margin-bottom: 16px;
+  // Responsive design
+  @media (max-width: 640px) {
+    padding: 16px;
 
-        input[type="radio"] {
-          display: none;
-        }
-
+    .paymentOptions {
+      .paymentOption {
         label {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          padding: 16px;
-          border: 2px solid #e0e0e0;
-          border-radius: 8px;
-          transition: all 0.2s;
-          font-weight: 500;
-          color: #333;
+          padding: 16px 20px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
 
-          &:hover {
-            border-color: #007bff;
-            background: #f8f9ff;
+          .radioButton {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            margin-right: 0;
           }
 
-          .radio-button {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50%;
-            margin-right: 12px;
-            position: relative;
-            transition: all 0.2s;
-          }
-        }
-
-        input[type="radio"]:checked + label {
-          border-color: #007bff;
-          background: #f8f9ff;
-
-          .radio-button {
-            border-color: #007bff;
-            background: #007bff;
-
-            &::after {
-              content: '';
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
-              width: 8px;
-              height: 8px;
-              background: white;
-              border-radius: 50%;
-            }
+          .paymentIcon {
+            margin-left: 0;
+            margin-top: 4px;
           }
         }
       }

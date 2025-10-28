@@ -37,8 +37,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div className={styles.demoInfo}>
             <p className={styles.demoText}>
               <strong>Thông tin đăng nhập demo:</strong><br />
-              Username: <code>user</code><br />
-              Password: <code>user123</code>
+              Username/Email: <code>max</code><br />
+              Password: <code>strongPassword123</code>
             </p>
           </div>
         )}

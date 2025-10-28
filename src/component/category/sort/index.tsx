@@ -11,6 +11,25 @@ const Sort: FC<SortProps> = ({
   setShowSortOption,
 }) => {
   const activeSort = sortOptions?.find((item) => item.isActive === true);
+  const getClarifiedLabel = () => {
+    const key = activeSort?.querySort;
+    switch (key) {
+      case "name_asc":
+        return "Tên (A→Z)";
+      case "name_desc":
+        return "Tên (Z→A)";
+      case "price_asc":
+        return "Giá (↑)";
+      case "price_desc":
+        return "Giá (↓)";
+      case "rating_desc":
+        return "Đánh giá (cao→thấp)";
+      case "default":
+        return "Mặc định";
+      default:
+        return activeSort?.label || "Mặc định";
+    }
+  };
 
   const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -34,9 +53,7 @@ const Sort: FC<SortProps> = ({
         onClick={() => setShowSortOption(!showSortOption)}
       >
         <FontAwesomeIcon icon={faSort} fontSize={14} />
-        <p className={styles.title}>
-          Sắp xếp: {activeSort?.label}
-        </p>
+        <p className={styles.title}>Sắp xếp: {getClarifiedLabel()}</p>
         <FontAwesomeIcon 
           icon={faChevronDown} 
           className={`${styles.chevron} ${showSortOption ? styles.rotated : ''}`}

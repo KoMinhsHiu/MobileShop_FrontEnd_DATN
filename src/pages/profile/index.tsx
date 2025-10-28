@@ -7,8 +7,9 @@ import PersonalInfo from '@/component/profile/personalInfo';
 import ChangePassword from '@/component/profile/changePassword';
 import AdditionalOptions from '@/component/profile/additionalOptions';
 import TabNavigation from '@/component/profile/tabNavigation';
+import { withAuth } from '@/component/auth';
 
-const ProfilePage: React.FC = () => {
+const ProfilePageComponent: React.FC = () => {
   const {
     activeTab,
     isLoading,
@@ -24,9 +25,7 @@ const ProfilePage: React.FC = () => {
     logout
   } = useProfile();
 
-  if (!isAuthenticated) {
-    return <div>Đang tải...</div>;
-  }
+  // Note: Auth protection is now handled by withAuth HOC
 
   return (
     <div className={styles.profileContainer}>
@@ -70,12 +69,15 @@ const ProfilePage: React.FC = () => {
 
       {/* Logout Button */}
       <div className={styles.logoutSection}>
-        <button onClick={logout} className={styles.logoutButton}>
+        <button onClick={() => logout()} className={styles.logoutButton}>
           Đăng xuất
         </button>
       </div>
     </div>
   );
 };
+
+// Protect the profile page with authentication
+const ProfilePage = withAuth(ProfilePageComponent);
 
 export default ProfilePage;
