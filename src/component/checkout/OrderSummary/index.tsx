@@ -24,7 +24,9 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             <div className={styles.itemInfo}>
               <h4>{product.name}</h4>
               <p>Số lượng: {product.quantity}</p>
-              <p className={styles.itemPrice}>{formatPrice(parsePrice(product.price) * product.quantity)}</p>
+              <p className={styles.itemPrice}>
+                {formatPrice(Math.max(0, (parsePrice(product.price) - parsePrice(product.discount || 0)) * product.quantity))}
+              </p>
             </div>
           </div>
         ))}
@@ -38,8 +40,12 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         
         <div className={styles.summaryRow}>
           <span>Phí vận chuyển:</span>
-          <span className={orderSummary.shippingFee === 0 ? styles.freeShipping : ''}>
-            {orderSummary.shippingFee === 0 ? 'Miễn phí' : formatPrice(orderSummary.shippingFee)}
+          <span>
+            {orderSummary.shippingFee === 0 ? (
+              'Đang tính...'
+            ) : (
+              formatPrice(orderSummary.shippingFee)
+            )}
           </span>
         </div>
         

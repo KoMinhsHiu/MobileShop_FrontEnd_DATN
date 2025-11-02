@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/authContext';
 import { validateRegisterForm } from '@/utils/validation';
@@ -21,6 +21,19 @@ const RegisterForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  useEffect(() => {
+    if (router.isReady) {
+      const { email, firstName, lastName } = router.query;
+
+      setFormData(prev => ({
+        ...prev,
+        email: email as string || '',
+        firstName: firstName as string || '',
+        lastName: lastName as string || '',
+      }));
+    }
+  }, [router.isReady, router.query]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -28,6 +41,8 @@ const RegisterForm: React.FC = () => {
       [name]: value
     }));
   };
+
+  const isLoginWithGoogle = router.query.email && router.query.firstName && router.query.lastName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,10 +79,29 @@ const RegisterForm: React.FC = () => {
     alert("Tính năng đăng ký Google sẽ được phát triển trong tương lai");
   };
 
-
-
   return (
     <>
+      {isLoginWithGoogle && (
+        <div style={{
+          backgroundColor: '#fff3cd',
+          border: '1px solid #ffc107',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '20px',
+          color: '#856404',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+        }}>
+          <strong>Tiếp tục đăng ký</strong>
+          <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>
+            Vui lòng hoàn tất đăng ký với các thông tin bên dưới để tạo tài khoản.
+          </p>
+        </div>
+      )}
+
       {/* Registration Form */}
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.inputGroup}>

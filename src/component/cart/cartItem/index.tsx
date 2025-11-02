@@ -10,14 +10,15 @@ import { CartItemProps } from "./cartItem.types";
 import styles from "./cartItem.module.scss";
 
 const CartItem: FC<CartItemProps> = ({ product }) => {
-  const { id, productAttributeId, quantity, name, image, price, attributes } = product;
+  const { id, productAttributeId, quantity, name, image, price, discount, attributes } = product;
   const { removeFromCart, isLoading } = useCart();
 
   // Calculate total price for this item
   const itemTotal = useMemo(() => {
     const unitPrice = parsePrice(price);
-    return unitPrice * quantity;
-  }, [price, quantity]);
+    const discountAmount = discount ? parsePrice(discount) : 0;
+    return (unitPrice - discountAmount) * quantity;
+  }, [price, quantity, discount]);
 
   // Handle remove item from cart
   const handleRemove = useCallback(() => {
@@ -48,7 +49,15 @@ const CartItem: FC<CartItemProps> = ({ product }) => {
       </div>
 
       <div className={styles.priceColumn}>
-        <span className={styles.unitPrice}>{price}</span>
+        {discount ? (
+          <span className={styles.unitPrice}>
+            {formatPrice(parsePrice(price) - (discount ? parsePrice(discount) : 0))}
+          </span>
+        ) : (
+          <span className={styles.unitPrice}>
+            {formatPrice(parsePrice(price))}
+          </span>
+        )}
       </div>
 
       <div className={styles.quantityColumn}>

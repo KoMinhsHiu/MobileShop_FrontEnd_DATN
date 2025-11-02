@@ -1,5 +1,5 @@
 import axiosInstance from './fetchData/axiosInstance';
-import { OrdersAPI, CreateOrderAPI } from '@/const/endPoint';
+import { OrdersAPI, CreateOrderAPI, CalculateShippingFeeAPI } from '@/const/endPoint';
 
 // API Response Types
 export interface OrderItem {
@@ -120,6 +120,20 @@ export interface CreateOrderResponse {
   };
 }
 
+export interface ShippingFeeRequest {
+  province: string;
+  commune: string;
+}
+
+export interface ShippingFeeResponse {
+  status: number;
+  message: string;
+  data: {
+    shippingFee: string;
+  };
+  errors: null;
+}
+
 // API Functions
 export const ordersAPI = {
   // Get user's orders
@@ -157,3 +171,15 @@ export const ordersAPI = {
 };
 
 export default ordersAPI;
+
+export const shippingAPI = {
+  calculateShippingFee: async (data: ShippingFeeRequest): Promise<ShippingFeeResponse> => {
+    try {
+      const response = await axiosInstance.post(CalculateShippingFeeAPI, data);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error calculating shipping fee:', error);
+      throw new Error(error.response?.data?.message || 'Failed to calculate shipping fee');
+    }
+  }
+};

@@ -20,7 +20,6 @@ const CartPageComponent = () => {
       return {
         totalItems: 0,
         subtotal: 0,
-        shippingFee: 0,
         grandTotal: 0
       };
     }
@@ -29,22 +28,20 @@ const CartPageComponent = () => {
     
     const totalItems = cart.products.reduce((sum: number, product: any) => sum + product.quantity, 0);
     const subtotal = cart.products.reduce((sum: number, product: any) => {
-      const price = parsePrice(product.price);
-      console.log(`🛒 Product: ${product.name}, Price: ${product.price}, Parsed: ${price}, Quantity: ${product.quantity}`);
-      return sum + (price * product.quantity);
+      const basePrice = parsePrice(product.price);
+      const discount = product.discount ? parsePrice(product.discount) : 0;
+      const finalPrice = basePrice - discount;
+      
+      console.log(`🛒 Product: ${product.name}, Base Price: ${basePrice}, Discount: ${discount}, Final: ${finalPrice}`);
+      return sum + (finalPrice * product.quantity);
     }, 0);
     
     console.log('🛒 Calculated subtotal:', subtotal);
-    
-    // Calculate shipping fee (free shipping for orders over 500,000 VND)
-    const shippingFee = subtotal >= 500000 ? 0 : 30000;
-    const grandTotal = subtotal + shippingFee;
-
+  
     return {
       totalItems,
       subtotal,
-      shippingFee,
-      grandTotal
+      grandTotal: subtotal,
     };
   }, [cart?.products]);
 
@@ -135,16 +132,10 @@ const CartPageComponent = () => {
                     
                     <div className={styles.summaryRow}>
                       <span>Phí vận chuyển:</span>
-                      <span className={cartSummary.shippingFee === 0 ? styles.freeShipping : ''}>
-                        {cartSummary.shippingFee === 0 ? 'Miễn phí' : formatPrice(cartSummary.shippingFee)}
+                      <span className={styles.shippingFee}>
+                        Tính khi thanh toán
                       </span>
                     </div>
-                    
-                    {cartSummary.subtotal < 500000 && cartSummary.subtotal > 0 && (
-                      <div className={styles.shippingNote}>
-                        <small>Mua thêm {formatPrice(500000 - cartSummary.subtotal)} để được miễn phí vận chuyển</small>
-                      </div>
-                    )}
                     
                     <div className={`${styles.summaryRow} ${styles.grandTotal}`}>
                       <span>Tổng cộng:</span>

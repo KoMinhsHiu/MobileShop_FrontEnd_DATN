@@ -10,16 +10,18 @@ import PaymentMethods from "@/component/checkout/PaymentMethods";
 import OrderSummary from "@/component/checkout/OrderSummary";
 import { ShippingInfo } from "@/component/checkout/ShippingForm/types";
 import { PaymentMethod } from "@/component/checkout/PaymentMethods/types";
-import { ordersAPI, CreateOrderRequest } from "@/utils/api/orders";
+import { ordersAPI, CreateOrderRequest, shippingAPI } from "@/utils/api/orders";
 import { useLocation } from "@/utils/hooks/useLocation";
 import { withAuth } from "@/component/auth";
 
 import styles from "./checkout.module.scss";
+import { paymentAPI } from "@/utils/api/transformer/payment";
 
 const CheckoutPageComponent = () => {
-  const { cart } = useCart();
+  const { cart } = useCart() as { cart: any };
   const router = useRouter();
   const { provinces, communes, selectedProvince, selectedCommune, loading, handleProvinceChange, handleCommuneChange } = useLocation();
+  const [shippingFee, setShippingFee] = useState<string>('0 ₫');
 
   // Debug logging for communes state
   useEffect(() => {
@@ -30,6 +32,37 @@ const CheckoutPageComponent = () => {
       communes: communes.slice(0, 5) // Show first 5 communes for debugging
     });
   }, [communes, selectedProvince, selectedCommune]);
+
+  useEffect(() => {
+    const calculateShippingFee = async () => {
+      if (!cart?.products || cart.products.length === 0) return;
+      if (!selectedProvince || !selectedCommune) return;
+
+      try {
+        console.log('🚚 Calculating shipping fee...');
+
+        const province = provinces.find(p => p.code.toString() === selectedProvince);
+        const commune = communes.find(c => c.code.toString() === selectedCommune);
+
+        const response = await shippingAPI.calculateShippingFee({
+          province: province ? province.name : '',
+          commune: commune ? commune.name : ''
+        });
+
+        if (response.status === 200 && response.data?.shippingFee) {
+          setShippingFee(response.data.shippingFee);
+          console.log('🚚 Shipping fee calculated:', response.data.shippingFee);
+        } else {
+          console.error('❌ Failed to calculate shipping fee:', response);
+        }
+      } catch (error) {
+        console.error('❌ Error calculating shipping fee:', error);
+      }
+    };
+
+    calculateShippingFee();
+  }, [cart, selectedProvince, selectedCommune]);
+    
 
   // Form state
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
@@ -65,21 +98,23 @@ const CheckoutPageComponent = () => {
 
     const totalItems = cart.products.reduce((sum: number, product: any) => sum + product.quantity, 0);
     const subtotal = cart.products.reduce((sum: number, product: any) => {
-      const price = parsePrice(product.price);
-      return sum + (price * product.quantity);
+      const basePrice = parsePrice(product.price);
+      const discount = product.discount ? parsePrice(product.discount) : 0;
+      const finalPrice = basePrice - discount;
+      
+      console.log(`🛒 Product: ${product.name}, Base Price: ${basePrice}, Discount: ${discount}, Final: ${finalPrice}`);
+      return sum + (finalPrice * product.quantity);
     }, 0);
-    
-    // Calculate shipping fee (free shipping for orders over 500,000 VND)
-    const shippingFee = subtotal >= 500000 ? 0 : 30000;
-    const grandTotal = subtotal + shippingFee;
+
+    const fee = parsePrice(shippingFee);
 
     return {
       totalItems,
       subtotal,
-      shippingFee,
-      grandTotal
+      shippingFee: fee,
+      grandTotal: subtotal + fee,
     };
-  }, [cart?.products]);
+  }, [cart?.products, shippingFee]);
 
   const validatePhone = (phone: string): boolean => {
     // Kiểm tra số điện thoại: bắt đầu bằng 0, có 10 ký tự, chỉ chứa số
@@ -108,11 +143,11 @@ const CheckoutPageComponent = () => {
     if (!cart?.products) return [];
 
     return cart.products.map((product: any) => ({
-      variantId: parseInt(product.productAttributeId) || parseInt(product.id),
-      colorId: parseInt(product.productAttributeId) || parseInt(product.id), // Fallback to variantId if no separate colorId
+      variantId: parseInt(product.productAttributeId),
+      colorId: parseInt(product.colorId),
       quantity: product.quantity,
       price: parsePrice(product.price),
-      discount: parsePrice(product.price) // Assuming no discount for now
+      discount: parsePrice(product.price) - parsePrice(product.discount || 0)
     }));
   };
 
@@ -263,15 +298,18 @@ const CheckoutPageComponent = () => {
     }
       
       // Transform cart items to API format
-      const items = transformCartToOrderItems();
+      const items: { variantId: number; colorId: number; quantity: number; price: number; discount: number }[] = transformCartToOrderItems();
+
+      const totalAmount = items.reduce((sum: number, item) => sum + (item.price * item.quantity), 0);
+      const discountAmount = items.reduce((sum: number, item) => sum + (item.discount * item.quantity), 0);
 
       // Create order request
       const orderRequest: CreateOrderRequest = {
-        totalAmount: orderSummary.subtotal,
-        discountAmount: 0, // No discount for now
+        totalAmount: totalAmount,
+        discountAmount: discountAmount,
         shippingFee: orderSummary.shippingFee,
         finalAmount: orderSummary.grandTotal,
-        recipientName: shippingInfo.fullName,
+        recipientName: shippingInfo.fullName, 
         recipientPhone: shippingInfo.phone,
         street: shippingInfo.address,
         communeId: communeId, // Using ID instead of code
@@ -312,10 +350,21 @@ const CheckoutPageComponent = () => {
             // TODO: Implement Momo integration
             router.push(`/orders/success?orderId=${response.data.orderId}`);
             break;
-          case 'vnpay':
-            toast.info('Chuyển hướng đến VNPay...');
-            // TODO: Implement VNPay integration
-            router.push(`/orders/success?orderId=${response.data.orderId}`);
+            case 'vnpay':
+            try {
+              const paymentResp = await paymentAPI.getVNPayUrl(response.data.orderId);
+
+              if (paymentResp?.status === 200 && paymentResp.data?.paymentUrl) {
+                const paymentUrl = paymentResp.data.paymentUrl;
+
+                console.log('🌐 Redirecting to VNPay URL:', paymentUrl)
+                // Redirect user to VNPay payment URL
+                window.location.href = paymentUrl;
+              }
+            } catch (paymentError) {
+              console.error('❌ VNPay payment error:', paymentError);
+              toast.error('Không thể tạo liên kết thanh toán VNPay. Vui lòng thử lại sau.');
+            }
             break;
           default:
             toast.error('Phương thức thanh toán không hợp lệ');
