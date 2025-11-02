@@ -32,6 +32,7 @@ export type ProductCart = {
   attributes: { key: string };
   image: string;
   price: string;
+  discount?: string;
   quantity: number;
   rate: number;
   totalPrice: string;

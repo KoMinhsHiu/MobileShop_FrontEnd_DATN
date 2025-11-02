@@ -16,6 +16,7 @@ export const CategoryAPI="/categoryProducts"
 export const RegisterAPI = "/auth/register";
 export const LoginAPI = "/auth/login";
 export const LogoutAPI = "/auth/logout";
+export const GoogleOAuthAPI = "/auth/google";
 
 // Phone Variants API
 export const PhoneVariantsAPI = "/phones/variants/filter";
@@ -25,6 +26,10 @@ export const CreatePhoneVariantAPI = "/phones/variants/create";
 // Orders API
 export const OrdersAPI = "/orders/me";
 export const CreateOrderAPI = "/orders/create";
+export const CalculateShippingFeeAPI = "/shipment/fee";
+
+// Payment API
+export const VNPayAPI = "/payments/vnpay/create";
 
 // Location APIs
 export const ProvincesAPI = "/locations/provinces";

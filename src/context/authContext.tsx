@@ -24,6 +24,8 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<boolean>;
   register: (userData: RegisterRequest) => Promise<boolean>;
   logout: () => Promise<void>;
+  googleOAuth: () => Promise<void>;
+  googleOAuthCallback: (code: string) => Promise<boolean>;
   isLoading: boolean;
 }
 
@@ -314,6 +316,95 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  
+  const googleOAuth = async (): Promise<void> => {
+    try {
+      await authAPI.googleOAuth();
+    } catch (error: any) {
+      console.error('Google OAuth error:', error);
+    }
+  };
+
+  const googleOAuthCallback = async (code: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      const response = await authAPI.googleOAuthCallback(code);
+
+      if (response.status === 200) {
+        // Handle successful OAuth login similar to normal login
+        const accessToken = response.data.tokens.accessToken;
+        const decodedToken = decodeJWT(accessToken);
+
+        if (!decodedToken) {
+          toast.error('Token không hợp lệ!');
+          return false;
+        }
+
+        const userData: User = {
+          userId: decodedToken.sub,
+          username: decodedToken.username,
+          email: decodedToken.email,
+          firstName: '', // Will be populated from user profile API
+          lastName: '', // Will be populated from user profile API
+          phone: '', // Will be populated from user profile API
+          dateOfBirth: '', // Will be populated from user profile API
+          roleId: decodedToken.role === 'admin' ? 2 : 1, // Map role to roleId
+          role: decodedToken.role,
+          avatar: ''
+        };
+
+        const tokensWithTimestamp = {
+          ...response.data.tokens,
+          issuedAt: Date.now() // Add timestamp when token was issued
+        };
+        localStorage.setItem('phonehub_tokens', JSON.stringify(tokensWithTimestamp));
+        localStorage.setItem('phonehub_user', JSON.stringify(userData));
+        setUser(userData);
+
+        toast.success('Đăng nhập bằng Google thành công!');
+
+        // Redirect based on returnUrl or user role
+        setTimeout(() => {
+          const returnUrl = router.query.returnUrl as string;
+
+          if (returnUrl && returnUrl !== '/LoginSignup/login' && returnUrl !== '/LoginSignup/register') {
+            console.log('🔙 Redirecting to returnUrl:', returnUrl);
+            router.push(returnUrl);
+          } else {
+            router.push(userData.role === 'admin' ? '/admin' : '/');
+          }
+        }, 2000);
+
+        return true;
+      } else {
+        toast.error('Đăng nhập bằng Google thất bại!');
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Google OAuth callback error:', error);
+
+      if (error.status === 404 && error.responseData?.data?.isNewUser) {
+        const { googleUser } = error.responseData.data;
+        
+        // Redirect to register with Google user data
+        router.push({
+          pathname: '/LoginSignup/register',
+          query: {
+            email: googleUser.email,
+            firstName: googleUser.firstName,
+            lastName: googleUser.lastName
+          }
+        });
+        
+        return false;
+      }
+
+      toast.error(error.message || 'Có lỗi xảy ra khi đăng nhập bằng Google!');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const value: AuthContextType = {
     user,
@@ -321,6 +412,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
+    googleOAuth,
+    googleOAuthCallback,
     isLoading
   };
 

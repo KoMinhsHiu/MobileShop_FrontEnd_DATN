@@ -19,7 +19,7 @@ const nextConfig = {
   i18n: {
     locales: ["en", "fr", "vi"],
     defaultLocale: "vi",
-    localeDetection: true,
+    localeDetection: false,
   },
 };
 

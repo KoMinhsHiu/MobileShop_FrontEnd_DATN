@@ -43,7 +43,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           quantity: item.quantity,
           name: `${item.variant.name} ${item.variant.variantName}`,
           image: item.variant.imageUrl || "/images/brands/Apple.jpg",
+          colorId: item.variant.colorId,
           price: `${item.price.toLocaleString('vi-VN')}₫`,
+          discount: item.discount ? `${item.discount.toLocaleString('vi-VN')}₫` : undefined,
           attributes: {
             "Màu sắc": item.variant.color,
             "Số lượng": item.quantity.toString()

@@ -1,5 +1,5 @@
 import axiosInstance from './fetchData/axiosInstance';
-import { RegisterAPI, LoginAPI, LogoutAPI } from '@/const/endPoint';
+import { RegisterAPI, LoginAPI, LogoutAPI, GoogleOAuthAPI } from '@/const/endPoint';
 
 // Types for API requests and responses
 export interface RegisterRequest {
@@ -208,5 +208,75 @@ export const authAPI = {
         throw new Error('Có lỗi xảy ra khi đăng xuất: ' + error.message);
       }
     }
-  }
+  },
+
+  // Google OAuth login
+  googleOAuth: async (): Promise<void> => {
+    try {
+      console.log('🌐 Redirecting to Google OAuth...');
+      console.log('📍 API Endpoint:', GoogleOAuthAPI);
+      console.log('🌐 Base URL:', axiosInstance.defaults.baseURL);
+      console.log('🔗 Full URL:', `${axiosInstance.defaults.baseURL}${GoogleOAuthAPI}`);
+
+      window.location.href = `${axiosInstance.defaults.baseURL}${GoogleOAuthAPI}`;
+    } catch (error: any) {
+      console.error('❌ Google OAuth Error occurred:');
+      console.error('🔍 Error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+          timeout: error.config?.timeout
+        }
+      });
+    }
+  },
+
+  googleOAuthCallback: async (code: string) => {
+    try {
+      console.log('🔄 Handling Google OAuth callback...');
+      console.log('📍 API Endpoint:', `${GoogleOAuthAPI}/callback`);
+      console.log('🌐 Base URL:', axiosInstance.defaults.baseURL);
+      console.log('🔗 Full URL:', `${axiosInstance.defaults.baseURL}${GoogleOAuthAPI}/callback`);
+      console.log('📋 Authorization code:', code);
+
+      const response = await axiosInstance.post(`${GoogleOAuthAPI}/callback`, { code });
+      console.log('✅ Google OAuth Callback Response received:');
+      console.log('📊 Status:', response.status);
+      console.log('📋 Data:', response.data);
+
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Google OAuth Callback Error occurred:');
+      console.error('🔍 Error details:', {
+        message: error.message,
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          baseURL: error.config?.baseURL,
+          timeout: error.config?.timeout
+        }
+      });
+
+      if (error.response?.status === 404) {
+        const enhancedError = {
+          ...error,
+          status: 404,
+          responseData: error.response.data
+        };
+        throw enhancedError;
+      }
+
+      throw new Error('Có lỗi xảy ra trong quá trình xác thực Google: ' + error.message);
+    }
+  },
 };

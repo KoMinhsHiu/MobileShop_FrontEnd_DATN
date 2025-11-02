@@ -5,7 +5,7 @@ import styles from './auth.module.scss';
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, googleOAuth, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -52,7 +52,7 @@ const LoginForm: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
-    alert("Tính năng đăng nhập Google sẽ được phát triển trong tương lai");
+    googleOAuth();
   };
 
 
