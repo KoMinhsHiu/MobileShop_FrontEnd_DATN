@@ -46,17 +46,18 @@ const OrderManagement: React.FC = () => {
 
   // Handle filter changes
   const handleFilterChange = useCallback((key: keyof typeof filters, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  }, [setFilters]);
+    setFilters({ ...filters, [key]: value });
+  }, [setFilters, filters]);
 
   // Handle sort
   const handleSort = useCallback((sortBy: 'orderDate' | 'totalAmount' | 'status') => {
-    setFilters(prev => ({
-      ...prev,
+    const newSortOrder = filters.sortBy === sortBy && filters.sortOrder === 'desc' ? 'asc' : 'desc';
+    setFilters({
+      ...filters,
       sortBy,
-      sortOrder: prev.sortBy === sortBy && prev.sortOrder === 'desc' ? 'asc' : 'desc'
-    }));
-  }, [setFilters]);
+      sortOrder: newSortOrder
+    });
+  }, [setFilters, filters]);
 
   // Handle view order
   const handleViewOrder = useCallback((order: Order) => {

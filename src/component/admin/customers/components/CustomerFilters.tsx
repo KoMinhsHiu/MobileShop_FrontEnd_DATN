@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { CustomerFilters } from '../../../admin.types';
+import { CustomerFilters } from '../../admin.types';
 import { ROLE_OPTIONS, STATUS_OPTIONS } from '../constants/customerConstants';
 import styles from '../CustomerManagement.module.scss';
 

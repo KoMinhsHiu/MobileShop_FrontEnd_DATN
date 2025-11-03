@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 // Types
-import { Customer, CustomerFilters, PaginationInfo } from '../../../admin.types';
+import { Customer, CustomerFilters, PaginationInfo } from '../../admin.types';
 
 // Utils
 import { 

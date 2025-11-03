@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBell,
@@ -85,14 +86,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
         
         <nav className={styles.nav}>
           {MENU_ITEMS.map((item, index) => (
-            <a
+            <Link
               key={index}
               href={item.href}
               className={`${styles.navItem} ${item.href === currentPage ? styles.active : ''}`}
             >
               <FontAwesomeIcon icon={item.icon} />
               <span>{item.label}</span>
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
@@ -142,7 +143,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
                     ))}
                   </div>
                   <div className={styles.notificationFooter}>
-                    <a href="/admin/notifications">Xem tất cả thông báo</a>
+                    <Link href="/admin/notifications">Xem tất cả thông báo</Link>
                   </div>
                 </div>
               )}
@@ -162,14 +163,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
               
               {profileMenuOpen && (
                 <div className={styles.profileMenu}>
-                  <a href="/admin/profile" className={styles.menuItem}>
+                  <Link href="/admin/profile" className={styles.menuItem}>
                     <FontAwesomeIcon icon={faUser} />
                     Profile
-                  </a>
-                  <a href="/admin/settings" className={styles.menuItem}>
+                  </Link>
+                  <Link href="/admin/settings" className={styles.menuItem}>
                     <FontAwesomeIcon icon={faCog} />
                     Cài đặt
-                  </a>
+                  </Link>
                   <button 
                     className={styles.menuItem}
                     onClick={handleLogout}

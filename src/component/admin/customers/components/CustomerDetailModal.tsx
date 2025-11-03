@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faEnvelope, faPhone, faMapMarkerAlt, faShoppingCart, faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { Customer } from '../../../admin.types';
+import { Customer } from '../../admin.types';
 import { formatCurrency, formatDate, getRoleIcon, getRoleLabel, getStatusLabel } from '../constants/customerConstants';
 import styles from '../CustomerDetailModal.module.scss';
 

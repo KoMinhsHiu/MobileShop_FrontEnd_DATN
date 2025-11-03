@@ -215,7 +215,7 @@ const AdvancedFilter: FC<AdvancedFilterProps> = ({ onFiltersChange, initialFilte
                 >
                   <option value="">Không giới hạn</option>
                   {screenSizeOptions.map(size => (
-                    <option key={size} value={size}>{size}"</option>
+                    <option key={size} value={size}>{size}&quot;</option>
                   ))}
                 </select>
               </div>
@@ -228,7 +228,7 @@ const AdvancedFilter: FC<AdvancedFilterProps> = ({ onFiltersChange, initialFilte
                 >
                   <option value="">Không giới hạn</option>
                   {screenSizeOptions.map(size => (
-                    <option key={size} value={size}>{size}"</option>
+                    <option key={size} value={size}>{size}&quot;</option>
                   ))}
                 </select>
               </div>

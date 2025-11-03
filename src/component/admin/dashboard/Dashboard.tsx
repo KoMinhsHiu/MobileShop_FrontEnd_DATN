@@ -121,18 +121,18 @@ const Dashboard: React.FC = () => {
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
-                  data={ORDER_STATUS_DATA}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={120}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {ORDER_STATUS_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
+                    data={ORDER_STATUS_DATA as any}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={120}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {ORDER_STATUS_DATA.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
                 <Tooltip 
                   contentStyle={getChartTooltipStyle()}
                   formatter={getPieChartTooltipFormatter}

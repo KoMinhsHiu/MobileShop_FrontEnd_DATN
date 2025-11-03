@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const LoginSignupIndex = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const LoginSignupIndex = () => {
     }}>
       <div style={{ textAlign: 'center' }}>
         <h2>Redirecting to login...</h2>
-        <p>If you are not redirected automatically, <a href="/LoginSignup/login">click here</a>.</p>
+        <p>If you are not redirected automatically, <Link href="/LoginSignup/login">click here</Link>.</p>
       </div>
     </div>
   );

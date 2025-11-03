@@ -39,6 +39,11 @@ const mapSortParams = (
 
 
 const CategoryPage: FC<CategoryPageProps> = ({ initialCategory }) => {
+  const router = useRouter();
+  const menu = useMegaMenu();
+  const page = parseInt(router.query.page as string, 10) || 1;
+  const categoryId = String(router.query.slug);
+
   const [filterQuery, setFilterQuery] = useState<string | undefined>();
   const [orderQuery, setOrderQuery] = useState<string | undefined>(undefined);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -55,40 +60,7 @@ const CategoryPage: FC<CategoryPageProps> = ({ initialCategory }) => {
     maxScreenSize?: number;
     nfc?: boolean;
   }>({});
-  const router = useRouter();
-  const menu = useMegaMenu();
-  const page = parseInt(router.query.page as string, 10) || 1;
-  const categoryId = String(router.query.slug);
-  
-  // Redirect /category/all to /products
-  if (categoryId === 'all') {
-    router.replace('/products');
-    return null;
-  }
-  
-  // Handle filter changes
-  const handleFilterChange = (newFilter: string) => {
-    if (newFilter === "undefined") {
-      setActiveFilters([]);
-      setFilterQuery(undefined);
-    } else {
-      // Toggle the filter in active filters array
-      setActiveFilters(prev => {
-        const updatedFilters = prev.includes(newFilter)
-          ? prev.filter(f => f !== newFilter)
-          : [...prev, newFilter];
-        
-        setFilterQuery(updatedFilters.length > 0 ? updatedFilters.join(',') : undefined);
-        return updatedFilters;
-      });
-    }
-  };
 
-  // Handle sort changes
-  const handleSortChange = (newSort: string) => {
-    setOrderQuery(newSort === "default" ? undefined : newSort);
-  };
-  
   // Use the new phone variants API
   const sortParams = mapSortParams(orderQuery);
   const { data: phoneVariantsData, isLoading, error } = useFetchPhoneVariants({
@@ -99,9 +71,7 @@ const CategoryPage: FC<CategoryPageProps> = ({ initialCategory }) => {
     ...advancedFilters,
   });
 
-
-  // Transform the data to match the expected Category interface
-  const category: Category = {
+  const category = React.useMemo(() => ({
     title: categoryId === 'all' ? "Tất cả điện thoại" : categoryId.charAt(0).toUpperCase() + categoryId.slice(1),
     product: phoneVariantsData?.products || [],
     totalProducts: phoneVariantsData?.totalProducts || 0,
@@ -135,10 +105,39 @@ const CategoryPage: FC<CategoryPageProps> = ({ initialCategory }) => {
       { label: "Tên (Z→A)", value: "name_desc", querySort: "name_desc", isActive: orderQuery === "name_desc" },
       { label: "Đánh giá (cao→thấp)", value: "rating_desc", querySort: "rating_desc", isActive: orderQuery === "rating_desc" }
     ]
-  };
+  }), [categoryId, phoneVariantsData, orderQuery]);
 
   useEffect(() => {
+    // Effect logic here...
   }, [isLoading, error, category, initialCategory]);
+  
+  // Handle filter changes
+  const handleFilterChange = (newFilter: string) => {
+    if (newFilter === "undefined") {
+      setActiveFilters([]);
+      setFilterQuery(undefined);
+    } else {
+      setActiveFilters(prev => {
+        const updatedFilters = prev.includes(newFilter)
+          ? prev.filter(f => f !== newFilter)
+          : [...prev, newFilter];
+        
+        setFilterQuery(updatedFilters.length > 0 ? updatedFilters.join(',') : undefined);
+        return updatedFilters;
+      });
+    }
+  };
+
+  // Handle sort changes
+  const handleSortChange = (newSort: string) => {
+    setOrderQuery(newSort === "default" ? undefined : newSort);
+  };
+
+  // Redirect /category/all to /products
+  if (categoryId === 'all') {
+    router.replace('/products');
+    return null;
+  }
 
   // Only show placeholder on initial load, not on filter changes
   if (isLoading && !phoneVariantsData) {

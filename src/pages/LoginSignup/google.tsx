@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/authContext";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -52,7 +53,7 @@ const GoogleCallbackPage = () => {
       ) : (
         <div style={{ textAlign: 'center' }}>
           <h2>Đang xử lý xác thực Google...</h2>
-          <p>Vui lòng chờ trong khi chúng tôi hoàn tất đăng nhập. Nếu không được chuyển hướng, <a href="/LoginSignup/login">nhấn vào đây</a>.</p>
+          <p>Vui lòng chờ trong khi chúng tôi hoàn tất đăng nhập. Nếu không được chuyển hướng, <Link href="/LoginSignup/login">nhấn vào đây</Link>.</p>
         </div>
       )}
     </div>

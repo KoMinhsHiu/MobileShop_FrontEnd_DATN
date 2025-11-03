@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { Customer, UserRole } from '../../../admin.types';
+import { Customer, UserRole } from '../../admin.types';
 import { ROLE_OPTIONS } from '../constants/customerConstants';
 import styles from '../RoleAssignmentModal.module.scss';
 
