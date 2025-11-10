@@ -18,6 +18,10 @@ export const LoginAPI = "/auth/login";
 export const LogoutAPI = "/auth/logout";
 export const GoogleOAuthAPI = "/auth/google";
 
+// Phones API
+export const PhonesAPI = "/phones";
+export const CategoriesAPI = "/categories";
+
 // Phone Variants API
 export const PhoneVariantsAPI = "/phones/variants/filter";
 export const PhoneVariantDetailAPI = "/phones/variants";

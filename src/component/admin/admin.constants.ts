@@ -5,13 +5,9 @@ import {
   faUsers,
   faChartBar,
   faDollarSign,
-  faArrowUp,
-  faClock,
-  faTruck,
-  faCheckCircle,
-  faTimesCircle,
   faMobileAlt,
-  faLayerGroup
+  faLayerGroup,
+  faTags
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   MenuItem, 
@@ -25,8 +21,9 @@ import {
 
 export const MENU_ITEMS: MenuItem[] = [
   { icon: faTachometerAlt, label: 'Dashboard', href: '/admin', active: false },
-  { icon: faBox, label: 'Quản lý biến thể điện thoại', href: '/admin/products', active: false },
-  { icon: faLayerGroup, label: 'Quản lý dòng điện thoại', href: '/admin/phone-lines', active: false },
+  { icon: faTags, label: 'Quản lý thương hiệu', href: '/admin/brands', active: false },
+  { icon: faLayerGroup, label: 'Quản lý danh mục', href: '/admin/categories', active: false },
+  { icon: faMobileAlt, label: 'Quản lý điện thoại', href: '/admin/phones', active: false },
   { icon: faShoppingCart, label: 'Quản lý đơn hàng', href: '/admin/orders', active: false },
   { icon: faUsers, label: 'Quản lý khách hàng', href: '/admin/customers', active: false },
   { icon: faChartBar, label: 'Thống kê doanh thu', href: '/admin/reports', active: false },

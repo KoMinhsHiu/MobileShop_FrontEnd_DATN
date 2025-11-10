@@ -10,7 +10,7 @@ import PaymentMethods from "@/component/checkout/PaymentMethods";
 import OrderSummary from "@/component/checkout/OrderSummary";
 import { ShippingInfo } from "@/component/checkout/ShippingForm/types";
 import { PaymentMethod } from "@/component/checkout/PaymentMethods/types";
-import { ordersAPI, CreateOrderRequest, shippingAPI } from "@/utils/api/orders";
+import { ordersAPI, CreateOrderRequest, shippingAPI, PaymentMethodDto } from "@/utils/api/orders";
 import { useLocation } from "@/utils/hooks/useLocation";
 import { withAuth } from "@/component/auth";
 
@@ -303,6 +303,18 @@ const CheckoutPageComponent = () => {
       const totalAmount = items.reduce((sum: number, item) => sum + (item.price * item.quantity), 0);
       const discountAmount = items.reduce((sum: number, item) => sum + (item.discount * item.quantity), 0);
 
+      let paymentMethod: PaymentMethodDto;
+      switch (selectedPayment) {
+        case 'vnpay':
+          paymentMethod = { id: 2, code: 'VNPAY', name: 'VNPAY' };
+          break;
+        case 'cod':
+          paymentMethod = { id: 1, code: 'COD', name: 'Thanh toán khi nhận hàng (COD)' };
+          break;
+        default:  
+          paymentMethod = { id: 2, code: 'COD', name: 'Thanh toán khi nhận hàng (COD)' };
+      }
+
       // Create order request
       const orderRequest: CreateOrderRequest = {
         totalAmount: totalAmount,
@@ -315,7 +327,8 @@ const CheckoutPageComponent = () => {
         communeId: communeId, // Using ID instead of code
         provinceId: provinceId, // Using ID instead of code
         postalCode: '', // Optional field
-        items: items
+        items: items,
+        paymentMethod: paymentMethod,
       };
 
       console.log('🚀 Creating order with data:', {

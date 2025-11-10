@@ -92,6 +92,12 @@ export interface CreateOrderItem {
   discount: number;
 }
 
+export interface PaymentMethodDto {
+  id: number;
+  code: string;
+  name: string;
+}
+
 export interface CreateOrderRequest {
   totalAmount: number;
   discountAmount: number;
@@ -105,6 +111,7 @@ export interface CreateOrderRequest {
   postalCode?: string;
   voucherIdApplied?: number;
   pointUsed?: number;
+  paymentMethod: PaymentMethodDto;
   items: CreateOrderItem[];
 }
 
