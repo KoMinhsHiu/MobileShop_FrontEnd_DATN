@@ -65,7 +65,7 @@ export const ProductTransformer = (data: any): ProductType => {
       })) || [],
       description: data.description || "Sample product description",
       id: String(data.id || 1),
-      productAttributeId: null,
+      productAttributeId: 0,
     };
   }
 };

@@ -67,6 +67,8 @@ export interface Specification {
 export interface SpecificationInfo {
   info: string;
   specification: Specification;
+  valueNumeric?: number;
+  unit?: string;
 }
 
 export interface Review {
