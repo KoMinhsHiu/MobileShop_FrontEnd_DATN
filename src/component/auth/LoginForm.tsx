@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/context/authContext';
 import styles from './auth.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -112,8 +114,10 @@ const LoginForm: React.FC = () => {
               type="button"
               className={styles.passwordToggle}
               onClick={() => setShowPassword(!showPassword)}
+              title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
             >
-              {showPassword ? "🙈" : "👁️"}
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
             </button>
           </div>
         </div>

@@ -1,10 +1,10 @@
 import { 
   faPen, 
-  faPlus, 
-  faTags, 
+  faPlus,
   faTrash, 
   faSearch,
-  faSpinner 
+  faSpinner, 
+  faBox
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./BrandManagement.module.scss";
@@ -105,7 +105,7 @@ const BrandManagement = () => {
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.title}>
-            <FontAwesomeIcon icon={faTags} className={styles.titleIcon} />
+            <FontAwesomeIcon icon={faBox} className={styles.titleIcon} />
             Quản lý thương hiệu
           </h1>
           <p className={styles.subtitle}>Quản lý danh sách thương hiệu</p>

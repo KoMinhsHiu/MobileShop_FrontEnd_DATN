@@ -1,3 +1,6 @@
+import { StatusHistory, Shipment } from "@/utils/api/orders";
+import { Payment } from "@/utils/api/payment";
+
 export interface MenuItem {
   icon: any;
   label: string;
@@ -42,12 +45,12 @@ export interface RecentOrder {
   id: string;
   customer: string;
   amount: string;
-  status: 'pending' | 'shipping' | 'completed' | 'cancelled';
+  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'canceled' | 'failed';
   date: string;
   items: number;
 }
 
-export type OrderStatus = 'pending' | 'shipping' | 'completed' | 'cancelled';
+export type OrderStatus = 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'canceled' | 'failed';
 
 // Order Management Types
 export interface OrderItem {
@@ -56,6 +59,7 @@ export interface OrderItem {
   productName: string;
   variant: string;
   quantity: number;
+  color: string;
   unitPrice: number;
   totalPrice: number;
   image?: string;
@@ -78,8 +82,14 @@ export interface Order {
   customer: CustomerInfo;
   items: OrderItem[];
   totalAmount: number;
+  discountAmount: number;
+  shippingFee: number;
+  finalAmount: number;
   paymentMethod: 'COD' | 'VNPay' | 'Momo' | 'BankTransfer';
   status: OrderStatus;
+  statusHistory?: StatusHistory[];
+  shipments?: Shipment[];
+  payments?: Payment[];
   orderDate: string;
   deliveryDate?: string;
   notes?: string;

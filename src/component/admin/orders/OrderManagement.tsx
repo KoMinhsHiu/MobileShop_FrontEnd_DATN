@@ -2,14 +2,14 @@ import React, { useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faShoppingCart,
-  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { Order } from '../admin.types';
-import { MOCK_ORDERS } from '../admin.constants';
 import { ORDER_STATUS_OPTIONS } from './constants/orderConstants';
 import { useOrderManagement } from './hooks/useOrderManagement';
-import { OrderService, handleApiError } from './services/orderService';
+import { handleApiError } from './services/orderService';
+import ordersAPI from '@/utils/api/orders';
 import OrderDetailModal from './OrderDetailModal';
+import UpdateOrderStatusModal from './UpdateOrderStatusModal';
 import OrderTable from './components/OrderTable';
 import OrderFiltersComponent from './components/OrderFilters';
 import ToastContainer from './ToastContainer';
@@ -22,9 +22,8 @@ import styles from './OrderManagement.module.scss';
 
 const OrderManagement: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   
   const { toasts, removeToast, showSuccess, showError } = useToast();
   
@@ -33,14 +32,17 @@ const OrderManagement: React.FC = () => {
     filteredOrders,
     filters,
     pagination,
+    isLoading,
+    error,
     setFilters,
     updateOrder,
     clearFilters,
     goToPage,
     goToPreviousPage,
-    goToNextPage
+    goToNextPage,
+    refetch,
+    handleItemsPerPageChange
   } = useOrderManagement({
-    initialOrders: MOCK_ORDERS,
     itemsPerPage: 10
   });
 
@@ -62,12 +64,22 @@ const OrderManagement: React.FC = () => {
   // Handle view order
   const handleViewOrder = useCallback((order: Order) => {
     setSelectedOrder(order);
-    setIsModalOpen(true);
+    setIsDetailModalOpen(true);
   }, []);
 
-  // Handle close modal
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
+  const handleUpdateOrder = useCallback((order: Order) => {
+    setSelectedOrder(order);
+    setIsUpdateModalOpen(true);
+  }, []);
+
+  // Handle close modals
+  const handleCloseDetailModal = useCallback(() => {
+    setIsDetailModalOpen(false);
+    setSelectedOrder(null);
+  }, []);
+
+  const handleCloseUpdateModal = useCallback(() => {
+    setIsUpdateModalOpen(false);
     setSelectedOrder(null);
   }, []);
 
@@ -77,11 +89,8 @@ const OrderManagement: React.FC = () => {
     status: string, 
     internalNotes?: string
   ) => {
-    setIsLoading(true);
-    setError(null);
-    
     try {
-      await OrderService.updateOrderStatus(orderId, status, internalNotes);
+      await ordersAPI.updateOrderStatus(orderId, status);
       
       const order = orders.find(o => o.id === orderId);
       if (!order) {
@@ -103,22 +112,21 @@ const OrderManagement: React.FC = () => {
         'Cập nhật thành công',
         `Đơn hàng ${order.orderNumber} đã được chuyển sang trạng thái ${statusLabel}.`
       );
+
+      refetch();
     } catch (error) {
       const errorMessage = handleApiError(error);
-      setError(errorMessage);
       showError(
         'Cập nhật thất bại',
         errorMessage
       );
-    } finally {
-      setIsLoading(false);
     }
   }, [orders, updateOrder, showSuccess, showError]);
 
   // Handle retry
   const handleRetry = useCallback(() => {
-    setError(null);
-  }, []);
+    refetch();
+  }, [refetch]);
 
   // Show loading state
   if (isLoading && !error) {
@@ -153,12 +161,6 @@ const OrderManagement: React.FC = () => {
             <FontAwesomeIcon icon={faShoppingCart} style={{ marginRight: '12px' }} />
             Quản lý đơn hàng
           </h1>
-          <div className={styles.headerActions}>
-            <button className="btn btn-outline">
-              <FontAwesomeIcon icon={faCalendarAlt} />
-              Xuất báo cáo
-            </button>
-          </div>
         </div>
 
         {/* Filters */}
@@ -176,17 +178,26 @@ const OrderManagement: React.FC = () => {
           pagination={pagination}
           statusOptions={ORDER_STATUS_OPTIONS}
           onViewOrder={handleViewOrder}
+          onUpdateOrder={handleUpdateOrder}
           onSort={handleSort}
           onPageChange={goToPage}
           onPreviousPage={goToPreviousPage}
           onNextPage={goToNextPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
 
         {/* Order Detail Modal */}
         <OrderDetailModal
           order={selectedOrder}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseDetailModal}
+        />
+
+        {/* Update Order Status Modal */}
+        <UpdateOrderStatusModal
+          order={selectedOrder}
+          isOpen={isUpdateModalOpen}
+          onClose={handleCloseUpdateModal}
           onUpdateStatus={handleUpdateOrderStatus}
         />
 

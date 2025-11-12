@@ -84,7 +84,7 @@ const PhoneManagement = () => {
         await deletePhone(id);
         messageApi.success('Xóa dòng điện thoại thành công');
         // Reload phone list
-        window.location.reload();
+        setPagination(prev => ({ ...prev, currentPage: 1 }));
       } catch (error) {
         messageApi.error('Không thể xóa dòng điện thoại. Vui lòng thử lại sau.');
       }

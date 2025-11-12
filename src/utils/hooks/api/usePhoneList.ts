@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { fetchPhoneList, PhoneListParams, PhoneListResponse } from '@/utils/api/phone';
+import { fetchPhoneList, PhoneListResponse } from '@/utils/api/phone';
+
+export interface PhoneListParams {
+  page: number;
+  limit: number;
+}
 
 export interface UsePhoneListReturn {
   phones: PhoneListResponse['data']['data'];
@@ -9,7 +14,7 @@ export interface UsePhoneListReturn {
   refetch: () => void;
 }
 
-export const usePhoneList = (params: PhoneListParams = {}): UsePhoneListReturn => {
+export const usePhoneList = (params: PhoneListParams): UsePhoneListReturn => {
   const [phones, setPhones] = useState<PhoneListResponse['data']['data']>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +25,8 @@ export const usePhoneList = (params: PhoneListParams = {}): UsePhoneListReturn =
       setIsLoading(true);
       setError(null);
       
-      const response = await fetchPhoneList(params);
+      const { page, limit } = params;
+      const response = await fetchPhoneList(page, limit);
       
       if (response.status === 200) {
         setPhones(response.data.data);
@@ -38,7 +44,7 @@ export const usePhoneList = (params: PhoneListParams = {}): UsePhoneListReturn =
 
   useEffect(() => {
     fetchData();
-  }, [params.page, params.limit, params.order]);
+  }, [params.page, params.limit]);
 
   const refetch = () => {
     fetchData();

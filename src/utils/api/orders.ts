@@ -1,5 +1,6 @@
 import axiosInstance from './fetchData/axiosInstance';
 import { OrdersAPI, CreateOrderAPI, CalculateShippingFeeAPI } from '@/const/endPoint';
+import { Payment } from './payment';
 
 // API Response Types
 export interface OrderItem {
@@ -32,7 +33,8 @@ export interface StatusHistory {
   id: number;
   orderId: number;
   status: string;
-  note: string | null;
+  note?: string;
+  createdAt: string;
 }
 
 export interface Transaction {
@@ -44,14 +46,16 @@ export interface Transaction {
   moneyValue: number;
 }
 
+export type ShipmentStatus = 'pending' | 'processing' | 'delivered' | 'canceled' | 'failed';
+
 export interface Shipment {
   id: number;
   orderId: number;
-  carrier: string;
-  trackingNumber: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
+  provider: string;
+  trackingCode: string;
+  status: ShipmentStatus;
+  fee: number;
+  estimatedDeliveryDate: string;
 }
 
 export interface Order {
@@ -74,12 +78,28 @@ export interface Order {
   statusHistory: StatusHistory[];
   transactions: Transaction[];
   shipments: Shipment[];
+  payments: Payment[];
 }
 
 export interface OrdersResponse {
   status: number;
   message: string;
   data: Order[]; // API trả về array trực tiếp, không phải object với orders
+  errors: null;
+}
+
+export interface OrdersListResponse {
+  status: number;
+  message: string;
+  data: {
+    data: Order[];
+    paging: {
+      page: number;
+      limit: number;
+      order: string;
+    };
+    total: number;
+  };
   errors: null;
 }
 
@@ -146,11 +166,77 @@ export const ordersAPI = {
   // Get user's orders
   getMyOrders: async (): Promise<OrdersResponse> => {
     try {
-      const response = await axiosInstance.get(OrdersAPI);
+      const response = await axiosInstance.get(`${OrdersAPI}/me`);
       return response.data;
     } catch (error: any) {
       console.error('Error fetching orders:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+    }
+  },
+
+  // List orders with pagination
+  listOrders: async (page: number, limit: number): Promise<OrdersListResponse> => {
+    try {
+      // Get JWT token from localStorage (using phonehub_tokens key)
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${OrdersAPI}/list`, {
+        params: { page, limit },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching orders list:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders list');
+    }
+  },
+
+  // List customer orders with pagination
+  listCustomerOrders: async (page: number, limit: number): Promise<OrdersListResponse> => {
+    try {
+      // Get JWT token from localStorage (using phonehub_tokens key)
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${OrdersAPI}/me/list`, {
+        params: { page, limit },
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;      
+    } catch (error: any) {
+      console.error('Error fetching customer orders list:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch customer orders list');
     }
   },
 
@@ -174,7 +260,37 @@ export const ordersAPI = {
       console.error('Error creating order:', error);
       throw new Error(error.response?.data?.message || 'Failed to create order');
     }
-  }
+  },
+
+  updateOrderStatus: async (orderId: string, status: string): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.put(`${OrdersAPI}/status/${orderId}`,
+        { status },
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+    } catch (error: any) {
+      console.error('Error updating order status:', error);
+      throw new Error(error.response?.data?.message || 'Failed to update order status');
+    }
+  },
 };
 
 export default ordersAPI;

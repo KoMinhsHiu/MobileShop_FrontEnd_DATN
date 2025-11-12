@@ -4,58 +4,49 @@ import { OrderStatusOption } from '../../admin.types';
  * Order status options with icons and colors
  */
 export const ORDER_STATUS_OPTIONS: OrderStatusOption[] = [
-  { 
-    value: 'pending', 
-    label: 'Chờ xác nhận', 
-    color: '#f59e0b', 
-    icon: '🟡' 
+  {
+    value: 'pending',
+    label: 'Chờ xác nhận',
+    color: '#FBBF24', // amber
+    icon: '⏳'
   },
-  { 
-    value: 'shipping', 
-    label: 'Đang giao', 
-    color: '#3b82f6', 
-    icon: '🚚' 
+  {
+    value: 'paid',
+    label: 'Đã thanh toán',
+    color: '#06B6D4', // cyan
+    icon: '💳'
   },
-  { 
-    value: 'completed', 
-    label: 'Đã giao', 
-    color: '#10b981', 
-    icon: '✅' 
+  {
+    value: 'processing',
+    label: 'Đang xử lý',
+    color: '#6366F1', // indigo
+    icon: '⚙️'
   },
-  { 
-    value: 'cancelled', 
-    label: 'Đã hủy', 
-    color: '#ef4444', 
-    icon: '❌' 
+  {
+    value: 'shipped',
+    label: 'Đang giao',
+    color: '#3B82F6', // blue
+    icon: '🚚'
+  },
+  {
+    value: 'delivered',
+    label: 'Đã giao',
+    color: '#10B981', // green
+    icon: '✅'
+  },
+  {
+    value: 'canceled',
+    label: 'Đã hủy',
+    color: '#EF4444', // red
+    icon: '🛑'
+  },
+  {
+    value: 'failed',
+    label: 'Thất bại',
+    color: '#B91C1C', // dark red
+    icon: '⚠️'
   }
 ];
-
-/**
- * Payment method options
- */
-export const PAYMENT_METHODS = [
-  { value: 'COD', label: 'COD' },
-  { value: 'VNPay', label: 'VNPay' },
-  { value: 'Momo', label: 'Momo' },
-  { value: 'BankTransfer', label: 'Chuyển khoản' }
-] as const;
-
-/**
- * Sort options for orders
- */
-export const SORT_OPTIONS = [
-  { value: 'orderDate', label: 'Ngày đặt' },
-  { value: 'totalAmount', label: 'Tổng tiền' },
-  { value: 'status', label: 'Trạng thái' }
-] as const;
-
-/**
- * Default pagination settings
- */
-export const DEFAULT_PAGINATION = {
-  itemsPerPage: 10,
-  maxVisiblePages: 5
-} as const;
 
 /**
  * Toast notification settings
