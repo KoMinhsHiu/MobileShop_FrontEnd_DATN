@@ -19,10 +19,12 @@ interface OrderTableProps {
   pagination: PaginationInfo;
   statusOptions: OrderStatusOption[];
   onViewOrder: (order: Order) => void;
+  onUpdateOrder: (order: Order) => void;
   onSort: (sortBy: 'orderDate' | 'totalAmount' | 'status') => void;
   onPageChange: (page: number) => void;
   onPreviousPage: () => void;
   onNextPage: () => void;
+  onItemsPerPageChange: (itemsPerPage: number) => void;
 }
 
 const OrderTable: React.FC<OrderTableProps> = ({
@@ -31,10 +33,10 @@ const OrderTable: React.FC<OrderTableProps> = ({
   pagination,
   statusOptions,
   onViewOrder,
+  onUpdateOrder,
   onSort,
   onPageChange,
-  onPreviousPage,
-  onNextPage
+  onItemsPerPageChange
 }) => {
   // Get status badge
   const getStatusBadge = (status: string) => {
@@ -69,27 +71,11 @@ const OrderTable: React.FC<OrderTableProps> = ({
       : <FontAwesomeIcon icon={faSortDown} />;
   };
 
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    const startPage = Math.max(1, pagination.currentPage - Math.floor(maxVisiblePages / 2));
-    const endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
-    
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-
   return (
     <div className={styles.tableCard}>
       <div className={styles.tableHeader}>
         <div>
           <h3>Danh sách đơn hàng</h3>
-          <div className={styles.tableInfo}>
-            Hiển thị {orders.length} trong tổng số {pagination.totalItems} đơn hàng
-          </div>
         </div>
       </div>
       
@@ -130,14 +116,11 @@ const OrderTable: React.FC<OrderTableProps> = ({
               </th>
               <th>Thanh toán</th>
               <th 
-                onClick={() => onSort('status')}
                 style={{ cursor: 'pointer' }}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && onSort('status')}
-                aria-label="Sắp xếp theo trạng thái"
               >
-                Trạng thái {getSortIcon('status')}
+                Trạng thái
               </th>
               <th>Hành động</th>
             </tr>
@@ -164,7 +147,7 @@ const OrderTable: React.FC<OrderTableProps> = ({
                       </button>
                       <button 
                         className={`${styles.editBtn} btn`}
-                        onClick={() => onViewOrder(order)}
+                        onClick={() => onUpdateOrder(order)}
                         aria-label={`Cập nhật đơn hàng ${order.orderNumber}`}
                       >
                         <FontAwesomeIcon icon={faEdit} />
@@ -190,43 +173,136 @@ const OrderTable: React.FC<OrderTableProps> = ({
       </div>
       
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div className={styles.pagination}>
-          <div className={styles.paginationInfo}>
-            Trang {pagination.currentPage} / {pagination.totalPages}
+      <div className={styles.pagination}>
+        <div className={styles.paginationInfo}>
+          Hiển thị {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} - {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} trong tổng số {pagination.totalItems} đơn hàng
+        </div>
+
+        <div className={styles.paginationControls}>
+          <div className={styles.itemsPerPage}>
+            <label>Hiển thị:</label>
+            <select
+              value={pagination.itemsPerPage}
+              onChange={(e) => onItemsPerPageChange(parseInt(e.target.value))}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span>đơn/trang</span>
           </div>
-          
-          <div className={styles.paginationControls}>
-            <button 
-              onClick={onPreviousPage}
+
+          <div className={styles.pageControls}>
+            <button
+              className={styles.paginationButton}
+              onClick={() => onPageChange(1)}
               disabled={pagination.currentPage === 1}
-              aria-label="Trang trước"
+              title="Trang đầu"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} />
+              <FontAwesomeIcon icon={faChevronLeft} />
+            </button>
+
+            <button
+              className={styles.paginationButton}
+              onClick={() => onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+              title="Trang trước"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
-            
-            {getPageNumbers().map(page => (
-              <button
-                key={page}
-                onClick={() => onPageChange(page)}
-                className={page === pagination.currentPage ? styles.active : ''}
-                aria-label={`Trang ${page}`}
-                aria-current={page === pagination.currentPage ? 'page' : undefined}
-              >
-                {page}
-              </button>
-            ))}
-            
-            <button 
-              onClick={onNextPage}
+
+            {(() => {
+              const totalPages = pagination.totalPages;
+              const currentPage = pagination.currentPage;
+              const pages = [];
+
+              if (totalPages <= 6) {
+                for (let i = 1; i <= totalPages; i++) {
+                  pages.push(
+                    <button
+                      key={i}
+                      className={`${styles.paginationButton} ${i === currentPage ? styles.active : ''}`}
+                      onClick={() => onPageChange(i)}
+                    >
+                      {i}
+                    </button>
+                  );
+                }
+              } else {
+                pages.push(
+                  <button
+                    key={1}
+                    className={`${styles.paginationButton} ${1 === currentPage ? styles.active : ''}`}
+                    onClick={() => onPageChange(1)}
+                  >
+                    1
+                  </button>
+                );
+
+                if (currentPage > 4) {
+                  pages.push(<span key="start-ellipsis" className={styles.ellipsis}>...</span>);
+                }
+
+                const start = Math.max(2, currentPage - 1);
+                const end = Math.min(totalPages - 1, currentPage + 1);
+                
+                for (let i = start; i <= end; i++) {
+                  if (i !== 1 && i !== totalPages) {
+                    pages.push(
+                      <button
+                        key={i}
+                        className={`${styles.paginationButton} ${i === currentPage ? styles.active : ''}`}
+                        onClick={() => onPageChange(i)}
+                      >
+                        {i}
+                      </button>
+                    );
+                  }
+                }
+
+                if (currentPage < totalPages - 3) {
+                  pages.push(<span key="end-ellipsis" className={styles.ellipsis}>...</span>);
+                }
+
+                if (totalPages > 1) {
+                  pages.push(
+                    <button
+                      key={totalPages}
+                      className={`${styles.paginationButton} ${totalPages === currentPage ? styles.active : ''}`}
+                      onClick={() => onPageChange(totalPages)}
+                    >
+                      {totalPages}
+                    </button>
+                  );
+                }
+              }
+
+              return pages;
+            })()}
+
+            <button
+              className={styles.paginationButton}
+              onClick={() => onPageChange(pagination.currentPage + 1)}
               disabled={pagination.currentPage === pagination.totalPages}
-              aria-label="Trang sau"
+              title="Trang sau"
             >
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+
+            <button
+              className={styles.paginationButton}
+              onClick={() => onPageChange(pagination.totalPages)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              title="Trang cuối"
+            >
+              <FontAwesomeIcon icon={faChevronRight} />
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

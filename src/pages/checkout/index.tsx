@@ -15,7 +15,7 @@ import { useLocation } from "@/utils/hooks/useLocation";
 import { withAuth } from "@/component/auth";
 
 import styles from "./checkout.module.scss";
-import { paymentAPI } from "@/utils/api/transformer/payment";
+import { paymentAPI } from "@/utils/api/payment";
 
 const CheckoutPageComponent = () => {
   const { cart } = useCart() as { cart: any };
@@ -306,10 +306,10 @@ const CheckoutPageComponent = () => {
       let paymentMethod: PaymentMethodDto;
       switch (selectedPayment) {
         case 'vnpay':
-          paymentMethod = { id: 2, code: 'VNPAY', name: 'VNPAY' };
+          paymentMethod = { id: 1, code: 'VNPAY', name: 'VNPAY' };
           break;
         case 'cod':
-          paymentMethod = { id: 1, code: 'COD', name: 'Thanh toán khi nhận hàng (COD)' };
+          paymentMethod = { id: 2, code: 'COD', name: 'Thanh toán khi nhận hàng (COD)' };
           break;
         default:  
           paymentMethod = { id: 2, code: 'COD', name: 'Thanh toán khi nhận hàng (COD)' };
@@ -353,17 +353,7 @@ const CheckoutPageComponent = () => {
             // For COD, redirect to success page immediately
             router.push(`/orders/success?orderId=${response.data.orderId}`);
             break;
-          case 'paypal':
-            toast.info('Chuyển hướng đến PayPal...');
-            // TODO: Implement PayPal integration
-            router.push(`/orders/success?orderId=${response.data.orderId}`);
-            break;
-          case 'momo':
-            toast.info('Chuyển hướng đến Momo...');
-            // TODO: Implement Momo integration
-            router.push(`/orders/success?orderId=${response.data.orderId}`);
-            break;
-            case 'vnpay':
+          case 'vnpay':
             try {
               const paymentResp = await paymentAPI.getVNPayUrl(response.data.orderId);
 

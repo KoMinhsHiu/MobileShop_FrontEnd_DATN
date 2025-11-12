@@ -28,12 +28,13 @@ export const PhoneVariantDetailAPI = "/phones/variants";
 export const CreatePhoneVariantAPI = "/phones/variants/create";
 
 // Orders API
-export const OrdersAPI = "/orders/me";
+export const OrdersAPI = "/orders";
 export const CreateOrderAPI = "/orders/create";
 export const CalculateShippingFeeAPI = "/shipment/fee";
 
 // Payment API
 export const VNPayAPI = "/payments/vnpay/create";
+export const PaymentAPI = "/payments";
 
 // Location APIs
 export const ProvincesAPI = "/locations/provinces";

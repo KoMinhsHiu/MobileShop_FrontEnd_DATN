@@ -4,6 +4,8 @@ import { useAuth } from '@/context/authContext';
 import { validateRegisterForm } from '@/utils/validation';
 import toast from 'react-hot-toast';
 import styles from './auth.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const RegisterForm: React.FC = () => {
   const router = useRouter();
@@ -218,8 +220,10 @@ const RegisterForm: React.FC = () => {
               type="button"
               className={styles.passwordToggle}
               onClick={() => setShowPassword(!showPassword)}
+              title={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
             >
-              {showPassword ? "🙈" : "👁️"}
+              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
             </button>
           </div>
         </div>
@@ -243,8 +247,10 @@ const RegisterForm: React.FC = () => {
               type="button"
               className={styles.passwordToggle}
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              title={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              aria-label={showConfirmPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
             >
-              {showConfirmPassword ? "🙈" : "👁️"}
+              <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
             </button>
           </div>
         </div>

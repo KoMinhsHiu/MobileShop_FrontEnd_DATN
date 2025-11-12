@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { OrderFilters, OrderStatusOption } from '../../admin.types';
 import styles from '../OrderManagement.module.scss';
+import { paymentAPI, PaymentMethod } from '@/utils/api/payment';
 
 interface OrderFiltersProps {
   filters: OrderFilters;
@@ -17,6 +18,26 @@ const OrderFiltersComponent: React.FC<OrderFiltersProps> = ({
   onFilterChange,
   onClearFilters
 }) => {
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false);
+  const { getPaymentMethods } = paymentAPI;
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        setIsLoadingPaymentMethods(true);
+        const methods = await getPaymentMethods();
+        setPaymentMethods(methods);
+      } catch (error) {
+        console.error('Error fetching payment methods:', error);
+      } finally {
+        setIsLoadingPaymentMethods(false);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
+
   return (
     <div className={styles.filtersCard}>
       <div className={styles.filtersGrid}>
@@ -56,12 +77,14 @@ const OrderFiltersComponent: React.FC<OrderFiltersProps> = ({
             value={filters.paymentMethod}
             onChange={(e) => onFilterChange('paymentMethod', e.target.value)}
             aria-label="Lọc theo phương thức thanh toán"
+            disabled={isLoadingPaymentMethods}
           >
             <option value="Tất cả">Tất cả</option>
-            <option value="COD">COD</option>
-            <option value="VNPay">VNPay</option>
-            <option value="Momo">Momo</option>
-            <option value="BankTransfer">Chuyển khoản</option>
+            {paymentMethods.map(method => (
+              <option key={method.id} value={method.code}>
+                {method.name}
+              </option>
+            ))}
           </select>
         </div>
         

@@ -94,6 +94,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+    
+    &:last-child {
+      border-bottom: none;
+    }
     
     .label {
       font-weight: 500;
@@ -133,6 +139,63 @@
     background: white;
     border-radius: 6px;
     border: 1px solid #e5e7eb;
+  }
+}
+
+.paymentShippingInfo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+  
+  .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 12px 0;
+  }
+  
+  .noInfo {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 20px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .paymentStatus, .shipmentStatus {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    
+    &.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    &.completed, &.delivered {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    &.failed, &.canceled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    
+    &.processing {
+      background: #e0e7ff;
+      color: #4338ca;
+    }
   }
 }
 
@@ -252,6 +315,143 @@
   }
 }
 
+.statusHistory {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .historyTimeline {
+    position: relative;
+    
+    .historyItem {
+      display: flex;
+      gap: 16px;
+      position: relative;
+      
+      &:not(:last-child) {
+        margin-bottom: 20px;
+      }
+      
+      .historyIcon {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .statusIcon {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 600;
+          z-index: 2;
+          
+          &.pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #f59e0b;
+          }
+          
+          &.paid {
+            background: #cffafe;
+            color: #0e7490;
+            border: 2px solid #06b6d4;
+          }
+          
+          &.processing {
+            background: #e0e7ff;
+            color: #4338ca;
+            border: 2px solid #6366f1;
+          }
+          
+          &.shipped {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+          }
+          
+          &.delivered {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+          }
+          
+          &.canceled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #ef4444;
+          }
+          
+          &.failed {
+            background: #fecaca;
+            color: #7f1d1d;
+            border: 2px solid #b91c1c;
+          }
+        }
+        
+        .historyLine {
+          position: absolute;
+          top: 32px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 2px;
+          height: 40px;
+          background: linear-gradient(to bottom, #e5e7eb, transparent);
+        }
+      }
+      
+      .historyContent {
+        flex: 1;
+        padding-top: 4px;
+        
+        .historyHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 6px;
+          
+          .statusLabel {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+          }
+          
+          .historyDate {
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+        
+        .historyNote {
+          color: #374151;
+          font-size: 13px;
+          line-height: 1.4;
+          padding: 8px 12px;
+          background: white;
+          border-radius: 6px;
+          border: 1px solid #e5e7eb;
+          margin-top: 8px;
+        }
+      }
+    }
+  }
+}
+
 .statusUpdate {
   background: #f8fafc;
   border-radius: 8px;
@@ -338,6 +538,15 @@
         background: #2563eb;
       }
     }
+    
+    &.editBtn {
+      background: #059669;
+      color: white;
+      
+      &:hover {
+        background: #047857;
+      }
+    }
   }
 }
 
@@ -353,21 +562,43 @@
   &.pending {
     background: #fef3c7;
     color: #92400e;
+    border: 1px solid #f59e0b;
   }
   
-  &.shipping {
+  &.paid {
+    background: #cffafe;
+    color: #0e7490;
+    border: 1px solid #06b6d4;
+  }
+  
+  &.processing {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #6366f1;
+  }
+  
+  &.shipped {
     background: #dbeafe;
     color: #1e40af;
+    border: 1px solid #3b82f6;
   }
   
-  &.completed {
+  &.delivered {
     background: #d1fae5;
     color: #065f46;
+    border: 1px solid #10b981;
   }
   
-  &.cancelled {
+  &.canceled {
     background: #fee2e2;
     color: #991b1b;
+    border: 1px solid #ef4444;
+  }
+  
+  &.failed {
+    background: #fecaca;
+    color: #7f1d1d;
+    border: 1px solid #b91c1c;
   }
 }
 
@@ -430,6 +661,11 @@
     padding: 16px;
   }
   
+  .paymentShippingInfo {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
   .orderItems {
     .itemsTable {
       th, td {
@@ -451,6 +687,50 @@
     
     button {
       width: 100%;
+    }
+  }
+  
+  .statusHistory {
+    padding: 16px;
+    
+    .historyTimeline {
+      .historyItem {
+        gap: 12px;
+        
+        .historyIcon {
+          .statusIcon {
+            width: 28px;
+            height: 28px;
+            font-size: 12px;
+          }
+          
+          .historyLine {
+            top: 28px;
+            height: 35px;
+          }
+        }
+        
+        .historyContent {
+          .historyHeader {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            
+            .statusLabel {
+              font-size: 13px;
+            }
+            
+            .historyDate {
+              font-size: 11px;
+            }
+          }
+          
+          .historyNote {
+            font-size: 12px;
+            padding: 6px 10px;
+          }
+        }
+      }
     }
   }
 }

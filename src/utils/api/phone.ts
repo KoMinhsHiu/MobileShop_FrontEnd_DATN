@@ -176,14 +176,14 @@ export interface CreateVariantResponse {
 }
 
 /**
- * Fetch phone list
+ * Fetch phone list with pagination
  */
-export const fetchPhoneList = async (): Promise<PhoneListResponse> => {
+export const fetchPhoneList = async (page: number, limit: number): Promise<PhoneListResponse> => {
   const baseURL = process.env.NODE_ENV === 'production' 
     ? process.env.NEXT_PUBLIC_API_URL || 'https://your-production-api.com'
     : 'http://localhost:3000';
   
-  const url = `${baseURL}/api/v1/phones/list`;
+  const url = `${baseURL}/api/v1/phones/list?page=${page}&limit=${limit}`;
   
   try {
     const response = await fetch(url, {
@@ -206,7 +206,7 @@ export const fetchPhoneList = async (): Promise<PhoneListResponse> => {
       message: "Phones retrieved successfully",
       data: {
         data: [],
-        paging: { page: 1, limit: 10, order: 'asc' },
+        paging: { page, limit, order: 'asc' },
         total: 0
       }
     };

@@ -167,25 +167,53 @@
 .statusBadge {
   @include badge($order-gray-100, $order-gray-700);
   padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 12px;
   
   &.pending {
     background: #fef3c7;
     color: #92400e;
+    border: 1px solid #f59e0b;
   }
   
-  &.shipping {
+  &.paid {
+    background: #cffafe;
+    color: #0e7490;
+    border: 1px solid #06b6d4;
+  }
+  
+  &.processing {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #6366f1;
+  }
+  
+  &.shipped {
     background: #dbeafe;
     color: #1e40af;
+    border: 1px solid #3b82f6;
   }
   
-  &.completed {
+  &.delivered {
     background: #d1fae5;
     color: #065f46;
+    border: 1px solid #10b981;
   }
   
-  &.cancelled {
+  &.canceled {
     background: #fee2e2;
     color: #991b1b;
+    border: 1px solid #ef4444;
+  }
+  
+  &.failed {
+    background: #fecaca;
+    color: #7f1d1d;
+    border: 1px solid #b91c1c;
   }
 }
 
@@ -225,26 +253,123 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   
   .paginationInfo {
     color: #6b7280;
     font-size: 14px;
+    font-weight: 500;
   }
   
   .paginationControls {
     display: flex;
-    gap: 8px;
     align-items: center;
+    gap: 16px;
     
-    button {
-      @include button-secondary;
-      padding: 8px 12px;
-      font-size: 14px;
+    .itemsPerPage {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: #6b7280;
+      flex-shrink: 0;
       
-      &.active {
-        background: $order-primary;
-        color: $order-white;
-        border-color: $order-primary;
+      label {
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      
+      select {
+        @include input-base;
+        padding: 4px 8px;
+        font-size: 12px;
+        min-width: 60px;
+        max-width: 70px;
+        background-color: white;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        cursor: pointer;
+        
+        &:focus {
+          outline: none;
+          border-color: $order-primary;
+          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+      }
+      
+      span {
+        font-size: 12px;
+        color: #9ca3af;
+        white-space: nowrap;
+      }
+    }
+    
+    .pageControls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      .paginationButton {
+        @include button-base;
+        padding: 8px 12px;
+        min-width: 40px;
+        height: 36px;
+        font-size: 14px;
+        font-weight: 500;
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        
+        &:hover:not(:disabled) {
+          background: #f9fafb;
+          border-color: #9ca3af;
+          color: #1f2937;
+        }
+        
+        &:active:not(:disabled) {
+          background: #f3f4f6;
+        }
+        
+        &.active {
+          background: $order-primary;
+          color: white;
+          border-color: $order-primary;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          
+          &:hover {
+            background: darken($order-primary, 5%);
+            border-color: darken($order-primary, 5%);
+          }
+        }
+        
+        &:disabled {
+          background: #f9fafb;
+          color: #d1d5db;
+          border-color: #e5e7eb;
+          cursor: not-allowed;
+        }
+        
+        svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
+      
+      .ellipsis {
+        padding: 8px 4px;
+        color: #9ca3af;
+        font-weight: 500;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        height: 36px;
       }
     }
   }
@@ -313,6 +438,42 @@
     padding: 16px;
     flex-direction: column;
     gap: 16px;
+    
+    .paginationControls {
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      
+      .itemsPerPage {
+        justify-content: center;
+        
+        select {
+          min-width: 100px;
+        }
+      }
+      
+      .pageControls {
+        justify-content: center;
+        flex-wrap: wrap;
+        
+        .paginationButton {
+          min-width: 36px;
+          height: 32px;
+          padding: 6px 10px;
+          font-size: 13px;
+          
+          svg {
+            width: 12px;
+            height: 12px;
+          }
+        }
+        
+        .ellipsis {
+          height: 32px;
+          padding: 6px 4px;
+        }
+      }
+    }
   }
 }
 
