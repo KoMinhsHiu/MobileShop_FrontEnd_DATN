@@ -1,5 +1,5 @@
 import axiosInstance from './fetchData/axiosInstance';
-import { RegisterAPI, LoginAPI, LogoutAPI, GoogleOAuthAPI } from '@/const/endPoint';
+import { RegisterAPI, LoginAPI, LogoutAPI, GoogleOAuthAPI, AuthAPI } from '@/const/endPoint';
 
 // Types for API requests and responses
 export interface RegisterRequest {
@@ -11,6 +11,13 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
+}
+
+export interface CreateAdminUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  phone: string;
 }
 
 export interface LoginRequest {
@@ -210,6 +217,40 @@ export const authAPI = {
     }
   },
 
+  changePassword: async (oldPassword: string, newPassword: string): Promise<any> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.post(`${AuthAPI}/change-password`,{
+        currentPassword: oldPassword,
+        newPassword: newPassword
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Change Password Error occurred:', error);
+      throw new Error('Có lỗi xảy ra khi thay đổi mật khẩu: ' + error.message);
+    }
+  },
+
   // Google OAuth login
   googleOAuth: async (): Promise<void> => {
     try {
@@ -279,4 +320,137 @@ export const authAPI = {
       throw new Error('Có lỗi xảy ra trong quá trình xác thực Google: ' + error.message);
     }
   },
+
+  getCurrentAdmin: async () => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${AuthAPI}/user/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Get Current Admin Error occurred:', error);
+      throw new Error('Có lỗi xảy ra khi lấy thông tin người dùng hiện tại: ' + error.message);
+    }
+  },
+
+  updateAdminProfile: async (username: string) => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.put(`${AuthAPI}/user/me`,
+        { username },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Update Admin Profile Error occurred:', error);
+      throw new Error('Có lỗi xảy ra khi cập nhật thông tin người dùng: ' + error.message);
+    }
+  },
+
+  createAdminUser: async (userData: CreateAdminUserRequest) => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.post(`${AuthAPI}/user`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Create Admin User Error occurred:', error);
+      throw new Error('Có lỗi xảy ra khi tạo người dùng quản trị: ' + error.message);
+    }
+  },
+
+  updateUserStatus: async (userId: string, status: string): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      
+      console.log('🔄 Updating user status...');
+
+      const response = await axiosInstance.post(`${AuthAPI}/status/${userId}`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      console.log('✅ Update User Status Response received:');
+      console.log('📊 Status:', response.status);
+      console.log('📋 Data:', response.data);
+    } catch (error: any) {
+      console.error('❌ Update User Status Error occurred:', error);
+      throw new Error('Có lỗi xảy ra khi cập nhật trạng thái người dùng: ' + error.message);
+    }
+  }
 };

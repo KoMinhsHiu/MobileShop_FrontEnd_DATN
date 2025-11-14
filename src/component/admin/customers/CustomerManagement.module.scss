@@ -56,6 +56,11 @@
         align-items: center;
         gap: 8px;
 
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
         &.btn-primary {
           background: #007bff;
           color: white;
@@ -70,12 +75,26 @@
           color: #007bff;
           border: 1px solid #007bff;
 
-          &:hover {
+          &:hover:not(:disabled) {
             background: #007bff;
             color: white;
           }
         }
       }
+    }
+  }
+
+  .errorContainer {
+    margin-bottom: 20px;
+    
+    .errorMessage {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid #f5c6cb;
+      font-size: 14px;
+      font-weight: 500;
     }
   }
 
@@ -247,6 +266,8 @@
               font-size: 12px;
               font-weight: 500;
               text-transform: uppercase;
+              white-space: nowrap;
+              display: inline-block;
 
               &.active {
                 background: #d4edda;
@@ -256,6 +277,11 @@
               &.inactive {
                 background: #f8d7da;
                 color: #721c24;
+              }
+
+              &.banned {
+                background: #d6d8db;
+                color: #495057;
               }
             }
 
@@ -273,8 +299,9 @@
 
             .actions {
               display: flex;
+              flex-direction: column;
               gap: 4px;
-              flex-wrap: wrap;
+              align-items: flex-start;
 
               .btn {
                 padding: 4px 8px;
@@ -288,6 +315,8 @@
                 align-items: center;
                 gap: 3px;
                 white-space: nowrap;
+                min-width: 60px;
+                justify-content: flex-start;
 
                 &.btn-view {
                   background: #17a2b8;
@@ -308,6 +337,15 @@
                 }
 
                 &.btn-lock {
+                  background: #ffc107;
+                  color: #212529;
+
+                  &:hover {
+                    background: #e0a800;
+                  }
+                }
+
+                &.btn-ban {
                   background: #dc3545;
                   color: white;
 
@@ -339,10 +377,39 @@
     padding: 20px 24px;
     background: white;
     border-top: 1px solid #dee2e6;
+    gap: 24px; // Add gap between sections
 
     .paginationInfo {
       color: #6c757d;
       font-size: 14px;
+      flex: 1;
+    }
+
+    .itemsPerPage {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6c757d;
+      font-size: 14px;
+      margin-right: 24px; // Add margin to separate from pagination controls
+
+      label {
+        font-weight: 500;
+      }
+
+      .itemsPerPageSelect {
+        padding: 6px 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        background: white;
+        font-size: 14px;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+        }
+      }
     }
 
     .paginationControls {
@@ -379,6 +446,33 @@
         display: flex;
         gap: 4px;
       }
+    }
+  }
+
+  .loadingState {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 3px solid #007bff;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    p {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
     }
   }
 

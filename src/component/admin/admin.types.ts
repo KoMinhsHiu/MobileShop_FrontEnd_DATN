@@ -85,7 +85,7 @@ export interface Order {
   discountAmount: number;
   shippingFee: number;
   finalAmount: number;
-  paymentMethod: 'COD' | 'VNPay' | 'Momo' | 'BankTransfer';
+  paymentMethod: 'COD' | 'VNPay' | 'Momo' | 'BankTransfer' | 'None';
   status: OrderStatus;
   statusHistory?: StatusHistory[];
   shipments?: Shipment[];
@@ -213,7 +213,7 @@ export type UserRole = 'admin' | 'employee' | 'customer';
 /**
  * User status types for account state
  */
-export type UserStatus = 'active' | 'inactive';
+export type UserStatus = 'active' | 'inactive' | 'banned';
 
 /**
  * Customer address information
@@ -244,7 +244,12 @@ export interface Customer {
   avatar?: string;
   name: string;
   email: string;
+  username?: string;
   phone: string;
+  gender?: string;
+  dateOfBirth?: string;
+  pointsBalance?: number;
+  lastChangePass?: string;
   role: UserRole;
   status: UserStatus;
   createdAt: string;

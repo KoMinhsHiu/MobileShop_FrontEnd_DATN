@@ -81,7 +81,7 @@ export const useOrderManagement = ({
           discountAmount: apiOrder.discountAmount,
           shippingFee: apiOrder.shippingFee,
           finalAmount: apiOrder.finalAmount,
-          paymentMethod: (apiOrder.payments?.[0]?.paymentMethod?.code || 'COD') as 'COD' | 'VNPay' | 'Momo' | 'BankTransfer',
+          paymentMethod: (apiOrder.payments?.[0]?.paymentMethod?.code || 'None') as 'COD' | 'VNPay' | 'Momo' | 'BankTransfer' | 'None',
           items: apiOrder.items.map(item => ({
             id: item.id.toString(),
             productId: item.variant.phoneId.toString(),

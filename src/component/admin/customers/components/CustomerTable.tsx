@@ -8,10 +8,10 @@ import {
   faSort, 
   faSortUp, 
   faSortDown, 
-  faEye, 
-  faEdit, 
+  faEye,
   faLock, 
-  faUnlock 
+  faUnlock, 
+  faBan
 } from '@fortawesome/free-solid-svg-icons';
 
 // Types
@@ -19,11 +19,8 @@ import { Customer, CustomerFilters, PaginationInfo } from '../../admin.types';
 
 // Utils
 import { 
-  formatDate, 
-  getRoleIcon, 
-  getRoleLabel, 
+  formatDate,
   getStatusLabel, 
-  getStatusColor 
 } from '../constants/customerConstants';
 
 // Styles
@@ -37,39 +34,34 @@ interface CustomerTableProps {
   customers: Customer[];
   filters: CustomerFilters;
   pagination: PaginationInfo & { paginatedCustomers: Customer[] };
+  loading?: boolean;
   onViewCustomer: (customer: Customer) => void;
-  onEditRole: (customer: Customer) => void;
-  onToggleStatus: (customer: Customer) => void;
+  onToggleStatus: (customer: Customer, newStatus: 'active' | 'inactive') => void;
+  onBanCustomer: (customer: Customer) => void;
   onSort: (sortBy: 'name' | 'createdAt' | 'email') => void;
   onPageChange: (page: number) => void;
   onPreviousPage: () => void;
   onNextPage: () => void;
+  onItemsPerPageChange: (limit: number) => void;
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-/**
- * CustomerTable - Displays customer data in a table format with sorting and pagination
- * Features:
- * - Sortable columns (name, email, created date)
- * - Pagination controls
- * - Action buttons (view, edit role, lock/unlock)
- * - Responsive design
- * - Empty state handling
- */
 const CustomerTable: React.FC<CustomerTableProps> = ({
   customers,
   filters,
   pagination,
+  loading = false,
   onViewCustomer,
-  onEditRole,
   onToggleStatus,
+  onBanCustomer,
   onSort,
   onPageChange,
   onPreviousPage,
-  onNextPage
+  onNextPage,
+  onItemsPerPageChange
 }) => {
   const { paginatedCustomers, currentPage, totalPages, totalItems, itemsPerPage } = pagination;
 
@@ -114,6 +106,24 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
     return numbers;
   };
 
+  const handleToggleStatus = (customer: Customer) => {
+    const newStatus = customer.status === 'active' ? 'inactive' : 'active';
+    onToggleStatus(customer, newStatus);
+  };
+
+  const handleBanCustomer = (customer: Customer) => {
+    onBanCustomer(customer);
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loadingState}>
+        <div className={styles.spinner}></div>
+        <p>Đang tải danh sách khách hàng...</p>
+      </div>
+    );
+  }
+
   if (customers.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -129,10 +139,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th style={{ width: '80px' }}>Ảnh đại diện</th>
             <th 
               className={styles.sortable}
-              style={{ width: '150px' }}
+              style={{ width: '180px' }}
               onClick={() => handleSort('name')}
             >
               Họ tên
@@ -147,18 +156,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
               {getSortIcon('email')}
             </th>
             <th style={{ width: '120px' }}>SĐT</th>
-            <th 
-              className={styles.sortable}
-              style={{ width: '120px' }}
-            >
-              Quyền
-            </th>
-            <th 
-              className={styles.sortable}
-              style={{ width: '140px' }}
-            >
-              Trạng thái
-            </th>
+            <th style={{ width: '130px' }}>Trạng thái</th>
             <th 
               className={styles.sortable}
               style={{ width: '120px' }}
@@ -167,37 +165,21 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
               Ngày tạo
               {getSortIcon('createdAt')}
             </th>
-            <th style={{ width: '160px' }}>Hành động</th>
+            <th style={{ width: '120px' }}>Hành động</th>
           </tr>
         </thead>
         <tbody>
           {paginatedCustomers.map((customer) => (
             <tr key={customer.id}>
               <td>
-                {customer.avatar ? (
-                  <img 
-                    src={customer.avatar} 
-                    alt={customer.name}
-                    className={styles.avatar}
-                  />
-                ) : (
-                  <div className={styles.avatarPlaceholder}>
-                    👤
-                  </div>
-                )}
-              </td>
-              <td>
                 <div style={{ fontWeight: '500' }}>
                   {customer.name}
                 </div>
               </td>
               <td>
-                <a 
-                  href={`mailto:${customer.email}`}
-                  className={styles.email}
-                >
+                <span className={styles.email}>
                   {customer.email}
-                </a>
+                </span>
               </td>
               <td>
                 <span className={styles.phone}>
@@ -205,18 +187,11 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                 </span>
               </td>
               <td>
-                <div className={styles.roleBadge}>
-                  <span className={styles.roleIcon}>
-                    {getRoleIcon(customer.role)}
-                  </span>
-                  {getRoleLabel(customer.role)}
-                </div>
-              </td>
-              <td>
                 <span 
                   className={`${styles.statusBadge} ${styles[customer.status]}`}
                 >
-                  {customer.status === 'active' ? '✅' : '🔒'} {getStatusLabel(customer.status)}
+                  {customer.status === 'active' ? '✅' : customer.status === 'inactive' ? '🔒' : '🚫'} 
+                  {getStatusLabel(customer.status)}
                 </span>
               </td>
               <td>
@@ -232,22 +207,28 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                     <FontAwesomeIcon icon={faEye} />
                     Xem
                   </button>
-                  <button
-                    className={`${styles.btn} ${styles['btn-edit']}`}
-                    onClick={() => onEditRole(customer)}
-                    title="Phân quyền"
-                  >
-                    <FontAwesomeIcon icon={faEdit} />
-                    Quyền
-                  </button>
-                  <button
-                    className={`${styles.btn} ${customer.status === 'active' ? styles['btn-lock'] : styles['btn-unlock']}`}
-                    onClick={() => onToggleStatus(customer)}
-                    title={customer.status === 'active' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
-                  >
-                    <FontAwesomeIcon icon={customer.status === 'active' ? faLock : faUnlock} />
-                    {customer.status === 'active' ? 'Khóa' : 'Mở'}
-                  </button>
+                  
+                  {customer.status !== 'banned' && (
+                    <button
+                      className={`${styles.btn} ${customer.status === 'active' ? styles['btn-lock'] : styles['btn-unlock']}`}
+                      onClick={() => handleToggleStatus(customer)}
+                      title={customer.status === 'active' ? 'Tạm khóa tài khoản' : 'Mở khóa tài khoản'}
+                    >
+                      <FontAwesomeIcon icon={customer.status === 'active' ? faLock : faUnlock} />
+                      {customer.status === 'active' ? 'Khóa' : 'Mở'}
+                    </button>
+                  )}
+                  
+                  {customer.status !== 'banned' && (
+                    <button
+                      className={`${styles.btn} ${styles['btn-ban']}`}
+                      onClick={() => handleBanCustomer(customer)}
+                      title="Cấm tài khoản"
+                    >
+                      <FontAwesomeIcon icon={faBan} />
+                      Cấm
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
@@ -259,6 +240,22 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
       <div className={styles.pagination}>
         <div className={styles.paginationInfo}>
           Hiển thị {((currentPage - 1) * itemsPerPage) + 1} - {Math.min(currentPage * itemsPerPage, totalItems)} trong tổng số {totalItems} khách hàng
+        </div>
+        
+        {/* Items per page selector */}
+        <div className={styles.itemsPerPage}>
+          <label>Hiển thị:</label>
+          <select 
+            value={itemsPerPage} 
+            onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
+            className={styles.itemsPerPageSelect}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+          <span>mục/trang</span>
         </div>
         
         <div className={styles.paginationControls}>

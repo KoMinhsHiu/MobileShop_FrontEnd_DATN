@@ -9,6 +9,7 @@ import NavigationBar from "@/component/navigationBar";
 import { CartProvider } from "@/context/cartContext";
 import { MegaMenuProvider } from "@/context/menuContext";
 import { AuthProvider } from "@/context/authContext";
+import { AdminProvider } from "@/context/adminContext";
 import { Toaster } from "react-hot-toast";
 import "./../../i18n";
 import { useRouter } from "next/router";
@@ -36,7 +37,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   // Use the page layout if it exists, otherwise use default layout
   const getLayout = Component.getLayout ?? ((page) => {
-    // Check if it's an admin page
+    // Check if it's an admin page - just return the page since AdminProvider is already global
     if (router.pathname.startsWith('/admin')) {
       return page;
     }
@@ -72,17 +73,19 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary>
           <AuthProvider>
-            <CartProvider>
-              <MegaMenuProvider
-                initialMenu={pageProps.menu || []}
-                language={router.locale}
-              >
-              <div className={inter.className}>
-                <Toaster />
-                {getLayout(<Component {...pageProps} />)}
-              </div>
-              </MegaMenuProvider>
-            </CartProvider>
+            <AdminProvider>
+              <CartProvider>
+                <MegaMenuProvider
+                  initialMenu={pageProps.menu || []}
+                  language={router.locale}
+                >
+                <div className={inter.className}>
+                  <Toaster />
+                  {getLayout(<Component {...pageProps} />)}
+                </div>
+                </MegaMenuProvider>
+              </CartProvider>
+            </AdminProvider>
           </AuthProvider>
         </HydrationBoundary>
       </QueryClientProvider>

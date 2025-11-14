@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faHistory } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faBell, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { TabNavigationProps, ProfileTab, TabConfig } from '../adminProfile.types';
 import styles from '../AdminProfile.module.scss';
 
@@ -8,7 +8,8 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange })
   const tabs: TabConfig[] = [
     { id: ProfileTab.PERSONAL, label: 'Thông tin cá nhân', icon: faUser },
     { id: ProfileTab.PASSWORD, label: 'Đổi mật khẩu', icon: faLock },
-    { id: ProfileTab.ACTIVITY, label: 'Nhật ký hoạt động', icon: faHistory }
+    { id: ProfileTab.NOTIFICATION, label: 'Thông báo', icon: faBell },
+    { id: ProfileTab.ACCOUNT, label: 'Tạo Admin Account', icon: faUserPlus }
   ];
 
   return (

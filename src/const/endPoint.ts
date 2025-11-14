@@ -17,6 +17,7 @@ export const RegisterAPI = "/auth/register";
 export const LoginAPI = "/auth/login";
 export const LogoutAPI = "/auth/logout";
 export const GoogleOAuthAPI = "/auth/google";
+export const AuthAPI = "/auth";
 
 // Phones API
 export const PhonesAPI = "/phones";
@@ -48,3 +49,7 @@ export const BrandsAPI = "/brands";
 
 // Customer/Profile API
 export const CustomerMeAPI = "/customers/me";
+export const CustomerAPI = "/customers";
+
+// Notification API
+export const NotificationsAPI = "/notifications";
