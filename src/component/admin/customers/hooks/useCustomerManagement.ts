@@ -1,13 +1,14 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Customer, CustomerFilters, PaginationInfo } from '../../admin.types';
 import { DEFAULT_CUSTOMER_FILTERS } from '../constants/customerConstants';
+import { customerAPI, CustomerData } from '@/utils/api/customer';
+import { authAPI } from '@/utils/api/auth';
 
 // ============================================================================
 // INTERFACES
 // ============================================================================
 
 interface UseCustomerManagementProps {
-  initialCustomers: Customer[];
   itemsPerPage?: number;
 }
 
@@ -16,15 +17,46 @@ interface UseCustomerManagementReturn {
   filteredCustomers: Customer[];
   filters: CustomerFilters;
   pagination: PaginationInfo & { paginatedCustomers: Customer[] };
+  loading: boolean;
+  error: string | null;
   setFilters: React.Dispatch<React.SetStateAction<CustomerFilters>>;
-  updateCustomer: (customerId: string, updates: Partial<Customer>) => void;
-  updateCustomerRole: (customerId: string, role: string) => void;
-  toggleCustomerStatus: (customerId: string) => void;
+  setItemsPerPage: (limit: number) => void;
+  updateCustomerStatus: (customerId: string, status: 'active' | 'inactive' | 'banned') => Promise<void>;
   clearFilters: () => void;
   goToPage: (page: number) => void;
   goToPreviousPage: () => void;
   goToNextPage: () => void;
+  refetchCustomers: () => Promise<void>;
 }
+
+// ============================================================================
+// CUSTOM HOOK
+// ============================================================================
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Convert API CustomerData to Customer interface
+ */
+const convertCustomerData = (customerData: CustomerData): Customer => {
+  return {
+    id: customerData.id.toString(),
+    name: `${customerData.lastName} ${customerData.firstName}`.trim(),
+    email: customerData.user.email,
+    phone: customerData.user.phone,
+    username: customerData.user.username,
+    gender: customerData.gender,
+    dateOfBirth: customerData.dateOfBirth,
+    pointsBalance: customerData.pointsBalance,
+    lastChangePass: customerData.user.lastChangePass,
+    role: 'customer', // Default role for customers
+    status: customerData.user.status || 'active',
+    createdAt: customerData.createdAt,
+    updatedAt: customerData.updatedAt
+  };
+};
 
 // ============================================================================
 // CUSTOM HOOK
@@ -36,19 +68,82 @@ interface UseCustomerManagementReturn {
  * @returns Customer management state and actions
  */
 export const useCustomerManagement = ({ 
-  initialCustomers, 
   itemsPerPage = 10 
 }: UseCustomerManagementProps): UseCustomerManagementReturn => {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [filters, setFilters] = useState<CustomerFilters>(DEFAULT_CUSTOMER_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentItemsPerPage, setCurrentItemsPerPage] = useState(itemsPerPage);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // ============================================================================
+  // API OPERATIONS
+  // ============================================================================
+
+  /**
+   * Fetch customers from API
+   */
+  const fetchCustomers = useCallback(async (page: number = 1, limit: number = currentItemsPerPage) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await customerAPI.listCustomers(page, limit);
+      const convertedCustomers = response.data.data.map(convertCustomerData);
+      setCustomers(convertedCustomers);
+      setTotalItems(response.data.total);
+    } catch (err: any) {
+      setError(err.message || 'Không thể tải danh sách khách hàng');
+      console.error('Error fetching customers:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentItemsPerPage]);
+
+  /**
+   * Update customer status via API
+   */
+  const updateCustomerStatus = useCallback(async (customerId: string, status: 'active' | 'inactive' | 'banned') => {
+    try {
+      await authAPI.updateUserStatus(customerId, status);
+      // Update local state
+      setCustomers(prev => prev.map(customer => 
+        customer.id === customerId 
+          ? { ...customer, status, updatedAt: new Date().toISOString() }
+          : customer
+      ));
+    } catch (err: any) {
+      throw new Error(err.message || 'Không thể cập nhật trạng thái khách hàng');
+    }
+  }, []);
+
+  // ============================================================================
+  // EFFECT HOOKS
+  // ============================================================================
+
+  /**
+   * Initial data fetch and refetch when page or itemsPerPage changes
+   */
+  useEffect(() => {
+    fetchCustomers(currentPage, currentItemsPerPage);
+  }, [fetchCustomers, currentPage, currentItemsPerPage]);
+
+  /**
+   * Reset current page when filters change
+   */
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [filters]);
 
   // ============================================================================
   // FILTERING & SORTING LOGIC
   // ============================================================================
 
   /**
-   * Filter and sort customers based on current filters
+   * Filter and sort customers based on current filters (client-side filtering)
    */
   const filteredCustomers = useMemo(() => {
     let filtered = [...customers];
@@ -61,11 +156,6 @@ export const useCustomerManagement = ({
         customer.email.toLowerCase().includes(searchLower) ||
         customer.phone.includes(searchLower)
       );
-    }
-
-    // Apply role filter
-    if (filters.role) {
-      filtered = filtered.filter(customer => customer.role === filters.role);
     }
 
     // Apply status filter
@@ -111,59 +201,31 @@ export const useCustomerManagement = ({
   // ============================================================================
 
   /**
-   * Calculate pagination information and get paginated customers
+   * Calculate pagination information - use API pagination, client filtering for display
    */
   const pagination: PaginationInfo & { paginatedCustomers: Customer[] } = useMemo(() => {
-    const totalItems = filteredCustomers.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
-
+    // For server-side pagination, show all filtered customers
+    const totalPages = Math.ceil(totalItems / currentItemsPerPage);
+    
     return {
       currentPage,
       totalPages,
       totalItems,
-      itemsPerPage,
-      paginatedCustomers
+      itemsPerPage: currentItemsPerPage,
+      paginatedCustomers: filteredCustomers // Show filtered results
     };
-  }, [filteredCustomers, currentPage, itemsPerPage]);
+  }, [filteredCustomers, currentPage, currentItemsPerPage, totalItems]);
 
   // ============================================================================
   // ACTION FUNCTIONS
   // ============================================================================
 
   /**
-   * Update customer information
+   * Update items per page and refetch data
    */
-  const updateCustomer = useCallback((customerId: string, updates: Partial<Customer>) => {
-    setCustomers(prev => prev.map(customer => 
-      customer.id === customerId 
-        ? { ...customer, ...updates, updatedAt: new Date().toISOString() }
-        : customer
-    ));
-  }, []);
-
-  /**
-   * Update customer role
-   */
-  const updateCustomerRole = useCallback((customerId: string, role: string) => {
-    updateCustomer(customerId, { role: role as any });
-  }, [updateCustomer]);
-
-  /**
-   * Toggle customer status between active and inactive
-   */
-  const toggleCustomerStatus = useCallback((customerId: string) => {
-    setCustomers(prev => prev.map(customer => 
-      customer.id === customerId 
-        ? { 
-            ...customer, 
-            status: customer.status === 'active' ? 'inactive' : 'active',
-            updatedAt: new Date().toISOString()
-          }
-        : customer
-    ));
+  const setItemsPerPage = useCallback((limit: number) => {
+    setCurrentItemsPerPage(limit);
+    setCurrentPage(1); // Reset to first page
   }, []);
 
   /**
@@ -173,6 +235,13 @@ export const useCustomerManagement = ({
     setFilters(DEFAULT_CUSTOMER_FILTERS);
     setCurrentPage(1);
   }, []);
+
+  /**
+   * Manually refetch customers
+   */
+  const refetchCustomers = useCallback(async () => {
+    await fetchCustomers(currentPage, currentItemsPerPage);
+  }, [fetchCustomers, currentPage, currentItemsPerPage]);
 
   // ============================================================================
   // PAGINATION HANDLERS
@@ -208,13 +277,15 @@ export const useCustomerManagement = ({
     filteredCustomers,
     filters,
     pagination,
+    loading,
+    error,
     setFilters,
-    updateCustomer,
-    updateCustomerRole,
-    toggleCustomerStatus,
+    setItemsPerPage,
+    updateCustomerStatus,
     clearFilters,
     goToPage,
     goToPreviousPage,
-    goToNextPage
+    goToNextPage,
+    refetchCustomers
   };
 };

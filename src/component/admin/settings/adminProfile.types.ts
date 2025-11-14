@@ -1,25 +1,17 @@
-// Enums
-export enum AdminRole {
-  ADMIN = 'Admin',
-  SUPER_ADMIN = 'Super Admin'
-}
-
 export enum ProfileTab {
   PERSONAL = 'personal',
   PASSWORD = 'password',
-  ACTIVITY = 'activity'
+  ACCOUNT = 'account',
+  NOTIFICATION = 'notification'
 }
 
 // Main interfaces
 export interface AdminProfile {
   id: string;
-  fullName: string;
+  username: string;
   email: string;
   phone: string;
-  avatar?: string;
-  role: AdminRole;
-  createdAt: string;
-  lastLoginAt: string;
+  lastChangePass?: string;
 }
 
 export interface ChangePasswordData {
@@ -28,27 +20,12 @@ export interface ChangePasswordData {
   confirmPassword: string;
 }
 
-export interface ActivityLog {
-  id: string;
-  action: string;
-  description: string;
-  timestamp: string;
-  ipAddress: string;
-  userAgent: string;
-}
-
 // Form validation interfaces
 export interface FormErrors {
-  fullName?: string;
-  phone?: string;
+  username?: string;
   currentPassword?: string;
   newPassword?: string;
   confirmPassword?: string;
-}
-
-// Component props interfaces
-export interface AdminProfileProps {
-  // Future props can be added here
 }
 
 export interface PersonalInfoProps {
@@ -56,7 +33,6 @@ export interface PersonalInfoProps {
   errors: FormErrors;
   isLoading: boolean;
   onFieldChange: (field: keyof AdminProfile, value: string) => void;
-  onAvatarUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onUpdate: () => void;
 }
 
@@ -68,11 +44,6 @@ export interface ChangePasswordProps {
   onPasswordChange: (field: keyof ChangePasswordData, value: string) => void;
   onToggleVisibility: (field: keyof PasswordVisibility) => void;
   onChangePassword: () => void;
-}
-
-export interface ActivityLogProps {
-  logs: ActivityLog[];
-  isLoading: boolean;
 }
 
 export interface TabNavigationProps {
@@ -93,19 +64,8 @@ export interface TabConfig {
   icon: any; // FontAwesome icon type
 }
 
-// API response types
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  errors?: FormErrors;
-}
-
 export interface UpdateProfileRequest {
-  fullName: string;
-  phone: string;
-  role: AdminRole;
-  avatar?: string;
+  username: string;
 }
 
 export interface ChangePasswordRequest {

@@ -9,59 +9,41 @@ import { faUsers, faFileExport } from '@fortawesome/free-solid-svg-icons';
 // Types
 import { Customer } from '../admin.types';
 
-// Constants
-import { MOCK_CUSTOMERS } from './constants/customerConstants';
-
 // Hooks
 import { useCustomerManagement } from './hooks/useCustomerManagement';
-import { useToast } from './hooks/useToast';
 
 // Components
 import CustomerFiltersComponent from './components/CustomerFilters';
 import CustomerTable from './components/CustomerTable';
 import CustomerDetailModal from './components/CustomerDetailModal';
-import RoleAssignmentModal from './components/RoleAssignmentModal';
-import ToastContainer from './components/ToastContainer';
 
 // Styles
 import styles from './CustomerManagement.module.scss';
+import { message } from 'antd';
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-/**
- * CustomerManagement - Main component for managing customers in admin panel
- * Features:
- * - Customer listing with pagination and sorting
- * - Customer filtering by role, status, and search
- * - Customer detail view modal
- * - Role assignment functionality
- * - Account lock/unlock functionality
- * - Toast notifications for actions
- */
 const CustomerManagement: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const [customerToToggle, setCustomerToToggle] = useState<Customer | null>(null);
-  
-  const { toasts, removeToast, showSuccess, showError } = useToast();
-  
+  const [messageApi, contextHolder] = message.useMessage();
   const {
-    customers,
     filteredCustomers,
     filters,
     pagination,
+    loading,
+    error,
     setFilters,
-    updateCustomerRole,
-    toggleCustomerStatus,
+    setItemsPerPage,
+    updateCustomerStatus,
     clearFilters,
     goToPage,
     goToPreviousPage,
-    goToNextPage
+    goToNextPage,
+    refetchCustomers
   } = useCustomerManagement({
-    initialCustomers: MOCK_CUSTOMERS,
     itemsPerPage: 10
   });
 
@@ -85,58 +67,49 @@ const CustomerManagement: React.FC = () => {
     setIsDetailModalOpen(true);
   }, []);
 
-  // Handle edit role
-  const handleEditRole = useCallback((customer: Customer) => {
-    setSelectedCustomer(customer);
-    setIsRoleModalOpen(true);
-  }, []);
-
-  // Handle toggle status
-  const handleToggleStatus = useCallback((customer: Customer) => {
-    setCustomerToToggle(customer);
-    
-    const action = customer.status === 'active' ? 'khóa' : 'mở khóa';
+  // Handle toggle status (active/inactive)
+  const handleToggleStatus = useCallback(async (customer: Customer, newStatus: 'active' | 'inactive') => {
+    const action = newStatus === 'active' ? 'mở khóa' : 'tạm khóa';
     const confirmMessage = `Bạn có chắc muốn ${action} tài khoản của ${customer.name}?`;
     
     if (window.confirm(confirmMessage)) {
-      toggleCustomerStatus(customer.id);
-      showSuccess(`Đã ${action} tài khoản của ${customer.name}`);
+      try {
+        await updateCustomerStatus(customer.id, newStatus);
+        messageApi.success(`Đã ${action} tài khoản của ${customer.name} thành công!`);
+      } catch (error: any) {
+        messageApi.error(`Lỗi khi ${action} tài khoản: ${error.message}`);
+      }
     }
-    
-    setCustomerToToggle(null);
-  }, [toggleCustomerStatus, showSuccess]);
+  }, [updateCustomerStatus, messageApi]);
 
-  // Handle close modals
+  // Handle ban customer
+  const handleBanCustomer = useCallback(async (customer: Customer) => {
+    const confirmMessage = `Bạn có chắc muốn cấm vĩnh viễn tài khoản của ${customer.name}? Hành động này không thể hoàn tác.`;
+    
+    if (window.confirm(confirmMessage)) {
+      try {
+        await updateCustomerStatus(customer.id, 'banned');
+        messageApi.success(`Đã cấm tài khoản của ${customer.name} thành công!`);
+      } catch (error: any) {
+        messageApi.error(`Lỗi khi cấm tài khoản: ${error.message}`);
+      }
+    }
+  }, [updateCustomerStatus, messageApi]);
+
+  // Handle items per page change
+  const handleItemsPerPageChange = useCallback((limit: number) => {
+    setItemsPerPage(limit);
+  }, [setItemsPerPage]);
+
+  // Handle close modal
   const handleCloseDetailModal = useCallback(() => {
     setIsDetailModalOpen(false);
     setSelectedCustomer(null);
   }, []);
 
-  const handleCloseRoleModal = useCallback(() => {
-    setIsRoleModalOpen(false);
-    setSelectedCustomer(null);
-  }, []);
-
-  // Handle save role
-  const handleSaveRole = useCallback((customerId: string, newRole: string) => {
-    const customer = customers.find(c => c.id === customerId);
-    if (customer) {
-      updateCustomerRole(customerId, newRole);
-      showSuccess(`Đã cập nhật quyền của ${customer.name} thành ${newRole === 'admin' ? 'Admin' : newRole === 'employee' ? 'Nhân viên' : 'Khách hàng'}`);
-    }
-  }, [customers, updateCustomerRole, showSuccess]);
-
-  // Handle export
-  const handleExport = useCallback(() => {
-    try {
-      // In a real app, this would call an API to export data
-      showSuccess('Đang xuất dữ liệu khách hàng...');
-    } catch (error) {
-      showError('Có lỗi xảy ra khi xuất dữ liệu');
-    }
-  }, [showSuccess, showError]);
-
   return (
+    <>
+    {contextHolder}
     <div className={styles.customerManagement}>
       {/* Header */}
       <div className={styles.header}>
@@ -144,13 +117,27 @@ const CustomerManagement: React.FC = () => {
           <FontAwesomeIcon icon={faUsers} style={{ marginRight: '12px' }} />
           Quản lý khách hàng
         </h1>
+        
         <div className={styles.headerActions}>
-          <button className="btn btn-outline" onClick={handleExport}>
-            <FontAwesomeIcon icon={faFileExport} />
-            Xuất báo cáo
+          <button 
+            className={`${styles.btn} ${styles['btn-outline']}`}
+            onClick={refetchCustomers}
+            disabled={loading}
+            title="Làm mới dữ liệu"
+          >
+            🔄 Làm mới
           </button>
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className={styles.errorContainer}>
+          <div className={styles.errorMessage}>
+            ❌ {error}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <CustomerFiltersComponent
@@ -164,13 +151,15 @@ const CustomerManagement: React.FC = () => {
         customers={filteredCustomers}
         filters={filters}
         pagination={pagination}
+        loading={loading}
         onViewCustomer={handleViewCustomer}
-        onEditRole={handleEditRole}
         onToggleStatus={handleToggleStatus}
+        onBanCustomer={handleBanCustomer}
         onSort={handleSort}
         onPageChange={goToPage}
         onPreviousPage={goToPreviousPage}
         onNextPage={goToNextPage}
+        onItemsPerPageChange={handleItemsPerPageChange}
       />
 
       {/* Customer Detail Modal */}
@@ -179,21 +168,8 @@ const CustomerManagement: React.FC = () => {
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetailModal}
       />
-
-      {/* Role Assignment Modal */}
-      <RoleAssignmentModal
-        customer={selectedCustomer}
-        isOpen={isRoleModalOpen}
-        onClose={handleCloseRoleModal}
-        onSave={handleSaveRole}
-      />
-
-      {/* Toast Notifications */}
-      <ToastContainer
-        toasts={toasts}
-        onRemoveToast={removeToast}
-      />
     </div>
+    </>
   );
 };
 

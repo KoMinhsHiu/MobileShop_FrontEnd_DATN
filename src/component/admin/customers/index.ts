@@ -11,7 +11,6 @@ export { default as CustomerManagement } from './CustomerManagement';
 export { default as CustomerTable } from './components/CustomerTable';
 export { default as CustomerFiltersComponent } from './components/CustomerFilters';
 export { default as CustomerDetailModal } from './components/CustomerDetailModal';
-export { default as RoleAssignmentModal } from './components/RoleAssignmentModal';
 export { default as ToastContainer } from './components/ToastContainer';
 
 // ============================================================================

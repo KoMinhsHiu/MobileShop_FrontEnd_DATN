@@ -1,8 +1,20 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faUser, faEnvelope, faPhone, faMapMarkerAlt, faShoppingCart, faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faTimes, 
+  faUser, 
+  faEnvelope, 
+  faPhone, 
+  faCalendarAlt, 
+  faVenusMars, 
+  faCoins, 
+  faUserTag,
+  faShieldAlt,
+  faBirthdayCake,
+  faKey
+} from '@fortawesome/free-solid-svg-icons';
 import { Customer } from '../../admin.types';
-import { formatCurrency, formatDate, getRoleIcon, getRoleLabel, getStatusLabel } from '../constants/customerConstants';
+import { formatDate, getStatusLabel } from '../constants/customerConstants';
 import styles from '../CustomerDetailModal.module.scss';
 
 interface CustomerDetailModalProps {
@@ -26,18 +38,32 @@ const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({
     }
   };
 
-  const getOrderStatusLabel = (status: string) => {
-    const statusMap: { [key: string]: string } = {
-      pending: 'Chờ xử lý',
-      shipping: 'Đang giao',
-      completed: 'Đã giao',
-      cancelled: 'Đã hủy'
+  const formatGender = (gender: string) => {
+    const genderMap: { [key: string]: string } = {
+      male: '👨 Nam',
+      female: '👩 Nữ',
+      other: '👤 Khác'
     };
-    return statusMap[status] || status;
+    return genderMap[gender] || '👤 Không xác định';
   };
 
-  const getOrderStatusClass = (status: string) => {
-    return styles[status] || styles.pending;
+  const formatDateOfBirth = (dateString: string) => {
+    if (!dateString) return 'Chưa cập nhật';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric'
+    });
+  };
+
+  const getStatusIcon = (status: string) => {
+    const iconMap: { [key: string]: string } = {
+      active: '✅',
+      inactive: '🔒',
+      banned: '🚫'
+    };
+    return iconMap[status] || '❓';
   };
 
   return (
@@ -76,136 +102,106 @@ const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({
               </h3>
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
-                  <span className={styles.label}>Họ tên</span>
+                  <span className={styles.label}>
+                    <FontAwesomeIcon icon={faUser} style={{ marginRight: '6px' }} />
+                    Họ tên
+                  </span>
                   <span className={styles.value}>{customer.name}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.label}>Email</span>
-                  <a 
-                    href={`mailto:${customer.email}`}
-                    className={`${styles.value} ${styles.email}`}
-                  >
+                  <span className={styles.label}>
+                    <FontAwesomeIcon icon={faUserTag} style={{ marginRight: '6px' }} />
+                    Tên đăng nhập
+                  </span>
+                  <span className={styles.value}>{customer.username || 'Chưa cập nhật'}</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>
                     <FontAwesomeIcon icon={faEnvelope} style={{ marginRight: '6px' }} />
+                    Email
+                  </span>
+                  <span className={styles.value}>
                     {customer.email}
-                  </a>
+                  </span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.label}>Số điện thoại</span>
-                  <span className={`${styles.value} ${styles.phone}`}>
+                  <span className={styles.label}>
                     <FontAwesomeIcon icon={faPhone} style={{ marginRight: '6px' }} />
-                    {customer.phone}
+                    Số điện thoại
+                  </span>
+                  <span className={`${styles.value} ${styles.phone}`}>
+                    {customer.phone || 'Chưa cập nhật'}
                   </span>
                 </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.label}>Quyền</span>
-                  <span className={styles.value}>
-                    {getRoleIcon(customer.role)} {getRoleLabel(customer.role)}
-                  </span>
-                </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.label}>Trạng thái</span>
-                  <span className={styles.value}>
-                    {customer.status === 'active' ? '✅' : '🔒'} {getStatusLabel(customer.status)}
-                  </span>
-                </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.label}>Ngày tạo</span>
-                  <span className={styles.value}>{formatDate(customer.createdAt)}</span>
-                </div>
+                {customer.gender && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.label}>
+                      <FontAwesomeIcon icon={faVenusMars} style={{ marginRight: '6px' }} />
+                      Giới tính
+                    </span>
+                    <span className={styles.value}>{formatGender(customer.gender)}</span>
+                  </div>
+                )}
+                {customer.dateOfBirth && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.label}>
+                      <FontAwesomeIcon icon={faBirthdayCake} style={{ marginRight: '6px' }} />
+                      Ngày sinh
+                    </span>
+                    <span className={styles.value}>{formatDateOfBirth(customer.dateOfBirth)}</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Address & Stats */}
+            {/* Additional Info */}
             <div className={styles.infoSection}>
               <h3 className={styles.sectionTitle}>
-                <FontAwesomeIcon icon={faMapMarkerAlt} style={{ marginRight: '8px' }} />
-                Địa chỉ & Thống kê
+                <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: '8px' }} />
+                Thông tin bổ sung
               </h3>
               
-              {/* Address */}
-              {customer.address && (
-                <div className={styles.infoGrid} style={{ marginBottom: '20px' }}>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>
+                    <FontAwesomeIcon icon={faShieldAlt} style={{ marginRight: '6px' }} />
+                    Trạng thái tài khoản
+                  </span>
+                  <span className={`${styles.value} ${styles.statusValue}`}>
+                    <span className={`${styles.statusBadge} ${styles[customer.status]}`}>
+                      {getStatusIcon(customer.status)} {getStatusLabel(customer.status)}
+                    </span>
+                  </span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>
+                    <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: '6px' }} />
+                    Ngày tạo tài khoản
+                  </span>
+                  <span className={styles.value}>{formatDate(customer.createdAt)}</span>
+                </div>
+                {typeof customer.pointsBalance === 'number' && (
                   <div className={styles.infoItem}>
-                    <span className={styles.label}>Địa chỉ</span>
-                    <span className={styles.value}>
-                      {customer.address.street}, {customer.address.ward}, {customer.address.district}, {customer.address.city}
+                    <span className={styles.label}>
+                      <FontAwesomeIcon icon={faCoins} style={{ marginRight: '6px' }} />
+                      Điểm tích lũy
+                    </span>
+                    <span className={`${styles.value} ${styles.points}`}>
+                      {customer.pointsBalance.toLocaleString('vi-VN')} điểm
                     </span>
                   </div>
-                </div>
-              )}
-
-              {/* Stats */}
-              <div className={styles.statsSection}>
-                <div className={styles.statsGrid}>
-                  <div className={styles.statCard}>
-                    <div className={styles.statValue}>
-                      <FontAwesomeIcon icon={faShoppingCart} style={{ marginRight: '8px' }} />
-                      {customer.orderCount || 0}
-                    </div>
-                    <div className={styles.statLabel}>Đơn hàng</div>
+                )}
+                {customer.lastChangePass && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.label}>
+                      <FontAwesomeIcon icon={faKey} style={{ marginRight: '6px' }} />
+                      Lần cuối đổi mật khẩu
+                    </span>
+                    <span className={`${styles.value} ${styles.lastChangePass}`}>{formatDate(customer.lastChangePass)}</span>
                   </div>
-                  <div className={styles.statCard}>
-                    <div className={styles.statValue}>
-                      <FontAwesomeIcon icon={faDollarSign} style={{ marginRight: '8px' }} />
-                      {formatCurrency(customer.totalSpent || 0)}
-                    </div>
-                    <div className={styles.statLabel}>Tổng chi tiêu</div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
-          </div>
-
-          {/* Orders History */}
-          <div className={styles.ordersSection}>
-            <h3 className={styles.sectionTitle}>
-              <FontAwesomeIcon icon={faShoppingCart} style={{ marginRight: '8px' }} />
-              Lịch sử đơn hàng
-            </h3>
-            
-            {customer.orders && customer.orders.length > 0 ? (
-              <table className={styles.ordersTable}>
-                <thead>
-                  <tr>
-                    <th>Mã đơn</th>
-                    <th>Ngày đặt</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {customer.orders.map((order) => (
-                    <tr key={order.id}>
-                      <td>
-                        <span className={styles.orderNumber}>
-                          {order.orderNumber}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={styles.orderDate}>
-                          {formatDate(order.orderDate)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={styles.orderAmount}>
-                          {formatCurrency(order.totalAmount)}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`${styles.orderStatus} ${getOrderStatusClass(order.status)}`}>
-                          {getOrderStatusLabel(order.status)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className={styles.noOrders}>
-                <div className={styles.noOrdersIcon}>📦</div>
-                <p>Khách hàng chưa có đơn hàng nào</p>
-              </div>
-            )}
           </div>
         </div>
 

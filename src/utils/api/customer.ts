@@ -1,5 +1,5 @@
 import axiosInstance from './fetchData/axiosInstance';
-import { CustomerMeAPI } from '@/const/endPoint';
+import { CustomerAPI, CustomerMeAPI } from '@/const/endPoint';
 
 // API Response Types
 export interface CustomerUser {
@@ -7,12 +7,15 @@ export interface CustomerUser {
   username: string;
   email: string;
   phone: string;
+  status?: 'active' | 'inactive' | 'banned';
+  lastChangePass?: string;
 }
 
 export interface CustomerData {
   id: number;
   firstName: string;
   lastName: string;
+  gender: 'male' | 'female' | 'other';
   dateOfBirth: string;
   pointsBalance: number;
   user: CustomerUser;
@@ -43,8 +46,62 @@ export interface UpdateCustomerResponse {
   errors: null;
 }
 
+export interface ListCustomersResponse {
+  status: number;
+  message: string;
+  data: {
+    data: CustomerData[];
+    paging: {
+      page: number;
+      limit: number;
+      order: 'asc' | 'desc';
+    };
+    total: number;
+  };
+}
+
+export interface UpdateUserResponse {
+  status: number;
+  message: string;
+  data: { success: boolean };
+  errors: null;
+}
+
 // API Functions
 export const customerAPI = {
+  listCustomers: async (page?: number, limit?: number): Promise<ListCustomersResponse> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${CustomerAPI}/list`, {
+        params: {
+          page : page || 1,
+          limit: limit || 10
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching customers:', error);
+      throw error;
+    }
+  },
   // Get current customer info
   getMe: async (): Promise<CustomerMeResponse> => {
     try {

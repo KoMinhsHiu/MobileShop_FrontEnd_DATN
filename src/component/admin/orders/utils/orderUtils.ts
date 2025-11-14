@@ -19,8 +19,6 @@ export const formatDate = (dateString: string): string => {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
   });
 };
 
@@ -31,18 +29,6 @@ export const calculateTotalItems = (order: Order): number => {
   return order.items.reduce((sum, item) => sum + item.quantity, 0);
 };
 
-/**
- * Get order status color
- */
-export const getOrderStatusColor = (status: OrderStatus): string => {
-  const statusColors = {
-    pending: '#f59e0b',
-    shipping: '#3b82f6',
-    completed: '#10b981',
-    cancelled: '#ef4444'
-  };
-  return statusColors[status] || '#6b7280';
-};
 
 /**
  * Get payment method display name

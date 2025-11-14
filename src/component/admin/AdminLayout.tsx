@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -11,10 +11,11 @@ import {
   faCog,
   faSpinner
 } from '@fortawesome/free-solid-svg-icons';
-import { MENU_ITEMS, NOTIFICATIONS } from './admin.constants';
+import { MENU_ITEMS } from './admin.constants';
 import { AdminLayoutProps } from './admin.types';
 import { useAuth } from '@/context/authContext';
 import { useToast } from '@/component/common/ToastContainer';
+import { useAdminContext } from '@/context/adminContext';
 import styles from './AdminLayout.module.scss';
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/admin' }) => {
@@ -22,6 +23,15 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Admin context for shared state
+  const {
+    unreadNotifications,
+    loadingNotifications,
+    adminData,
+    loadingAdmin
+  } = useAdminContext();
+  
   const { logout } = useAuth();
   const { showSuccess, showError, ToastContainer } = useToast();
 
@@ -122,28 +132,53 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
                 onClick={() => setNotificationOpen(!notificationOpen)}
               >
                 <FontAwesomeIcon icon={faBell} className={styles.bellIcon} />
-                <span className={styles.notificationBadge}>{NOTIFICATIONS.length}</span>
+                {unreadNotifications.length > 0 && (
+                  <span className={styles.notificationBadge}>{unreadNotifications.length}</span>
+                )}
               </button>
               
               {notificationOpen && (
                 <div className={styles.notificationDropdown}>
                   <div className={styles.notificationHeader}>
                     <h3>Thông báo</h3>
-                    <span className={styles.notificationCount}>{NOTIFICATIONS.length} mới</span>
+                    <span className={styles.notificationCount}>{unreadNotifications.length} mới</span>
                   </div>
                   <div className={styles.notificationList}>
-                    {NOTIFICATIONS.map((notification) => (
-                      <div key={notification.id} className={styles.notificationItem}>
+                    {loadingNotifications ? (
+                      <div className={styles.notificationItem}>
                         <div className={styles.notificationContent}>
-                          <p className={styles.notificationMessage}>{notification.message}</p>
-                          <span className={styles.notificationTime}>{notification.time}</span>
+                          <p>Đang tải thông báo...</p>
                         </div>
-                        <div className={`${styles.notificationDot} ${styles[notification.type]}`} />
                       </div>
-                    ))}
+                    ) : unreadNotifications.length === 0 ? (
+                      <div className={styles.notificationItem}>
+                        <div className={styles.notificationContent}>
+                          <p>Không có thông báo mới</p>
+                        </div>
+                      </div>
+                    ) : (
+                      unreadNotifications.map((notification) => (
+                        <div key={notification.id} className={styles.notificationItem}>
+                          <div className={styles.notificationContent}>
+                            <h4 className={styles.notificationTitle}>{notification.title}</h4>
+                            <p className={styles.notificationMessage}>{notification.message}</p>
+                            <span className={styles.notificationTime}>
+                              {new Date(notification.createdAt).toLocaleDateString('vi-VN', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <div className={`${styles.notificationDot} ${styles.unread}`} />
+                        </div>
+                      ))
+                    )}
                   </div>
                   <div className={styles.notificationFooter}>
-                    <Link href="/admin/notifications">Xem tất cả thông báo</Link>
+                    <Link href="/admin/settings">Xem tất cả thông báo</Link>
                   </div>
                 </div>
               )}
@@ -154,19 +189,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
                 className={styles.profile}
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
               >
-                <div className={styles.avatar}>
-                  <img src="/images/logo.png" alt="Admin" />
-                </div>
-                <span>Admin User</span>
+                <span>
+                  {loadingAdmin ? 'Đang tải...' : (adminData?.username || 'Admin User')}
+                </span>
                 <FontAwesomeIcon icon={faChevronDown} />
               </div>
               
               {profileMenuOpen && (
                 <div className={styles.profileMenu}>
-                  <Link href="/admin/profile" className={styles.menuItem}>
-                    <FontAwesomeIcon icon={faUser} />
-                    Profile
-                  </Link>
                   <Link href="/admin/settings" className={styles.menuItem}>
                     <FontAwesomeIcon icon={faCog} />
                     Cài đặt

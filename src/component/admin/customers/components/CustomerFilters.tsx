@@ -2,13 +2,14 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { CustomerFilters } from '../../admin.types';
-import { ROLE_OPTIONS, STATUS_OPTIONS } from '../constants/customerConstants';
+import { STATUS_OPTIONS } from '../constants/customerConstants';
 import styles from '../CustomerManagement.module.scss';
 
 interface CustomerFiltersProps {
   filters: CustomerFilters;
   onFilterChange: (key: keyof CustomerFilters, value: string) => void;
   onClearFilters: () => void;
+  onResetOnPageChange?: boolean;
 }
 
 const CustomerFiltersComponent: React.FC<CustomerFiltersProps> = ({
@@ -51,23 +52,6 @@ const CustomerFiltersComponent: React.FC<CustomerFiltersProps> = ({
           </div>
         </div>
 
-        {/* Role Filter */}
-        <div className={styles.filterGroup}>
-          <label>Quyền</label>
-          <select
-            className={`${styles.formControl} ${styles.select}`}
-            value={filters.role}
-            onChange={(e) => handleInputChange('role', e.target.value)}
-          >
-            <option value="">Tất cả quyền</option>
-            {ROLE_OPTIONS.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.icon} {role.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
         {/* Status Filter */}
         <div className={styles.filterGroup}>
           <label>Trạng thái</label>
@@ -79,7 +63,7 @@ const CustomerFiltersComponent: React.FC<CustomerFiltersProps> = ({
             <option value="">Tất cả trạng thái</option>
             {STATUS_OPTIONS.map((status) => (
               <option key={status.value} value={status.value}>
-                {status.value === 'active' ? '✅' : '🔒'} {status.label}
+                {status.value === 'active' ? '✅' : status.value === 'inactive' ? '🔒' : '🚫'} {status.label}
               </option>
             ))}
           </select>
@@ -106,9 +90,10 @@ const CustomerFiltersComponent: React.FC<CustomerFiltersProps> = ({
               className={`${styles.btn} ${styles['btn-secondary']}`}
               onClick={onClearFilters}
               title="Xóa bộ lọc"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
             >
               <FontAwesomeIcon icon={faTimes} />
-              Xóa lọc
+              <span>Xóa lọc</span>
             </button>
           )}
         </div>

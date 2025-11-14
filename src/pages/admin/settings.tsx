@@ -1,9 +1,9 @@
 import React from 'react';
 import AdminLayout from '@/component/admin/AdminLayout';
-import AdminProfile from '@/component/admin/profile';
+import AdminProfile from '@/component/admin/settings';
 import AdminGuard from '@/component/auth/AdminGuard';
 
-const AdminProfilePage: React.FC = () => {
+const AdminProfilePage = () => {
   return (
     <AdminGuard>
       <AdminLayout>
