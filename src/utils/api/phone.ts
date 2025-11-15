@@ -175,6 +175,12 @@ export interface CreateVariantResponse {
   errors: null;
 }
 
+export interface VariantsResponse {
+  status: number;
+  message: string;
+  data: PhoneVariant[];
+}
+
 /**
  * Fetch phone list with pagination
  */
@@ -210,150 +216,6 @@ export const fetchPhoneList = async (page: number, limit: number): Promise<Phone
         total: 0
       }
     };
-  }
-};
-
-/**
- * Fetch phone colors
- */
-export const fetchPhoneColors = async (): Promise<PhoneColorResponse> => {
-  const baseURL = process.env.NODE_ENV === 'production' 
-    ? process.env.NEXT_PUBLIC_API_URL || 'https://your-production-api.com'
-    : 'http://localhost:3000';
-  
-  const url = `${baseURL}/api/v1/phones/colors`;
-  
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch phone colors: ${response.status} ${response.statusText}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    console.warn('Phone Colors API not available, using mock data:', error);
-    return {
-      status: 200,
-      message: "Colors retrieved successfully",
-      data: [],
-      errors: null
-    };
-  }
-};
-
-/**
- * Fetch phone specifications
- */
-export const fetchPhoneSpecifications = async (): Promise<PhoneSpecificationResponse> => {
-  const baseURL = process.env.NODE_ENV === 'production' 
-    ? process.env.NEXT_PUBLIC_API_URL || 'https://your-production-api.com'
-    : 'http://localhost:3000';
-  
-  const url = `${baseURL}/api/v1/phones/specifications`;
-  
-  try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch phone specifications: ${response.status} ${response.statusText}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    console.warn('Phone Specifications API not available, using mock data:', error);
-    return {
-      status: 200,
-      message: "Specifications retrieved successfully",
-      data: [],
-      errors: null
-    };
-  }
-};
-
-/**
- * Create a new phone variant
- */
-export const createPhoneVariant = async (requestData: CreateVariantRequest): Promise<CreateVariantResponse> => {
-  const baseURL = process.env.NODE_ENV === 'production' 
-    ? process.env.NEXT_PUBLIC_API_URL || 'https://your-production-api.com'
-    : 'http://localhost:3000';
-  
-  const url = `${baseURL}/api/v1/phones/variants/create`;
-  
-  // Get JWT token from localStorage (using phonehub_tokens key)
-  let token = null;
-  try {
-    const tokens = localStorage.getItem('phonehub_tokens');
-    if (tokens) {
-      const tokenData = JSON.parse(tokens);
-      token = tokenData.accessToken || tokenData.access_token || tokenData.token;
-    }
-  } catch (error) {
-    console.error('Error parsing token data:', error);
-  }
-  
-  // Check if token exists
-  if (!token) {
-    throw new Error('Authentication token not found. Please login again.');
-  }
-  
-  // Log token information for debugging
-  console.log('=== API REQUEST DEBUG ===');
-  console.log('1. Request URL:', url);
-  console.log('2. Request Method: POST');
-  console.log('3. Token found:', token ? 'Yes' : 'No');
-  console.log('4. Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
-  console.log('5. Request Body:', JSON.stringify(requestData, null, 2));
-  console.log('========================');
-  
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      console.log('=== API ERROR RESPONSE ===');
-      console.log('1. Response Status:', response.status);
-      console.log('2. Response Status Text:', response.statusText);
-      console.log('3. Response Headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (response.status === 401) {
-        throw new Error('Unauthorized: Invalid or expired token. Please login again.');
-      } else if (response.status === 403) {
-        throw new Error('Forbidden: You do not have permission to create phone variants.');
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.log('4. Error Response Body:', errorData);
-        throw new Error(errorData.message || `Failed to create phone variant: ${response.status} ${response.statusText}`);
-      }
-    }
-
-    const responseData = await response.json();
-    console.log('=== API SUCCESS RESPONSE ===');
-    console.log('1. Response Status:', response.status);
-    console.log('2. Response Data:', responseData);
-    console.log('============================');
-    
-    return responseData;
-  } catch (error) {
-    console.error('Error creating phone variant:', error);
-    throw error;
   }
 };
 
@@ -794,6 +656,35 @@ export const phonesAPI = {
     }
   },
 
+  getVariants: async (): Promise<VariantsResponse> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${PhonesAPI}/variants`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching phone variants:', error);
+      throw new Error(error.response?.message || 'Failed to fetch phone variants');
+    }
+  },
+
   updatePhoneVariant: async (variantId: number, requestData: UpdateVariantRequest): Promise<void> => {
     try {
       let token = null;
@@ -852,3 +743,4 @@ export const phonesAPI = {
 }
 
 export default phonesAPI;
+

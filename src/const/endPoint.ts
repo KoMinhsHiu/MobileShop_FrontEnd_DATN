@@ -53,3 +53,12 @@ export const CustomerAPI = "/customers";
 
 // Notification API
 export const NotificationsAPI = "/notifications";
+
+// Voucher API
+export const VouchersAPI = "/vouchers";
+
+// Inventory API
+export const InventoriesAPI = "/inventory"; 
+
+// Dashboard Analytics API
+export const DashboardStatAPI = "/dashboard"; 

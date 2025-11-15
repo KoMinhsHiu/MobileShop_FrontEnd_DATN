@@ -4,7 +4,7 @@ import Dashboard from '@/component/admin/dashboard/Dashboard';
 import MetaTags from '@/component/metaTags';
 import AdminGuard from '@/component/auth/AdminGuard';
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboard = () => {
   return (
     <AdminGuard>
       <MetaTags 
