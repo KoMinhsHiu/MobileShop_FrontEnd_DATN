@@ -1,0 +1,218 @@
+.orderStatusChart {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  height: fit-content;
+
+  @media (max-width: 640px) {
+    padding: 1rem;
+  }
+}
+
+.chartHeader {
+  margin-bottom: 1.5rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+  }
+
+  p {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    margin-bottom: 1rem;
+
+    h3 {
+      font-size: 1.125rem;
+    }
+
+    p {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.chartContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+
+  @media (max-width: 640px) {
+    gap: 1rem;
+  }
+}
+
+.noDataContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 2px dashed #cbd5e1;
+}
+
+.noDataText {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-style: italic;
+  margin: 0;
+}
+
+// Custom tooltip styles
+.tooltip {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-size: 0.875rem;
+}
+
+.tooltipLabel {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipValue {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltipCount {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.tooltipPercentage {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+// Legend styles
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 280px;
+
+  @media (max-width: 640px) {
+    gap: 0.5rem;
+    max-width: none;
+  }
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f1f5f9;
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 640px) {
+    gap: 0.5rem;
+    padding: 0.375rem 0.5rem;
+  }
+}
+
+.legendColor {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  @media (max-width: 640px) {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+}
+
+.legendContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.legendLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.2;
+
+  @media (max-width: 640px) {
+    font-size: 0.75rem;
+  }
+}
+
+.legendValue {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+
+  @media (max-width: 640px) {
+    font-size: 0.625rem;
+  }
+}
+
+// Status-specific legend colors with enhanced visual feedback
+.legendItem {
+  &:nth-child(1) .legendColor {
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  }
+  
+  &:nth-child(2) .legendColor {
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  }
+  
+  &:nth-child(3) .legendColor {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  &:nth-child(4) .legendColor {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+}
+
+// Responsive chart adjustments
+@media (max-width: 480px) {
+  .orderStatusChart {
+    padding: 0.75rem;
+  }
+
+  .chartContainer {
+    .recharts-wrapper {
+      height: 250px !important;
+    }
+  }
+
+  .legend {
+    gap: 0.375rem;
+  }
+
+  .legendItem {
+    padding: 0.25rem 0.375rem;
+    gap: 0.375rem;
+  }
+}

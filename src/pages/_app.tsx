@@ -68,12 +68,29 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     );
   });
 
+  // Check if current route is admin page
+  const isAdminRoute = router.pathname.startsWith('/admin');
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary>
           <AuthProvider>
-            <AdminProvider>
+            {isAdminRoute ? (
+              <AdminProvider>
+                <CartProvider>
+                  <MegaMenuProvider
+                    initialMenu={pageProps.menu || []}
+                    language={router.locale}
+                  >
+                  <div className={inter.className}>
+                    <Toaster />
+                    {getLayout(<Component {...pageProps} />)}
+                  </div>
+                  </MegaMenuProvider>
+                </CartProvider>
+              </AdminProvider>
+            ) : (
               <CartProvider>
                 <MegaMenuProvider
                   initialMenu={pageProps.menu || []}
@@ -85,7 +102,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                 </div>
                 </MegaMenuProvider>
               </CartProvider>
-            </AdminProvider>
+            )}
           </AuthProvider>
         </HydrationBoundary>
       </QueryClientProvider>
