@@ -14,6 +14,8 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [chartLoading, setChartLoading] = useState(false);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -31,6 +33,19 @@ const Dashboard: React.FC = () => {
 
     fetchDashboardData();
   }, []);
+
+  const handleDateRangeChange = async (startDate: string, endDate: string) => {
+    try {
+      setChartLoading(true);
+      const data = await dashboardAPI.getDashboardAnalytics(startDate, endDate);
+      setAnalyticsData(data);
+    } catch (error: any) {
+      console.error('Error fetching date range data:', error);
+      setError(error.message || 'Có lỗi xảy ra khi tải dữ liệu theo khoảng thời gian');
+    } finally {
+      setChartLoading(false);
+    }
+  };
 
   const handleRefresh = async () => {
     try {
@@ -97,7 +112,11 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Revenue Period Chart - Top Section */}
-      <RevenuePeriodChart revenueData={analyticsData.revenueByPeriod} />
+      <RevenuePeriodChart 
+        revenueData={analyticsData.revenueByPeriod} 
+        onDateRangeChange={handleDateRangeChange}
+        isLoading={chartLoading}
+      />
 
       {/* Summary Cards - 6 metrics in 2 rows */}
       <SummaryCards analyticsData={analyticsData} />

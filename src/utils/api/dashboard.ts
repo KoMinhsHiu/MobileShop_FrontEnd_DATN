@@ -8,18 +8,10 @@ export interface RevenueDataPoint {
   date: string;
 }
 
-export interface RevenuePeriodData {
+export interface RevenueByPeriod {
   total: number;
   data: RevenueDataPoint[];
-  period: 'daily' | 'monthly';
-}
-
-export interface RevenueByPeriod {
-  last7Days: RevenuePeriodData;
-  last30Days: RevenuePeriodData;
-  last3Months: RevenuePeriodData;
-  last6Months: RevenuePeriodData;
-  lastYear: RevenuePeriodData;
+  period: 'daily' | 'weekly' | 'monthly' | 'quarterly';
 }
 
 // Payment Methods Interface
@@ -63,7 +55,7 @@ export interface DashboardAnalyticsResponse {
 
 // Dashboard API Functions
 export const dashboardAPI = {
-  getDashboardAnalytics: async (): Promise<DashboardAnalytics> => {
+  getDashboardAnalytics: async (startDate?: string, endDate?: string): Promise<DashboardAnalytics> => {
     try {
       // Get JWT token from localStorage (using phonehub_tokens key)
       let token = null;
@@ -82,7 +74,14 @@ export const dashboardAPI = {
         throw new Error('Authentication token not found. Please login again.');
       }
 
-      const response = await axiosInstance.get<DashboardAnalyticsResponse>(`${DashboardStatAPI}`, {
+      // Prepare request body
+      const requestBody: any = {};
+      if (startDate && endDate) {
+        requestBody.startDate = startDate;
+        requestBody.endDate = endDate;
+      }
+
+      const response = await axiosInstance.post<DashboardAnalyticsResponse>(`${DashboardStatAPI}`, requestBody, {
         headers: {
           Authorization: `Bearer ${token}`
         }
