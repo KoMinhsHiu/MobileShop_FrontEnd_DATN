@@ -21,7 +21,7 @@ const Modal: FC<ModalProps> = ({
   const divRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = React.useCallback((event: MouseEvent) => {
     if (
       divRef.current &&
       !divRef.current.contains(event.target as Node) &&
@@ -29,18 +29,18 @@ const Modal: FC<ModalProps> = ({
     ) {
       onClose();
     }
-  };
+  }, [closeClickOutSide, onClose]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [handleClickOutside]);
 
   useEffect(() => {
     onClose();
-  }, [router.asPath]);
+  }, [router.asPath, onClose]);
 
   return (
     <div

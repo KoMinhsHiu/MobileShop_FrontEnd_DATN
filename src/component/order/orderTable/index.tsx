@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { Order } from "@/utils/type/order";
+import { Order } from "@/utils/api/orders";
 import { formatPrice } from "@/utils/function/formatPrice";
 import OrderStatusBadge from "../orderStatusBadge";
 
@@ -96,9 +96,39 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders }) => {
               <OrderStatusBadge 
                 status={order.status} 
                 statusConfig={{
-                  [order.status]: {
-                    label: getStatusLabel(order.status),
-                    color: getStatusColor(order.status),
+                  pending: {
+                    label: getStatusLabel('pending'),
+                    color: getStatusColor('pending'),
+                    icon: '📦'
+                  },
+                  paid: {
+                    label: getStatusLabel('paid'),
+                    color: getStatusColor('paid'),
+                    icon: '📦'
+                  },
+                  processing: {
+                    label: getStatusLabel('processing'),
+                    color: getStatusColor('processing'),
+                    icon: '📦'
+                  },
+                  shipped: {
+                    label: getStatusLabel('shipped'),
+                    color: getStatusColor('shipped'),
+                    icon: '📦'
+                  },
+                  delivered: {
+                    label: getStatusLabel('delivered'),
+                    color: getStatusColor('delivered'),
+                    icon: '📦'
+                  },
+                  canceled: {
+                    label: getStatusLabel('canceled'),
+                    color: getStatusColor('canceled'),
+                    icon: '📦'
+                  },
+                  failed: {
+                    label: getStatusLabel('failed'),
+                    color: getStatusColor('failed'),
                     icon: '📦'
                   }
                 }} 

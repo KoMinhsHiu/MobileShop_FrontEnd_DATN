@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Main axios instance for all APIs (with /v1 prefix)
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api/v1", // Base API URL with v1
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1",
   timeout: 30000, // Tăng timeout lên 30 giây
   headers: {
     "Content-Type": "application/json",
@@ -15,9 +15,7 @@ export const v1AxiosInstance = axiosInstance;
 
 // Separate axios instance for phone APIs (without /api/v1 prefix)
 export const phoneAxiosInstance = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? "https://your-production-api.com" 
-    : "http://localhost:3000", // No /api/v1 prefix for phone APIs
+  baseURL: "http://localhost:3000",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",

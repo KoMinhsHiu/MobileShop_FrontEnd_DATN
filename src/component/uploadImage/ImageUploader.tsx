@@ -258,6 +258,7 @@ const ImageUploader = forwardRef<ImageUploaderRef, ImageUploaderProps>(({
       {/* Preview Modal */}
       {previewImage && (
         <Image
+          alt=""
           style={{ display: 'none' }}
           preview={{
             visible: previewOpen,

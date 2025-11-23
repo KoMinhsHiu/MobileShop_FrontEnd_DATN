@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from './auth.module.scss';
 
+import Image from 'next/image';
+
 interface AuthLayoutProps {
   children: React.ReactNode;
   title: string;
@@ -20,12 +22,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         {/* Logo and Title */}
         <div className={styles.header}>
           <div className={styles.logoContainer}>
-            <img
+            <Image
               src="/images/PhoneHubLogo.png"
               alt="PhoneHub Logo"
               width={120}
               height={80}
+              priority
               className={styles.logo}
+              style={{ objectFit: 'contain' }}
             />
           </div>
           <h1 className={styles.title}>{title}</h1>

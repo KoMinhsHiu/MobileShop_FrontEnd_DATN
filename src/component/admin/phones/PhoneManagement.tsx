@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import AddPhoneForm from "./AddPhoneForm";
 import phonesAPI from "@/utils/api/phone";
 
+import Image from 'next/image';
+
 interface PhoneLine {
   id: number;
   name: string;
@@ -207,10 +209,14 @@ const PhoneManagement = () => {
                 <tr key={line.id}>
                   <td>
                     <div className={styles.imageCell}>
-                      <img 
+                      <Image
                         src={line.image}
                         alt={line.name}
+                        width={60}
+                        height={60}
+                        priority
                         className={styles.productImage}
+                        style={{ objectFit: 'cover', borderRadius: '8px' }}
                       />
                     </div>
                   </td>

@@ -2,9 +2,19 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
+  output: "standalone",
   images: {
     unoptimized: true,
-    domains: ["localhost"],
+    domains: [
+      "localhost",
+      "cdn2.cellphones.com.vn",
+      "images.samsung.com",
+      "www.apple.com",
+      "i02.appmifile.com",
+      "www.oppo.com",
+      "res.cloudinary.com",
+    ],
     remotePatterns: [
       {
         protocol: "https",

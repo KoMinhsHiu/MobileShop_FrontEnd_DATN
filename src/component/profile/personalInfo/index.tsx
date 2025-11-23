@@ -1,7 +1,9 @@
 import React from 'react';
-import { UserProfile } from '@/pages/profile/profile.types';
-import { PROFILE_MESSAGES } from '@/pages/profile/constants/profileMessages';
+import { UserProfile } from '@/utils/type/profile';
+import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import styles from './personalInfo.module.scss';
+
+import Image from 'next/image';
 
 interface PersonalInfoProps {
   personalInfo: UserProfile;
@@ -26,10 +28,14 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
         {/* Avatar Upload */}
         <div className={styles.avatarSection}>
           <div className={styles.avatarContainer}>
-            <img
+            <Image
               src={personalInfo.avatar || '/images/logo.png'}
               alt="Avatar"
+              width={100}
+              height={100}
+              priority
               className={styles.avatar}
+              style={{ objectFit: 'cover', borderRadius: '50%' }}
             />
             <input
               type="file"

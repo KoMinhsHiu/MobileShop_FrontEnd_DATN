@@ -6,5 +6,4 @@ export * from "./featureProduct";
 export * from "./cartContext";
 export * from "./category";
 export * from "./order";
-export * from "./phoneVariant";
 export * from "./brand";

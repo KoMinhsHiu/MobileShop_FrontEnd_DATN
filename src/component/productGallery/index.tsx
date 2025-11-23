@@ -11,6 +11,8 @@ import { productGalleryProps } from "./productGallery.types";
 
 import styles from "./productGallery.module.scss";
 
+import Image from 'next/image';
+
 const ProductGallery: FC<productGalleryProps> = ({ images }) => {
   const sliderImages = images;
   const [activeIndex, setActiveIndex] = useState(0);
@@ -30,7 +32,7 @@ const ProductGallery: FC<productGalleryProps> = ({ images }) => {
     } else {
       setMainImage(sliderImages[activeIndex]);
     }
-  }, [activeIndex, images, isTransitioning]);
+  }, [activeIndex, images, isTransitioning, sliderImages]);
 
   const handleImageChange = (newIndex: number) => {
     if (newIndex !== activeIndex && !isTransitioning) {
@@ -62,22 +64,30 @@ const ProductGallery: FC<productGalleryProps> = ({ images }) => {
           <div className={styles.zoomButton} onClick={() => setIsZoomed(true)}>
             <FontAwesomeIcon icon={faSearchPlus} color="#fff" fontSize={20} />
           </div>
-          <img
+          <Image
             alt="product image"
             src={mainImage.src}
+            width={400}
+            height={400}
+            priority
             className={`${styles.mainImage} ${isTransitioning ? styles.transitioning : ""}`}
+            style={{ objectFit: 'contain', borderRadius: '12px' }}
             onClick={() => setIsZoomed(true)}
           />
         </div>
         <div className={styles.sliderWrapper}>
           {sliderImages?.map((image, idx) => {
             return (
-              <img
+              <Image
                 alt="product image"
                 src={image.src}
+                width={60}
+                height={60}
+                priority
                 className={`${styles.sliderImage} ${
                   idx === activeIndex ? styles.active : ""
                 }`}
+                style={{ objectFit: 'cover', borderRadius: '8px' }}
                 key={idx}
                 onClick={() => handleImageChange(idx)}
               />
@@ -96,10 +106,14 @@ const ProductGallery: FC<productGalleryProps> = ({ images }) => {
             >
               <FontAwesomeIcon icon={faTimes} color="#fff" fontSize={24} />
             </button>
-            <img
+            <Image
               alt="product image zoomed"
               src={mainImage.src}
+              width={800}
+              height={800}
+              priority
               className={styles.zoomedImage}
+              style={{ objectFit: 'contain', borderRadius: '12px' }}
             />
           </div>
         </div>

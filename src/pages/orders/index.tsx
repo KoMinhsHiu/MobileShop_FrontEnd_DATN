@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import MetaTags from "@/component/metaTags";
-import { Order } from "@/utils/type/order";
+import { Order } from "@/utils/api/orders";
 import { useFetchOrders } from "@/utils/hooks/api/useFetchOrders";
 import OrderTable from "@/component/order/orderTable";
 import { withAuth } from "@/component/auth";

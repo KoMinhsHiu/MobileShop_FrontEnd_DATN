@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Order } from "@/utils/type/order";
+import { Order } from "@/utils/api/orders";
 import OrderInfo from "@/component/order/orderInfo";
 import OrderTimeline from "@/component/order/orderTimeline";
 import OrderItemsList from "@/component/order/orderItemsList";
@@ -55,9 +55,11 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ order, loading }) => {
 
         <div className={styles.orderDetail}>
           <OrderInfo order={order} />
-          <OrderTimeline status={order.status} />
+          <OrderTimeline
+            statusHistory={order.statusHistory || []}
+          />
           <OrderItemsList items={order.items} />
-          <OrderSummary summary={order.summary} paymentMethod={order.paymentMethod} />
+          {/* <OrderSummary summary={order.summary} paymentMethod={order.paymentMethod} /> */}
         </div>
       </div>
     </div>

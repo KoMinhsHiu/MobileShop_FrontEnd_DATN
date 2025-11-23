@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/authContext';
 import { ordersAPI, Order } from '@/utils/api/orders';
 import toast from 'react-hot-toast';
@@ -16,7 +16,7 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     if (!isAuthenticated) {
       setLoading(false);
       return;
@@ -25,19 +25,13 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
     try {
       setLoading(true);
       setError(null);
-      
       const response = await ordersAPI.getMyOrders();
-      
       console.log('🔍 Orders API Response:', response);
       console.log('🔍 Response Data:', response.data);
       console.log('🔍 Data Type:', Array.isArray(response.data) ? 'Array' : typeof response.data);
       console.log('🔍 Data Length:', response.data?.length || 0);
-      
       if (response.status === 200) {
-        // API trả về data là array trực tiếp, không phải object với orders
         const ordersArray = response.data || [];
-        
-        // Debug: Log each order's orderDate
         console.log('📅 Orders with dates:');
         ordersArray.forEach((order: any, index: number) => {
           console.log(`📅 Order ${index + 1}:`, {
@@ -47,7 +41,6 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
             rawOrderDate: JSON.stringify(order.orderDate)
           });
         });
-        
         console.log('🔍 Setting orders:', ordersArray);
         setOrders(ordersArray);
       } else {
@@ -55,10 +48,7 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
       }
     } catch (err: any) {
       console.error('Error fetching orders:', err);
-      
-      // Handle specific error cases
       let errorMessage = 'Có lỗi xảy ra khi tải đơn hàng';
-      
       if (err.message.includes('404') || err.message.includes('Provinces not found')) {
         errorMessage = 'API đơn hàng đang được cập nhật. Vui lòng thử lại sau.';
         console.warn('Orders API temporarily unavailable - likely due to backend update');
@@ -69,17 +59,14 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
       } else if (err.message) {
         errorMessage = err.message;
       }
-      
       setError(errorMessage);
-      
-      // Show toast notification for user feedback (only for non-404 errors)
       if (!err.message.includes('404') && !err.message.includes('Provinces not found')) {
         toast.error(errorMessage);
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   const refetch = async () => {
     await fetchOrders();
@@ -87,7 +74,7 @@ export const useFetchOrders = (): UseFetchOrdersReturn => {
 
   useEffect(() => {
     fetchOrders();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchOrders]);
 
   return {
     orders,

@@ -31,7 +31,7 @@ const CheckoutPageComponent = () => {
       selectedCommune,
       communes: communes.slice(0, 5) // Show first 5 communes for debugging
     });
-  }, [communes, selectedProvince, selectedCommune]);
+  }, [communes, provinces, selectedProvince, selectedCommune]);
 
   useEffect(() => {
     const calculateShippingFee = async () => {
@@ -61,7 +61,7 @@ const CheckoutPageComponent = () => {
     };
 
     calculateShippingFee();
-  }, [cart, selectedProvince, selectedCommune]);
+  }, [cart, selectedProvince, selectedCommune, communes, provinces]);
     
 
   // Form state

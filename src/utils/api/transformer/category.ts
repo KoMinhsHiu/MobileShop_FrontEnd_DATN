@@ -67,8 +67,8 @@ export const CategoryTransformer = (data: any, categoryId?: string): Category =>
       product: productTransformer(data.psdata.products),
       filters: filtersTransformer(data.psdata.facets),
       sortOptions: sortTransformer(data.psdata.sort_orders),
-      activeSort: data.psdata.order_param ?? null,
-      activeFilter: data.psdata.q_param ?? null,
+      activeSort: data.psdata.order_param ?? "",
+      activeFilter: data.psdata.q_param ?? "",
       totalPage: data.psdata.pagination.pages_count,
       totalProducts: data.psdata.pagination.total_items,
     };
@@ -80,8 +80,8 @@ export const CategoryTransformer = (data: any, categoryId?: string): Category =>
       product: productTransformer(mockData.psdata.products),
       filters: filtersTransformer(mockData.psdata.facets),
       sortOptions: sortTransformer(mockData.psdata.sort_orders),
-      activeSort: mockData.psdata.order_param ?? null,
-      activeFilter: mockData.psdata.q_param ?? null,
+      activeSort: mockData.psdata.order_param ?? "",
+      activeFilter: mockData.psdata.q_param ?? "",
       totalPage: mockData.psdata.pagination.pages_count,
       totalProducts: mockData.psdata.pagination.total_items,
     };
@@ -116,8 +116,8 @@ export const CategoryTransformer = (data: any, categoryId?: string): Category =>
         querySort: option.value,
         isActive: false,
       })) || [],
-      activeSort: null,
-      activeFilter: null,
+      activeSort: "",
+      activeFilter: "",
       totalPage: data.totalPage || 1,
       totalProducts: data.totalProducts || 0,
     };

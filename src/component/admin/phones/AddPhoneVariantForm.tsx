@@ -1,7 +1,7 @@
 import { faSpinner, faTimes, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from './AddPhoneForm.module.scss';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import phonesAPI, { PhoneColor, PhoneSpecification, CreateVariantColor, CreateVariantRequest, CreateVariantSpecification } from "@/utils/api/phone";
 import ImageUploader, { ImageUploaderRef } from "@/component/uploadImage/ImageUploader";
 import { message } from "antd";
@@ -63,23 +63,22 @@ const AddPhoneVariantForm: React.FC<AddPhoneVariantFormProps> = ({
     updateColor(index, 'imageUrl', '');
   };
 
-  // Fetch data when component mounts
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [colorsData, specsData] = await Promise.all([
-          getAllColors(),
-          getAllSpecifications()
-        ]);
-        setColors(Array.isArray(colorsData) ? colorsData : []);
-        setSpecifications(Array.isArray(specsData) ? specsData : []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  const fetchData = useCallback(async () => {
+    try {
+      const [colorsData, specsData] = await Promise.all([
+        getAllColors(),
+        getAllSpecifications()
+      ]);
+      setColors(Array.isArray(colorsData) ? colorsData : []);
+      setSpecifications(Array.isArray(specsData) ? specsData : []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, [getAllColors, getAllSpecifications]);
 
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const [formData, setFormData] = useState<AddVariantFormData>({
     variantName: '',

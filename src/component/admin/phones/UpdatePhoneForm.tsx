@@ -59,7 +59,7 @@ const UpdatePhoneForm: React.FC<UpdatePhoneFormProps> = ({
     };
     
     fetchData();
-  }, []);
+  }, [getAllCategories]);
 
   const handleInputChange = (field: keyof typeof formData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));

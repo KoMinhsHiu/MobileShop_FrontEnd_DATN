@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { voucherAPI, Voucher, ListVouchersResponse } from '@/utils/api/voucher';
 import { useToast } from '@/component/common/ToastContainer';
 
@@ -25,7 +25,7 @@ export const useFetchVoucher = ({
   const [total, setTotal] = useState(0);
   const { showError } = useToast();
 
-  const fetchVouchers = async () => {
+  const fetchVouchers = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -92,7 +92,7 @@ export const useFetchVoucher = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, limit, showError]);
 
   const refetch = async () => {
     await fetchVouchers();
@@ -100,7 +100,7 @@ export const useFetchVoucher = ({
 
   useEffect(() => {
     fetchVouchers();
-  }, [page, limit]);
+  }, [page, limit, fetchVouchers]);
 
   return {
     vouchers,

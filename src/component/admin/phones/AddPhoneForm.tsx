@@ -1,7 +1,7 @@
 import { faSpinner, faTimes, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from './AddPhoneForm.module.scss';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { fetchBrandsSafe } from "@/utils/api/brands";
 import phonesAPI, { CreatePhoneRequest, PhoneCategory, PhoneColor, PhoneSpecification } from "@/utils/api/phone";
 import { TransformedBrand } from "@/utils/type";
@@ -78,8 +78,7 @@ const AddPhoneForm: React.FC<ProductFormProps> = ({ onSave, onClose }) => {
     updateColor(index, 'imageUrl', '');
   };
 
-  // Fetch data when component mounts
-  const fetchColors = async () => {
+  const fetchColors = useCallback(async () => {
     try {
       const colorsData = await getAllColors();
       setColors(Array.isArray(colorsData) ? colorsData : []);
@@ -87,9 +86,9 @@ const AddPhoneForm: React.FC<ProductFormProps> = ({ onSave, onClose }) => {
       console.error('Error fetching colors:', error);
       setColors([]);
     }
-  };
+  }, [getAllColors]);
 
-  const fetchSpecifications = async () => {
+  const fetchSpecifications = useCallback(async () => {
     try {
       const specsData = await getAllSpecifications();
       setSpecifications(Array.isArray(specsData) ? specsData : []);
@@ -97,7 +96,7 @@ const AddPhoneForm: React.FC<ProductFormProps> = ({ onSave, onClose }) => {
       console.error('Error fetching specifications:', error);
       setSpecifications([]);
     }
-  };
+  }, [getAllSpecifications]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,9 +113,8 @@ const AddPhoneForm: React.FC<ProductFormProps> = ({ onSave, onClose }) => {
         console.error('Error fetching data:', error);
       }
     };
-    
     fetchData();
-  }, []);
+  }, [getAllCategories, fetchColors, fetchSpecifications]);
 
   const [formData, setFormData] = useState<AddPhoneFormData>({
     name: '',

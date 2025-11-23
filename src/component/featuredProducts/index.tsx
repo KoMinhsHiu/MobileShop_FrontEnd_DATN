@@ -5,6 +5,8 @@ import { CategoryProducts } from "@/utils/type";
 import { useFetchPhoneVariants } from "@/utils/hooks/api/useFetchPhoneVariants";
 import styles from "./featuredProducts.module.scss";
 
+import Image from 'next/image';
+
 const FeaturedProducts: FC = () => {
   const [activeTab, setActiveTab] = useState<'featured' | 'new'>('featured');
   
@@ -12,14 +14,12 @@ const FeaturedProducts: FC = () => {
   const { data: featuredApiData } = useFetchPhoneVariants({
     page: 1,
     limit: 8,
-    order: 'rating_desc', // Featured products by rating
   });
 
   // Fetch new products from API
   const { data: newApiData } = useFetchPhoneVariants({
     page: 1,
     limit: 8,
-    order: 'created_desc', // New products by creation date
   });
 
   // Use API data if available, otherwise fall back to mock data
@@ -86,10 +86,14 @@ const FeaturedProducts: FC = () => {
               <div key={productId} className={styles.productCard}>
                 <Link href={`/product/${productId}`} className={styles.productLink}>
                   <div className={styles.imageContainer}>
-                    <img
+                    <Image
                       src={productImage}
                       alt={productName}
+                      priority
+                      width={180}
+                      height={180}
                       className={styles.productImage}
+                      style={{ objectFit: 'cover', borderRadius: '8px' }}
                     />
                     {discountAmount > 0 && (
                       <div className={styles.discountBadge}>

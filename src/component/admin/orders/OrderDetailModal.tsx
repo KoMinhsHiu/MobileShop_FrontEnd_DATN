@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTimes, 
@@ -308,10 +309,14 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                     <td>
                       <div className={styles.productInfo}>
                         {item.image && (
-                          <img 
-                            src={item.image} 
+                          <Image
+                            src={item.image}
                             alt={item.productName}
                             className={styles.productImage}
+                            width={48}
+                            height={48}
+                            priority
+                            unoptimized={item.image.startsWith('http')}
                           />
                         )}
                         <div className={styles.productDetails}>

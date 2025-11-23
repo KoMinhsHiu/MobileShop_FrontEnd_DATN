@@ -38,7 +38,7 @@ export function withAuth<P extends object>(
           query: { returnUrl: currentPath }
         });
       }
-    }, [isAuthenticated, isLoading, router]);
+    }, [isAuthenticated, isLoading, router, redirectTo]);
 
     // Show loading state while checking authentication
     if (isLoading) {

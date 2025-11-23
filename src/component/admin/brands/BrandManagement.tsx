@@ -9,6 +9,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./BrandManagement.module.scss";
 import { fetchBrandsSafe } from "@/utils/api/brands";
+import Image from "next/image";
 import { TransformedBrand } from "@/utils/type";
 import { useState, useEffect } from "react";
 import AddBrandForm from "./AddBrandForm";
@@ -159,10 +160,14 @@ const BrandManagement = () => {
                 <tr key={brand.id}>
                   <td className={styles.imageCell}>
                     {brand.imageUrl ? (
-                      <img 
-                        src={brand.imageUrl} 
+                      <Image
+                        src={brand.imageUrl}
                         alt={brand.name}
                         className={styles.productImage}
+                        width={48}
+                        height={48}
+                        priority
+                        unoptimized={brand.imageUrl.startsWith('http')}
                       />
                     ) : (
                       <div className={styles.noImage}>No Image</div>

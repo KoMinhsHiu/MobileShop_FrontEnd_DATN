@@ -28,9 +28,8 @@ export const useFetchPhoneVariants = (params: PhoneVariantsParams = {}) => {
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
     retry: false, // Don't retry on 404 errors
-    keepPreviousData: true, // Keep previous data while fetching new data
+    placeholderData: (previousData) => previousData, // Keep previous data while fetching new data
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 };

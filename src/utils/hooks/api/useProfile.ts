@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
-import { UserProfile, PasswordChange, ProfileTab } from '../profile.types';
-import { PROFILE_MESSAGES } from '../constants/profileMessages';
+import { UserProfile, PasswordChange, ProfileTab } from '@/utils/type/profile';
+import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import { customerAPI } from '@/utils/api/customer';
 
 export const useProfile = () => {

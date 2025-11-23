@@ -105,7 +105,7 @@ export interface LegacyOrder {
   id: string;
   orderNumber: string;
   orderDate: string;
-  status: 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'cancelled';
+  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'canceled' | 'failed';
   paymentMethod: 'cod' | 'paypal' | 'momo' | 'vnpay';
   shippingInfo: ShippingInfo;
   items: LegacyOrderItem[];
@@ -118,12 +118,17 @@ export interface OrderStatus {
     color: string;
     icon: string;
   };
-  confirmed: {
+  paid: {
     label: string;
     color: string;
     icon: string;
   };
-  shipping: {
+  processing: {
+    label: string;
+    color: string;
+    icon: string;
+  };
+  shipped: {
     label: string;
     color: string;
     icon: string;
@@ -133,7 +138,12 @@ export interface OrderStatus {
     color: string;
     icon: string;
   };
-  cancelled: {
+  canceled: {
+    label: string;
+    color: string;
+    icon: string;
+  };
+  failed: {
     label: string;
     color: string;
     icon: string;

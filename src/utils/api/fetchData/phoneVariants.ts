@@ -4,6 +4,8 @@ import { PhoneVariantsResponse, PhoneVariantsParams, PhoneVariantDetailResponse 
 export const fetchPhoneVariants = async (
   params: PhoneVariantsParams = {}
 ): Promise<PhoneVariantsResponse> => {
+  // Build queryParams outside try/catch for error logging
+  const queryParams = new URLSearchParams();
   try {
     // Validate and sanitize parameters
     const {
@@ -32,11 +34,8 @@ export const fetchPhoneVariants = async (
     const validatedLimit = Math.min(Math.max(1, limit || 10), 100); // Max 100 items per page
     const validatedOrder = order === "desc" ? "desc" : "asc";
 
-    // Build query parameters with validated values
-    const queryParams = new URLSearchParams();
     queryParams.append("page", validatedPage.toString());
     queryParams.append("limit", validatedLimit.toString());
-    
     if (validatedOrder) queryParams.append("order", validatedOrder);
 
     // Basic filters
@@ -61,7 +60,6 @@ export const fetchPhoneVariants = async (
         queryParams.append("chipset", chipset);
       }
     }
-    
     if (os) {
       if (Array.isArray(os)) {
         os.forEach(o => queryParams.append("os", o));
@@ -69,7 +67,6 @@ export const fetchPhoneVariants = async (
         queryParams.append("os", os);
       }
     }
-    
     // Validate and add numeric filters
     if (minRam !== undefined && minRam >= 0) {
       queryParams.append("minRam", minRam.toString());
@@ -99,58 +96,52 @@ export const fetchPhoneVariants = async (
     const response = await phoneAxiosInstance.get(
       `/api/v1/phones/variants/filter?${queryParams.toString()}`
     );
-
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching phone variants:", error);
     console.log("Request params:", params);
     console.log("Query string:", queryParams.toString());
     console.log("Full URL:", `/api/v1/phones/variants/filter?${queryParams.toString()}`);
-    
+
     // If it's a 400 error, log more details and try with minimal params
     if (error.response?.status === 400) {
       console.error("400 Bad Request - API validation error:", error.response.data);
       console.log("This might be due to invalid parameters or API schema changes");
       console.log("🔄 Trying with minimal parameters...");
-      
       try {
         // Try with only basic parameters
         const minimalParams = new URLSearchParams();
         minimalParams.append("page", "1");
         minimalParams.append("limit", "10");
-        
         const response = await phoneAxiosInstance.get(
           `/api/v1/phones/variants/filter?${minimalParams.toString()}`
         );
         console.log("✅ Success with minimal parameters");
         return response.data;
-      } catch (minimalError) {
+      } catch (minimalError: any) {
         console.log("❌ Failed even with minimal parameters");
       }
     }
-    
+
     // If it's a 404 error, try alternative endpoints
     if (error.response?.status === 404) {
       console.log("🔄 Trying alternative endpoints for 404 error...");
-      
       const alternatives = [
         "/phones/variants/filter",
-        "/api/phones/variants/filter", 
+        "/api/phones/variants/filter",
         "/v1/phones/variants/filter"
       ];
-      
       for (const endpoint of alternatives) {
         try {
           console.log(`🔍 Trying: ${endpoint}`);
           const response = await phoneAxiosInstance.get(`${endpoint}?${queryParams.toString()}`);
           console.log(`✅ Success with: ${endpoint}`);
           return response.data;
-        } catch (altError) {
+        } catch (altError: any) {
           console.log(`❌ Failed: ${endpoint}`, altError.message);
         }
       }
     }
-    
     throw error;
   }
 };
@@ -173,7 +164,7 @@ export const fetchPhoneVariantDetail = async (
     const response = await phoneAxiosInstance.get(endpoint);
     console.log("✅ API call successful:", response.status);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error fetching phone variant detail:", {
       message: error.message,
       status: error.response?.status,
@@ -181,29 +172,29 @@ export const fetchPhoneVariantDetail = async (
       url: error.config?.url,
       baseURL: error.config?.baseURL
     });
-    
+
     // If it's a 404 error, try alternative endpoints
     if (error.response?.status === 404) {
       console.log("🔄 Trying alternative endpoints for 404 error...");
-      
+
       const alternatives = [
         `/v1/phones/variants/${variantId}`,
         `/phones/variants/${variantId}`,
         `/api/phones/variants/${variantId}`
       ];
-      
+
       for (const altEndpoint of alternatives) {
         try {
           console.log(`🔍 Trying: ${altEndpoint}`);
           const response = await phoneAxiosInstance.get(altEndpoint);
           console.log(`✅ Success with: ${altEndpoint}`);
           return response.data;
-        } catch (altError) {
+        } catch (altError: any) {
           console.log(`❌ Failed: ${altEndpoint}`, altError.message);
         }
       }
     }
-    
+
     throw error;
   }
 };

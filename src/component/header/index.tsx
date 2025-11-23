@@ -11,6 +11,8 @@ import Search from "../search";
 import MegaMenu from "../megaMenu";
 import styles from "./header.module.scss";
 
+import Image from 'next/image';
+
 const Header: FC = () => {
   const { cart } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
@@ -20,7 +22,15 @@ const Header: FC = () => {
       <div className={`${styles.headerContent} container`}>
         <div className={styles.logoWrapper}>
           <Link href={"/"}>
-            <img src="/images/PhoneHubLogo.png" alt="PhoneHub Logo" className={styles.logo} />
+            <Image
+              src="/images/PhoneHubLogo.png"
+              alt="PhoneHub Logo"
+              width={120}
+              height={80}
+              priority
+              className={styles.logo}
+              style={{ objectFit: 'contain' }}
+            />
           </Link>
           <MegaMenu />
         </div>
@@ -38,7 +48,7 @@ const Header: FC = () => {
           <div className={styles.authButtons}>
             {isAuthenticated ? (
               <div className={styles.userSection}>
-                <span className={styles.welcomeText}>Xin chào, {user?.fullName || user?.username}!</span>
+                <span className={styles.welcomeText}>Xin chào, {user?.username}!</span>
                 <button 
                   onClick={() => logout()} 
                   className={styles.logoutBtn}

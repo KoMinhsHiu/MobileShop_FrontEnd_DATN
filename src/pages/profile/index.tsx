@@ -1,8 +1,8 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 import styles from './profile.module.scss';
-import { useProfile } from './hooks/useProfile';
-import { PROFILE_MESSAGES } from './constants/profileMessages';
+import { useProfile } from '@/utils/hooks/api/useProfile';
+import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import PersonalInfo from '@/component/profile/personalInfo';
 import ChangePassword from '@/component/profile/changePassword';
 import AdditionalOptions from '@/component/profile/additionalOptions';
@@ -48,8 +48,8 @@ const ProfilePageComponent: React.FC = () => {
               onUpdate={handleUpdatePersonalInfo}
             />
             <AdditionalOptions
-              onViewHistory={() => toast.info(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
-              onManagePayment={() => toast.info(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
+              onViewHistory={() => toast(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
+              onManagePayment={() => toast(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
             />
           </div>
         )}

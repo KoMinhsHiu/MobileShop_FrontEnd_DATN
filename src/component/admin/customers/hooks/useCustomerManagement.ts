@@ -136,7 +136,7 @@ export const useCustomerManagement = ({
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [filters]);
+  }, [filters, currentPage]);
 
   // ============================================================================
   // FILTERING & SORTING LOGIC
