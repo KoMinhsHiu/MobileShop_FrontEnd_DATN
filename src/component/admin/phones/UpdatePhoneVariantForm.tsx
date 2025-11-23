@@ -184,7 +184,7 @@ const UpdatePhoneVariantForm: React.FC<UpdatePhoneVariantFormProps> = ({
         }
       }));
     }
-  }, [formData.colors, variant.images]);
+  }, [formData.colors, variant.images, hasColorImages]);
 
   // Fetch colors and specifications
   useEffect(() => {
@@ -202,7 +202,7 @@ const UpdatePhoneVariantForm: React.FC<UpdatePhoneVariantFormProps> = ({
     };
 
     fetchData();
-  }, []);
+  }, [getAllColors, getAllSpecifications]);
 
   // Color handling functions
   const addColor = () => {

@@ -1,7 +1,7 @@
 import React from "react";
-import { OrderSummary } from "@/utils/type/order";
+import type { OrderSummary } from "@/utils/type/order";
 import { formatPrice } from "@/utils/function/formatPrice";
-import { getPaymentMethodLabel } from "@/pages/orders/utils";
+import { getPaymentMethodLabel } from "@/utils/function/ordersUtils";
 
 import styles from "./orderSummary.module.scss";
 

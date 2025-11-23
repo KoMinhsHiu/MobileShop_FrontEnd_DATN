@@ -10,6 +10,8 @@ import { mainSliderImage } from "@/const/mainSliderImage";
 
 import styles from "./mainSlider.module.scss";
 
+import Image from 'next/image';
+
 const MainSlider: FC = () => {
   return (
     <Swiper
@@ -22,10 +24,26 @@ const MainSlider: FC = () => {
           <SwiperSlide key={index}>
             {item.link ? (
               <Link href={item.link}>
-                <img src={item.image} alt={item.title} className={styles.image} />
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={800}
+                  height={320}
+                  priority
+                  className={styles.image}
+                  style={{ objectFit: 'cover', borderRadius: '12px' }}
+                />
               </Link>
             ) : (
-              <img src={item.image} alt={item.title} className={styles.image} />
+              <Image
+                src={item.image}
+                alt={item.title}
+                width={800}
+                height={320}
+                priority
+                className={styles.image}
+                style={{ objectFit: 'cover', borderRadius: '12px' }}
+              />
             )}
           </SwiperSlide>
         );

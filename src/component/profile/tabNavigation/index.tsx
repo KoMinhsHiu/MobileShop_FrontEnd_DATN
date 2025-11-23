@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProfileTab } from '@/pages/profile/profile.types';
+import { ProfileTab } from '@/utils/type/profile';
 import styles from './tabNavigation.module.scss';
 
 interface TabNavigationProps {

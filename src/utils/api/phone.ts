@@ -1,5 +1,5 @@
 import { BrandsAPI, CategoriesAPI, PhonesAPI } from "@/const/endPoint";
-import { PhoneVariant } from "../type";
+import { PhoneVariant } from "../type/phoneVariant";
 import axiosInstance from "./fetchData/axiosInstance";
 
 // Phone API interfaces and functions

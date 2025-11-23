@@ -33,18 +33,18 @@ const Sort: FC<SortProps> = ({
 
   const divRef = useRef<HTMLDivElement | null>(null);
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = React.useCallback((event: MouseEvent) => {
     if (divRef.current && !divRef.current.contains(event.target as Node)) {
       setShowSortOption(false);
     }
-  };
+  }, [setShowSortOption]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [handleClickOutside]);
 
   return (
     <div className={styles.sortWrapper} ref={divRef}>

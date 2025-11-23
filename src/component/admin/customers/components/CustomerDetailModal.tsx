@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTimes, 
@@ -73,10 +74,14 @@ const CustomerDetailModal: React.FC<CustomerDetailModalProps> = ({
         <div className={styles.modalHeader}>
           <h2>
             {customer.avatar ? (
-              <img 
-                src={customer.avatar} 
+              <Image
+                src={customer.avatar}
                 alt={customer.name}
                 className={styles.customerAvatar}
+                width={48}
+                height={48}
+                priority
+                unoptimized={customer.avatar.startsWith('http')}
               />
             ) : (
               <div className={styles.avatarPlaceholder}>

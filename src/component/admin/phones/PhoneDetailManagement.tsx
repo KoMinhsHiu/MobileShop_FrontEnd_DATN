@@ -4,12 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faSpinner, faPen, faChevronDown, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { PhoneVariant } from "@/utils/type";
+import { PhoneVariant, ColorVariant, ImageVariant, SpecificationInfo } from "@/utils/type/phoneVariant";
 import UpdatePhoneForm from './UpdatePhoneForm';
 import UpdatePhoneVariantForm from './UpdatePhoneVariantForm';
 import AddPhoneVariantForm from './AddPhoneVariantForm';
 import phonesAPI from '@/utils/api/phone';
 import { message } from 'antd';
+
+import Image from 'next/image';
 
 type PhoneDetailManagementProps = {
   id: string;
@@ -204,12 +206,16 @@ const PhoneDetailManagement = ({ id }: PhoneDetailManagementProps) => {
                         <div className={styles.colorSection}>
                           <h4>Màu sắc</h4>
                           <div className={styles.colorsList}>
-                            {variant.colors.map((color) => (
+                            {variant.colors.map((color: ColorVariant) => (
                               <div key={color.color.id} className={styles.colorItem}>
                                 <div className={styles.colorImage}>
-                                  <img 
-                                    src={variant.images.find(img => img.image.id === color.imageId)?.image.imageUrl || ''} 
+                                  <Image
+                                    src={variant.images.find((img: ImageVariant) => img.image.id === color.imageId)?.image.imageUrl || ''}
                                     alt={color.color.name}
+                                    width={60}
+                                    height={60}
+                                    priority
+                                    style={{ objectFit: 'cover', borderRadius: '8px' }}
                                   />
                                 </div>
                                 <span>{color.color.name}</span>
@@ -222,13 +228,20 @@ const PhoneDetailManagement = ({ id }: PhoneDetailManagementProps) => {
                           <h4>Hình ảnh khác</h4>
                           <div className={styles.imagesList}>
                             {variant.images
-                              .filter(img => !variant.colors.some(color => color.imageId === img.image.id))
-                              .map((img) => (
+                              .filter((img: ImageVariant) => !variant.colors.some((color: ColorVariant) => color.imageId === img.image.id))
+                              .map((img: ImageVariant) => (
                                 <div key={img.id} className={styles.imageItem}>
-                                  <img src={img.image.imageUrl} alt={`Ảnh ${img.id}`} />
+                                  <Image
+                                    src={img.image.imageUrl}
+                                    alt={`Ảnh ${img.id}`}
+                                    priority
+                                    width={60}
+                                    height={60}
+                                    style={{ objectFit: 'cover', borderRadius: '8px' }}
+                                  />
                                 </div>
                               ))}
-                            {variant.images.filter(img => !variant.colors.some(color => color.imageId === img.id)).length === 0 && (
+                            {variant.images.filter((img: ImageVariant) => !variant.colors.some((color: ColorVariant) => color.imageId === img.id)).length === 0 && (
                               <p className={styles.noImages}>Không có hình ảnh khác</p>
                             )}
                           </div>
@@ -240,7 +253,7 @@ const PhoneDetailManagement = ({ id }: PhoneDetailManagementProps) => {
                           <h4>Thông số kỹ thuật</h4>
                           <table className={styles.specificationsTable}>
                             <tbody>
-                              {variant.specifications.map((spec) => (
+                              {variant.specifications.map((spec: SpecificationInfo) => (
                                 <tr key={spec.specification.name}>
                                   <td>{spec.specification.name}</td>
                                   <td>{spec.info}</td>

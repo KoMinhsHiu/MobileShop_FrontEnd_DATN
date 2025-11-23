@@ -13,13 +13,18 @@ import { MegaMenuTransformer } from "@/utils/api/transformer/megaMenu";
 
 const ProductPage: FC<ProductPageProps> = ({ initialProduct, productId }) => {
   // Try to parse productId as variantId (number)
-  const variantId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
-  const isValidVariantId = !isNaN(variantId) && variantId > 0;
+  let variantId: number = 0;
+  if (typeof productId === 'string') {
+    variantId = parseInt(productId, 10);
+  } else if (typeof productId === 'number') {
+    variantId = productId;
+  }
+  const isValidVariantId = typeof variantId === 'number' && !isNaN(variantId) && variantId > 0;
 
   // Use new phone variant API if productId is a valid number
   const { data: phoneVariant, isLoading: isPhoneVariantLoading } = useFetchPhoneVariantDetail({
     variantId: isValidVariantId ? variantId : 0,
-    initialData: initialProduct,
+    initialData: undefined,
   });
 
   // Fallback to old product API if productId is not a valid number
@@ -36,6 +41,8 @@ const ProductPage: FC<ProductPageProps> = ({ initialProduct, productId }) => {
     return <ProductPlaceholder />;
   }
 
+  console.log("Rendering ProductPage with currentProduct:", currentProduct);
+
   return (
     <>
       <MetaTags title={currentProduct?.title} />
@@ -49,8 +56,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const referer = context.req.headers.referer || null;
   
   // Try to parse productId as variantId (number)
-  const variantId = typeof productId === 'string' ? parseInt(productId, 10) : productId;
-  const isValidVariantId = !isNaN(variantId) && variantId > 0;
+  let variantId: number = 0;
+  if (typeof productId === 'string') {
+    variantId = parseInt(productId, 10);
+  } else if (typeof productId === 'number') {
+    variantId = productId;
+  }
+  const isValidVariantId = typeof variantId === 'number' && !isNaN(variantId) && variantId > 0;
   
   if (!referer) {
     let initialProduct = null;

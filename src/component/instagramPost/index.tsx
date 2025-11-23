@@ -6,6 +6,8 @@ import { desktopPost, mobilePost } from "@/const/instagramImage";
 
 import styles from "./instagramPost.module.scss";
 
+import Image from 'next/image';
+
 const InstagramPost: FC = () => {
   const { width } = useWindowSize();
   const { t } = useTranslation();
@@ -19,7 +21,14 @@ const InstagramPost: FC = () => {
           {mobilePost?.map((post, index) => {
             return (
               <a className={styles.item} href={post.link} key={index}>
-                <img src={post.image} alt={post.title} />
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  width={120}
+                  height={120}
+                  priority
+                  style={{ objectFit: 'cover', borderRadius: '8px' }}
+                />
               </a>
             );
           })}
@@ -32,7 +41,14 @@ const InstagramPost: FC = () => {
                 ?.slice(columnIndex * 2, columnIndex * 2 + 2)
                 .map((post, index) => (
                   <a className={styles.item} key={index}>
-                    <img src={post.image} alt={post.title} />
+                    <Image
+                      src={post.image}
+                      alt={post.title}
+                      width={120}
+                      height={120}
+                      priority
+                      style={{ objectFit: 'cover', borderRadius: '8px' }}
+                    />
                   </a>
                 ))}
             </div>

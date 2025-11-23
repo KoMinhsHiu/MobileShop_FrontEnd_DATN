@@ -11,7 +11,7 @@ import AddCategoryForm from './AddCategoryForm';
 import UpdateCategoryForm from './UpdateCategoryForm';
 import styles from './CategoryManagement.module.scss';
 import phonesAPI, { PhoneCategory } from '@/utils/api/phone';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const CategoryManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,7 +24,7 @@ const CategoryManagement = () => {
   const { getAllCategories, deleteCategory } = phonesAPI;
 
   // Fetch categories data
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await getAllCategories();
@@ -35,11 +35,11 @@ const CategoryManagement = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getAllCategories]);
 
   useEffect(() => {
     loadCategories();
-  }, []);
+  }, [loadCategories]);
 
   const handleAddCategory = () => {
     setShowAddForm(true);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchPhoneList, PhoneListResponse } from '@/utils/api/phone';
 
 export interface PhoneListParams {
@@ -20,7 +20,7 @@ export const usePhoneList = (params: PhoneListParams): UsePhoneListReturn => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -40,11 +40,11 @@ export const usePhoneList = (params: PhoneListParams): UsePhoneListReturn => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params]);
 
   useEffect(() => {
     fetchData();
-  }, [params.page, params.limit]);
+  }, [fetchData]);
 
   const refetch = () => {
     fetchData();

@@ -11,6 +11,10 @@ interface ToastOptions {
 export const useToast = () => {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
   const addToast = useCallback((options: ToastOptions) => {
     const id = Math.random().toString(36).substr(2, 9);
     const newToast: ToastProps = {
@@ -20,11 +24,7 @@ export const useToast = () => {
     };
 
     setToasts(prev => [...prev, newToast]);
-  }, []);
-
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   const showSuccess = useCallback((title: string, message: string, duration?: number) => {
     addToast({ type: 'success', title, message, duration });

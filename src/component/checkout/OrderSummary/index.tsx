@@ -3,6 +3,8 @@ import { formatPrice, parsePrice } from "@/utils/function/formatPrice";
 import { OrderSummaryProps } from "./types";
 import styles from "./orderSummary.module.scss";
 
+import Image from 'next/image';
+
 const OrderSummary: React.FC<OrderSummaryProps> = ({
   products,
   orderSummary
@@ -13,11 +15,18 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         {products.map((product: any, idx: number) => (
           <div key={idx} className={styles.orderItem}>
             <div className={styles.itemImage}>
-              <img 
-                src={product.image || '/placeholder-product.jpg'} 
+              <Image
+                src={product.image || '/placeholder-product.jpg'}
                 alt={product.name}
+                width={60}
+                height={60}
+                priority
+                className={styles.productImage}
+                style={{ objectFit: 'cover', borderRadius: '8px' }}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
+                  if (e?.target) {
+                    (e.target as HTMLImageElement).src = '/placeholder-product.jpg';
+                  }
                 }}
               />
             </div>

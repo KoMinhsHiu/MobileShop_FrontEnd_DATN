@@ -3,7 +3,7 @@ import AdminLayout from '@/component/admin/AdminLayout';
 import { OrderManagement } from '@/component/admin/orders';
 import AdminGuard from '@/component/auth/AdminGuard';
 
-const AdminOrders: React.FC = () => {
+const AdminOrders = () => {
   return (
     <AdminGuard>
       <AdminLayout currentPage="/admin/orders">

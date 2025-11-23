@@ -4,6 +4,8 @@ import { formatPrice } from "@/utils/function/formatPrice";
 
 import styles from "./orderItemsList.module.scss";
 
+import Image from 'next/image';
+
 interface OrderItemsListProps {
   items: OrderItem[];
 }
@@ -16,13 +18,17 @@ const OrderItemsList: React.FC<OrderItemsListProps> = ({ items }) => {
         {items.map((item) => (
           <div key={item.id} className={styles.orderItem}>
             <div className={styles.itemImage}>
-              <img src={item.image} alt={item.name} />
+              <Image
+                src={item.variant.imageUrl}
+                alt={item.variant.name}
+                width={60}
+                height={60}
+                priority
+                style={{ objectFit: 'cover', borderRadius: '8px' }}
+              />
             </div>
             <div className={styles.itemInfo}>
-              <h4 className={styles.itemName}>{item.name}</h4>
-              <p className={styles.itemAttributes}>
-                {item.attributes.key}
-              </p>
+              <h4 className={styles.itemName}>{item.variant.name} {item.variant.variantName}</h4>
               <p className={styles.itemQuantity}>
                 Số lượng: {item.quantity}
               </p>

@@ -121,7 +121,7 @@ const OrderManagement: React.FC = () => {
         errorMessage
       );
     }
-  }, [orders, updateOrder, showSuccess, showError]);
+  }, [orders, updateOrder, showSuccess, showError, refetch]);
 
   // Handle retry
   const handleRetry = useCallback(() => {

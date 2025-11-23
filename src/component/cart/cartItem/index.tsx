@@ -9,6 +9,8 @@ import { CartItemProps } from "./cartItem.types";
 
 import styles from "./cartItem.module.scss";
 
+import Image from 'next/image';
+
 const CartItem: FC<CartItemProps> = ({ product }) => {
   const { id, productAttributeId, quantity, name, image, price, discount, attributes } = product;
   const { removeFromCart, isLoading } = useCart();
@@ -31,7 +33,15 @@ const CartItem: FC<CartItemProps> = ({ product }) => {
     <div className={styles.cartItem}>
       <div className={styles.imageColumn}>
         <Link href={productLink}>
-          <img src={image} alt={name} className={styles.productImage} />
+          <Image
+            src={image}
+            alt={name}
+            width={60}
+            height={60}
+            priority
+            className={styles.productImage}
+            style={{ objectFit: 'cover', borderRadius: '8px' }}
+          />
         </Link>
       </div>
 

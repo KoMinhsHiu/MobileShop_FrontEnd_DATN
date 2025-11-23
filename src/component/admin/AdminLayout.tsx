@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faBell,
@@ -83,7 +84,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
       <div className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logoContainer}>
-            <img src="/images/PhoneHubLogo.png" alt="Logo" className={styles.logoImage} />
+            <Image src="/images/PhoneHubLogo.png" priority alt="Logo" className={styles.logoImage} width={40} height={40} />
             <h2 className={styles.logo}>Admin Dashboard</h2>
           </div>
           <button 
@@ -120,7 +121,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage = '/adm
               <FontAwesomeIcon icon={faBars} />
             </button>
             <div className={styles.headerTitle}>
-              <img src="/images/PhoneHubLogo.png" alt="Logo" className={styles.headerLogo} />
+              <Image src="/images/PhoneHubLogo.png" priority alt="Logo" className={styles.headerLogo} width={32} height={32} />
               <h1>Admin Dashboard</h1>
             </div>
           </div>

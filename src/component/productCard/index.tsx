@@ -10,6 +10,8 @@ import { ProductCardProps } from "./productCard.types";
 
 import styles from "./productCard.module.scss";
 
+import Image from 'next/image';
+
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, isLoading } = useCart();
@@ -84,10 +86,14 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       <Link href={`/product/${product.id}`} className={styles.productLink}>
         <div className={styles.imageContainer}>
           {product.image && (
-            <img
+            <Image
               className={styles.image}
               src={product.image}
               alt={product.name}
+              width={180}
+              height={180}
+              priority
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
             />
           )}
           

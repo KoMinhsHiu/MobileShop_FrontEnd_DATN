@@ -51,7 +51,6 @@ export const useFetchCart = () => {
     },
     enabled: isAuthenticated, // Only fetch when user is authenticated
     staleTime: 1 * 60 * 1000, // 1 minute
-    cacheTime: 5 * 60 * 1000, // 5 minutes
     retry: false, // Don't retry on errors
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnMount: true, // Always refetch when component mounts

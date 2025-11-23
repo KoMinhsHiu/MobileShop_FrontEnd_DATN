@@ -22,8 +22,8 @@ const Search: FC = () => {
   const divRef = useRef<HTMLDivElement | null>(null);
 
   const [isOpen, setIsOpen] = useState(false);
-  const handleInputChange = useCallback(
-    debounce(async (value) => {
+  const handleInputChange = React.useMemo(
+    () => debounce(async (value) => {
       getData(ProductSearchAPI, { s: value, resultsPerPage: 10 })
         .then((data) => {
           const products = SearchTransformer(data);

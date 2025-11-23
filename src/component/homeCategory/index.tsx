@@ -6,6 +6,8 @@ import { TransformedBrand } from "@/utils/type/brand";
 
 import styles from "./homeCategory.module.scss";
 
+import Image from 'next/image';
+
 const HomeCategory: FC = () => {
   const [brands, setBrands] = useState<TransformedBrand[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,10 +58,14 @@ const HomeCategory: FC = () => {
                 key={brand.id}
               >
                 <div className={styles.brandIcon}>
-                  <img 
-                    src={brand.imageUrl} 
+                  <Image
+                    src={brand.imageUrl}
                     alt={`${brand.name} logo`}
+                    width={60}
+                    height={60}
+                    priority
                     className={styles.brandLogo}
+                    style={{ objectFit: 'contain', borderRadius: '8px' }}
                   />
                 </div>
                 <div className={styles.brandInfo}>

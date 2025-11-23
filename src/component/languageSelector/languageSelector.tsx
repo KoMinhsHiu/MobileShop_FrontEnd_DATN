@@ -18,7 +18,7 @@ const LanguageSelector: FC = () => {
     }
   };
 
-  const changeLanguage = (lng: string) => {
+  const changeLanguage = React.useCallback((lng: string) => {
     if (i18n.language !== lng) {
       i18n.changeLanguage(lng);
       const { pathname, query } = router;
@@ -26,7 +26,7 @@ const LanguageSelector: FC = () => {
       queryClient.invalidateQueries();
     }
     setOpenLanguage(false);
-  };
+  }, [i18n, router]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -36,7 +36,7 @@ const LanguageSelector: FC = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [locale, i18n.language]);
+  }, [locale, i18n.language, changeLanguage]);
 
   return (
     <div className={styles.languageBox}>

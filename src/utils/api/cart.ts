@@ -93,7 +93,7 @@ class CartAPI {
             console.log(`✅ Success with: ${endpoint}`);
             return response.data;
           } catch (altError) {
-            console.log(`❌ Failed: ${endpoint}`, altError.message);
+            console.log(`❌ Failed: ${endpoint}`, typeof altError === 'object' && altError !== null && 'message' in altError ? (altError as any).message : altError);
           }
         }
       }
@@ -149,7 +149,7 @@ class CartAPI {
             console.log(`✅ Success with: ${endpoint}`);
             return response.data;
           } catch (altError) {
-            console.log(`❌ Failed: ${endpoint}`, altError.message);
+            console.log(`❌ Failed: ${endpoint}`, typeof altError === 'object' && altError !== null && 'message' in altError ? (altError as any).message : altError);
           }
         }
       }

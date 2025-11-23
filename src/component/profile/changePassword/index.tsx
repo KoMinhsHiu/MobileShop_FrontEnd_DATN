@@ -1,6 +1,6 @@
 import React from 'react';
-import { PasswordChange } from '@/pages/profile/profile.types';
-import { PROFILE_MESSAGES } from '@/pages/profile/constants/profileMessages';
+import { PasswordChange } from '@/utils/type/profile';
+import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import styles from './changePassword.module.scss';
 
 interface ChangePasswordProps {

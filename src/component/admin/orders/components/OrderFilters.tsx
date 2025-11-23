@@ -36,7 +36,7 @@ const OrderFiltersComponent: React.FC<OrderFiltersProps> = ({
     };
 
     fetchPaymentMethods();
-  }, []);
+  }, [getPaymentMethods]);
 
   return (
     <div className={styles.filtersCard}>

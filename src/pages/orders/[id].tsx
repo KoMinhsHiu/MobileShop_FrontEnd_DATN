@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '@/context/authContext';
@@ -20,24 +20,11 @@ const OrderDetailPage = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/LoginSignup/login');
-      return;
-    }
-
-    if (id && isAuthenticated) {
-      fetchOrderDetail();
-    }
-  }, [id, isAuthenticated, isLoading, router]);
-
-  const fetchOrderDetail = async () => {
+  const fetchOrderDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      
       const response = await ordersAPI.getOrderById(Number(id));
-      
       if (response.status === 200) {
         setOrder(response.data.order);
       } else {
@@ -49,7 +36,18 @@ const OrderDetailPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/LoginSignup/login');
+      return;
+    }
+
+    if (id && isAuthenticated) {
+      fetchOrderDetail();
+    }
+  }, [id, isAuthenticated, isLoading, router, fetchOrderDetail]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -188,10 +186,40 @@ const OrderDetailPage = () => {
                     <OrderStatusBadge 
                       status={order.status} 
                       statusConfig={{
-                        [order.status]: {
-                          label: getStatusLabel(order.status),
-                          color: getStatusColor(order.status),
-                          icon: '📦'
+                        pending: {
+                          label: getStatusLabel('pending'),
+                          color: getStatusColor('pending'),
+                          icon: '⏳'
+                        },
+                        paid: {
+                          label: getStatusLabel('paid'),
+                          color: getStatusColor('paid'),
+                          icon: '💰'
+                        },
+                        processing: {
+                          label: getStatusLabel('processing'),
+                          color: getStatusColor('processing'),
+                          icon: '🔄'
+                        },
+                        shipped: {
+                          label: getStatusLabel('shipped'),
+                          color: getStatusColor('shipped'),
+                          icon: '🚚'
+                        },
+                        delivered: {
+                          label: getStatusLabel('delivered'),
+                          color: getStatusColor('delivered'),
+                          icon: '✅'
+                        },
+                        canceled: {
+                          label: getStatusLabel('canceled'),
+                          color: getStatusColor('canceled'),
+                          icon: '❌'
+                        },
+                        failed: {
+                          label: getStatusLabel('failed'),
+                          color: getStatusColor('failed'),
+                          icon: '⚠️'
                         }
                       }} 
                     />
@@ -213,12 +241,17 @@ const OrderDetailPage = () => {
             <div className={styles.orderDetails}>
               <OrderItemsList items={order.items} />
               <OrderSummary 
-                totalAmount={order.totalAmount}
-                discountAmount={order.discountAmount}
-                shippingFee={order.shippingFee}
-                finalAmount={order.finalAmount}
+                summary={{
+                  totalItems: order.items.reduce((sum, item) => sum + item.quantity, 0),
+                  subtotal: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  shippingFee: order.shippingFee,
+                  grandTotal: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0) + order.shippingFee
+                }}
+                paymentMethod={order.payments[0]?.paymentMethod.name || 'cod'}
               />
-              <OrderTimeline statusHistory={order.statusHistory} />
+              <OrderTimeline 
+                statusHistory={order.statusHistory || []}
+              />
             </div>
           </div>
         </div>

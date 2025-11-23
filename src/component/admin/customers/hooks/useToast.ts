@@ -36,6 +36,13 @@ export const useToast = (): UseToastReturn => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   /**
+   * Remove a toast notification by ID
+   */
+  const removeToast = useCallback((id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  }, []);
+
+  /**
    * Add a new toast notification
    */
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
@@ -54,14 +61,7 @@ export const useToast = (): UseToastReturn => {
         removeToast(id);
       }, newToast.duration);
     }
-  }, []);
-
-  /**
-   * Remove a toast notification by ID
-   */
-  const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  }, []);
+  }, [removeToast]);
 
   /**
    * Show success toast

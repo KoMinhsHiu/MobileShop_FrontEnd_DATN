@@ -79,21 +79,27 @@ const CategoryPage: FC<CategoryPageProps> = ({ initialCategory }) => {
     filters: [
       {
         name: "Giá",
+        label: "Giá",
+        display: true,
+        type: "price",
         options: [
-          { label: "Dưới 5 triệu", value: "0-5000000" },
-          { label: "5 - 10 triệu", value: "5000000-10000000" },
-          { label: "10 - 20 triệu", value: "10000000-20000000" },
-          { label: "Trên 20 triệu", value: "20000000+" }
+          { label: "Dưới 5 triệu", value: "0-5000000", active: false, display: true, productCount: 0, filterQuery: "price=0-5000000", properties: { color: "" } },
+          { label: "5 - 10 triệu", value: "5000000-10000000", active: false, display: true, productCount: 0, filterQuery: "price=5000000-10000000", properties: { color: "" } },
+          { label: "10 - 20 triệu", value: "10000000-20000000", active: false, display: true, productCount: 0, filterQuery: "price=10000000-20000000", properties: { color: "" } },
+          { label: "Trên 20 triệu", value: "20000000+", active: false, display: true, productCount: 0, filterQuery: "price=20000000+", properties: { color: "" } }
         ]
       },
       {
         name: "Thương hiệu",
+        label: "Thương hiệu",
+        display: true,
+        type: "brand",
         options: [
-          { label: "Apple", value: "Apple" },
-          { label: "Samsung", value: "Samsung" },
-          { label: "Xiaomi", value: "Xiaomi" },
-          { label: "Oppo", value: "Oppo" },
-          { label: "Vivo", value: "Vivo" }
+          { label: "Apple", value: "Apple", active: false, display: true, productCount: 0, filterQuery: "brand=Apple", properties: { color: "" } },
+          { label: "Samsung", value: "Samsung", active: false, display: true, productCount: 0, filterQuery: "brand=Samsung", properties: { color: "" } },
+          { label: "Xiaomi", value: "Xiaomi", active: false, display: true, productCount: 0, filterQuery: "brand=Xiaomi", properties: { color: "" } },
+          { label: "Oppo", value: "Oppo", active: false, display: true, productCount: 0, filterQuery: "brand=Oppo", properties: { color: "" } },
+          { label: "Vivo", value: "Vivo", active: false, display: true, productCount: 0, filterQuery: "brand=Vivo", properties: { color: "" } }
         ]
       }
     ],
