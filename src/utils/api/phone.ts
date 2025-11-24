@@ -185,11 +185,9 @@ export interface VariantsResponse {
  * Fetch phone list with pagination
  */
 export const fetchPhoneList = async (page: number, limit: number): Promise<PhoneListResponse> => {
-  const baseURL = process.env.NODE_ENV === 'production' 
-    ? process.env.NEXT_PUBLIC_API_URL || 'https://your-production-api.com'
-    : 'http://localhost:3000';
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
   
-  const url = `${baseURL}/api/v1/phones/list?page=${page}&limit=${limit}`;
+  const url = `${baseURL}/phones/list?page=${page}&limit=${limit}`;
   
   try {
     const response = await fetch(url, {
