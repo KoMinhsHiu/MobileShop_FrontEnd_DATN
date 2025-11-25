@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Main axios instance for all APIs (with /v1 prefix)
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1",
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/v1`,
   timeout: 30000, // Tăng timeout lên 30 giây
   headers: {
     "Content-Type": "application/json",
@@ -91,14 +91,22 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error("❌ Response interceptor error:", JSON.stringify({
-      message: error.message,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      url: error.config?.url,
-      responseData: error.response?.data
-    }, null, 2));
-    return Promise.reject(error);
+    if (error.response?.status === 404 && error.response?.data.data.isNewUser === true) {
+      console.warn("⚠️ Detected new user on 404 response:", JSON.stringify({
+        url: error.config?.url,
+        responseData: error.response?.data
+      }, null, 2));
+      return Promise.resolve(error.response);
+    } else {
+      console.error("❌ Response interceptor error:", JSON.stringify({
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        url: error.config?.url,
+        responseData: error.response?.data
+      }, null, 2));
+      return Promise.reject(error);
+    }
   }
 );
 

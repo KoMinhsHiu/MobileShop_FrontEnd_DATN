@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from './PhoneManagement.module.scss';
 import { faChevronLeft, faChevronRight, faEye, faFilter, faMobileAlt, faPlus, faSearch, faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { message } from 'antd';
 import { PaginationInfo } from "../admin.types";
 import { usePhoneList } from "@/utils/hooks/api/usePhoneList";
@@ -27,22 +27,26 @@ const PhoneManagement = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBrand, setFilterBrand] = useState('all');
-  const [pagination, setPagination] = useState<PaginationInfo>({
+  const [paginationState, setPaginationState] = useState({
     currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
     itemsPerPage: 10
   });
   const [showAddPhoneFormModal, setShowAddPhoneFormModal] = useState(false);
   const [editingPhone, setEditingPhone] = useState<Phone | null>(null);
-  const { phones, total, isLoading, error } = usePhoneList({
-    page: pagination.currentPage,
-    limit: pagination.itemsPerPage,
-  });
+
+  const apiParams = useMemo(() => ({
+    page: paginationState.currentPage,
+    limit: paginationState.itemsPerPage,
+  }), [paginationState.currentPage, paginationState.itemsPerPage]);
+
+  const { phones, total, isLoading, error } = usePhoneList(apiParams);
 
   const { deletePhone } = phonesAPI;
 
-  const phoneLines: PhoneLine[] = phones.map((phone: Phone) => ({
+  const totalItems = total || 0;
+  const totalPages = Math.ceil(totalItems / paginationState.itemsPerPage) || 1;
+
+  const phoneLines: PhoneLine[] = phones ? phones.map((phone: Phone) => ({
     id: phone.id,
     name: phone.name,
     brand: phone.brand.name,
@@ -50,7 +54,7 @@ const PhoneManagement = () => {
     image: phone.variants[0]?.images[0]?.image.imageUrl || '',
     createdAt: phone.createdAt,
     variantCount: phone.variants.length
-  }));
+  })) : [];
 
   const brands = Array.from(new Set(phoneLines.map(line => line.brand)));
 
@@ -61,14 +65,6 @@ const PhoneManagement = () => {
 
     return matchesSearch && matchesBrand;
   });
-
-  useEffect(() => {
-    setPagination(prev => ({
-      ...prev, 
-      totalItems: total,
-      totalPages: Math.ceil(total / prev.itemsPerPage)
-    }));
-  }, [total]);
 
   const handleAddPhone = () => {
     setShowAddPhoneFormModal(true);
@@ -86,7 +82,7 @@ const PhoneManagement = () => {
         await deletePhone(id);
         messageApi.success('Xóa dòng điện thoại thành công');
         // Reload phone list
-        setPagination(prev => ({ ...prev, currentPage: 1 }));
+        setPaginationState(prev => ({ ...prev, currentPage: 1 }));
       } catch (error) {
         messageApi.error('Không thể xóa dòng điện thoại. Vui lòng thử lại sau.');
       }
@@ -94,11 +90,11 @@ const PhoneManagement = () => {
   }
 
   const handlePageChange = (page: number) => {
-    setPagination(prev => ({ ...prev, currentPage: page }));
+    setPaginationState(prev => ({ ...prev, currentPage: page }));
   };
 
   const handleItemsPerPageChange = (itemsPerPage: number) => {
-    setPagination(prev => ({ 
+    setPaginationState(prev => ({
       ...prev, 
       itemsPerPage,
       currentPage: 1
@@ -271,14 +267,14 @@ const PhoneManagement = () => {
       {/* Pagination */}
       <div className={styles.pagination}>
         <div className={styles.paginationInfo}>
-          Hiển thị {((pagination.currentPage - 1) * pagination.itemsPerPage) + 1} - {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)} trong tổng số {pagination.totalItems} điện thoại
+          Hiển thị {((paginationState.currentPage - 1) * paginationState.itemsPerPage) + 1} - {Math.min(paginationState.currentPage * paginationState.itemsPerPage, totalItems)} trong tổng số {totalItems} điện thoại
         </div>
 
         <div className={styles.paginationControls}>
           <div className={styles.itemsPerPage}>
             <label>Hiển thị:</label>
             <select
-              value={pagination.itemsPerPage}
+              value={paginationState.itemsPerPage}
               onChange={(e) => handleItemsPerPageChange(parseInt(e.target.value))}
             >
               <option value={5}>5</option>
@@ -289,12 +285,12 @@ const PhoneManagement = () => {
             <span>điện thoại/trang</span>
           </div>
 
-          {pagination.totalPages > 1 && (
+          {totalPages > 1 && (
             <div className={styles.pageControls}>
               <button
                 className={styles.paginationButton}
                 onClick={() => handlePageChange(1)}
-                disabled={pagination.currentPage === 1}
+                disabled={paginationState.currentPage === 1}
                 title="Trang đầu"
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
@@ -303,16 +299,15 @@ const PhoneManagement = () => {
 
               <button
                 className={styles.paginationButton}
-                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                disabled={pagination.currentPage === 1}
+                onClick={() => handlePageChange(paginationState.currentPage - 1)}
+                disabled={paginationState.currentPage === 1}
                 title="Trang trước"
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
 
               {(() => {
-                const totalPages = pagination.totalPages;
-                const currentPage = pagination.currentPage;
+                const currentPage = paginationState.currentPage;
                 const pages = [];
 
                 if (totalPages <= 6) {
@@ -379,8 +374,8 @@ const PhoneManagement = () => {
 
               <button
                 className={styles.paginationButton}
-                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                disabled={pagination.currentPage === pagination.totalPages}
+                onClick={() => handlePageChange(paginationState.currentPage + 1)}
+                disabled={paginationState.currentPage === totalPages}
                 title="Trang sau"
               >
                 <FontAwesomeIcon icon={faChevronRight} />
@@ -388,8 +383,8 @@ const PhoneManagement = () => {
 
               <button
                 className={styles.paginationButton}
-                onClick={() => handlePageChange(pagination.totalPages)}
-                disabled={pagination.currentPage === pagination.totalPages}
+                onClick={() => handlePageChange(totalPages)}
+                disabled={paginationState.currentPage === totalPages}
                 title="Trang cuối"
               >
                 <FontAwesomeIcon icon={faChevronRight} />
@@ -412,8 +407,7 @@ const PhoneManagement = () => {
             setEditingPhone(null);
           }}
           onSuccess={() => {
-            // Reset về trang đầu tiên và reload dữ liệu
-            setPagination(prev => ({ ...prev, currentPage: 1 }));
+            setPaginationState(prev => ({ ...prev, currentPage: 1 }));
           }}
         />
       )}

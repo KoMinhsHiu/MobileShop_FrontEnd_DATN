@@ -25,7 +25,7 @@ interface AuthContextType {
   register: (userData: RegisterRequest) => Promise<boolean>;
   logout: () => Promise<void>;
   googleOAuth: () => Promise<void>;
-  googleOAuthCallback: (code: string) => Promise<boolean>;
+  googleOAuthCallback: (code: string) => Promise<number>;
   isLoading: boolean;
 }
 
@@ -325,7 +325,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const googleOAuthCallback = async (code: string): Promise<boolean> => {
+  const googleOAuthCallback = async (code: string): Promise<number> => {
     setIsLoading(true);
     try {
       const response = await authAPI.googleOAuthCallback(code);
@@ -337,7 +337,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (!decodedToken) {
           toast.error('Token không hợp lệ!');
-          return false;
+          return 400;
         }
 
         const userData: User = {
@@ -375,16 +375,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }, 2000);
 
-        return true;
-      } else {
-        toast.error('Đăng nhập bằng Google thất bại!');
-        return false;
-      }
-    } catch (error: any) {
-      console.error('Google OAuth callback error:', error);
-
-      if (error.status === 404 && error.responseData?.data?.isNewUser) {
-        const { googleUser } = error.responseData.data;
+        return 200;
+      } else if (response.status === 404 && response.data?.isNewUser) {
+        const { googleUser } = response.data;
         
         // Redirect to register with Google user data
         router.push({
@@ -395,12 +388,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             lastName: googleUser.lastName
           }
         });
-        
-        return false;
-      }
 
+        return 404;
+      } else {
+        toast.error('Đăng nhập bằng Google thất bại!');
+        return 400;
+      }
+    } catch (error: any) {
+      console.error('Google OAuth callback error:', error);
       toast.error(error.message || 'Có lỗi xảy ra khi đăng nhập bằng Google!');
-      return false;
+      return 400;
     } finally {
       setIsLoading(false);
     }

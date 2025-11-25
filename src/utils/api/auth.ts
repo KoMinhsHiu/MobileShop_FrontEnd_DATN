@@ -293,6 +293,10 @@ export const authAPI = {
 
       return response.data;
     } catch (error: any) {
+      if (error.response?.status === 404) {
+        return error.response.data;
+      }
+
       console.error('❌ Google OAuth Callback Error occurred:');
       console.error('🔍 Error details:', {
         message: error.message,
@@ -307,15 +311,6 @@ export const authAPI = {
           timeout: error.config?.timeout
         }
       });
-
-      if (error.response?.status === 404) {
-        const enhancedError = {
-          ...error,
-          status: 404,
-          responseData: error.response.data
-        };
-        throw enhancedError;
-      }
 
       throw new Error('Có lỗi xảy ra trong quá trình xác thực Google: ' + error.message);
     }
