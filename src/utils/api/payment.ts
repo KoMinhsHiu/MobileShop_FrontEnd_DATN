@@ -57,4 +57,34 @@ export const paymentAPI = {
       throw new Error(error.response?.data?.message || 'Failed to fetch payment methods');
     }
   },
+
+  createCODPayment: async (orderId: number): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.post(`${PaymentAPI}/cod`,
+        { orderId },
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+    } catch (error: any) {
+      console.error('Error creating COD payment:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create COD payment');
+    }
+  },
 }

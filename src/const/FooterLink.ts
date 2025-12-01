@@ -13,12 +13,12 @@ export const footerLink = [
   {
     id: 2,
     footerTitle: "SẢN PHẨM",
-    footerLink: "/category",
+    footerLink: "/products",
     link: [
-      { title: "iPhone", link: "/category/apple" },
-      { title: "Samsung", link: "/category/samsung" },
-      { title: "Xiaomi", link: "/category/xiaomi" },
-      { title: "OPPO", link: "/category/oppo" },
+      { title: "iPhone", link: "/products?brand=Apple" },
+      { title: "Samsung", link: "/products?brand=Samsung" },
+      { title: "Xiaomi", link: "/products?brand=Xiaomi" },
+      { title: "OPPO", link: "/products?brand=OPPO" },
     ],
   },
   {

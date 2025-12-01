@@ -3,19 +3,23 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuth } from '@/context/authContext';
 import { ordersAPI, Order } from '@/utils/api/orders';
-import { formatPrice } from '@/utils/function/formatPrice';
 import MetaTags from '@/component/metaTags';
 import OrderStatusBadge from '@/component/order/orderStatusBadge';
 import OrderTimeline from '@/component/order/orderTimeline';
 import OrderItemsList from '@/component/order/orderItemsList';
 import OrderSummary from '@/component/order/orderSummary';
-
+import { useToast } from '@/component/common/ToastContainer';
 import styles from './orderDetail.module.scss';
+import { withAuth } from '@/component/auth';
+import RepayModal from '@/component/order/RepayModal';
 
 const OrderDetailPage = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const { showSuccess, showError, ToastContainer } = useToast();
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const { id } = router.query;
@@ -24,9 +28,9 @@ const OrderDetailPage = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await ordersAPI.getOrderById(Number(id));
+      const response = await ordersAPI.getCustomerOrderById(Number(id));
       if (response.status === 200) {
-        setOrder(response.data.order);
+        setOrder(response.data);
       } else {
         throw new Error(response.message || 'Failed to fetch order');
       }
@@ -83,6 +87,37 @@ const OrderDetailPage = () => {
     };
     return colorMap[status] || '#6b7280';
   };
+
+  const handleCancelOrder = async () => {
+    if (!order) return;
+
+    const isConfirmed = window.confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');
+    if (!isConfirmed) return;
+
+    setIsActionLoading(true);
+    try {
+      await ordersAPI.cancelOrder(order.orderCode); 
+      
+      showSuccess('Đã hủy đơn hàng thành công');
+      fetchOrderDetail();
+    } catch (error: any) {
+      console.error(error);
+      showError(error.message || 'Không thể hủy đơn hàng');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleOpenPaymentModal = () => {
+    setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    showSuccess('Đã cập nhật phương thức thanh toán thành công!');
+    fetchOrderDetail();
+  };
+
+  const totalOrderAmount = order ? (order.items.reduce((sum, item) => sum + item.discount * item.quantity, 0) + order.shippingFee) : 0;
 
   if (isLoading || loading) {
     return (
@@ -233,8 +268,29 @@ const OrderDetailPage = () => {
                   <p><strong>Người nhận:</strong> {order.recipientName}</p>
                   <p><strong>Số điện thoại:</strong> {order.recipientPhone}</p>
                   <p><strong>Địa chỉ:</strong> {order.street}, {order.commune.name}, {order.province.name}</p>
-                  {order.postalCode && <p><strong>Mã bưu điện:</strong> {order.postalCode}</p>}
                 </div>
+              </div>
+
+              <div className={styles.actionButtons}>
+                {order.status === 'pending' && (
+                  <button 
+                    className={styles.cancelBtn}
+                    onClick={handleCancelOrder}
+                    disabled={isActionLoading}
+                  >
+                    {isActionLoading ? 'Đang xử lý...' : 'Hủy đơn hàng'}
+                  </button>
+                )}
+
+                {(!order.payments || order.payments.length === 0) && order.status === 'pending' && (
+                  <button 
+                    className={styles.repayBtn}
+                    onClick={handleOpenPaymentModal}
+                    disabled={loading}
+                  >
+                    Thanh toán ngay
+                  </button>
+                )}
               </div>
             </div>
 
@@ -243,11 +299,11 @@ const OrderDetailPage = () => {
               <OrderSummary 
                 summary={{
                   totalItems: order.items.reduce((sum, item) => sum + item.quantity, 0),
-                  subtotal: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                  subtotal: order.items.reduce((sum, item) => sum + item.discount * item.quantity, 0),
                   shippingFee: order.shippingFee,
-                  grandTotal: order.items.reduce((sum, item) => sum + item.price * item.quantity, 0) + order.shippingFee
+                  grandTotal: totalOrderAmount
                 }}
-                paymentMethod={order.payments[0]?.paymentMethod.name || 'cod'}
+                paymentMethod={order.payments[0]?.paymentMethod.name || 'undefined'}
               />
               <OrderTimeline 
                 statusHistory={order.statusHistory || []}
@@ -256,8 +312,20 @@ const OrderDetailPage = () => {
           </div>
         </div>
       </div>
+      {order && (
+        <RepayModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          orderId={order.id}
+          totalAmount={totalOrderAmount}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
+      <ToastContainer />
     </>
   );
 };
 
-export default OrderDetailPage;
+const OrderDetail = withAuth(OrderDetailPage);
+
+export default OrderDetail;

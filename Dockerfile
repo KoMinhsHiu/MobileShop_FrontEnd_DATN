@@ -19,11 +19,13 @@ ENV NODE_ENV=development
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-EXPOSE 5000
 
+ENV HOSTNAME="0.0.0.0" 
 ENV PORT=5000
 
-CMD ["node", ".next/standalone/server.js"]
+EXPOSE 5000
+
+CMD ["node", "server.js"]
 
 FROM base AS production
 WORKDIR /app
@@ -37,8 +39,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 5000
-
+ENV HOSTNAME="0.0.0.0" 
 ENV PORT=5000
 
-CMD ["node", ".next/standalone/server.js"]
+EXPOSE 5000
+
+CMD ["node", "server.js"]

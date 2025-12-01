@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/authContext';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
-import { UserProfile, PasswordChange, ProfileTab } from '@/utils/type/profile';
+import { UserProfile, PasswordChange, ProfileTab, PointHistory } from '@/utils/type/profile';
 import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import { customerAPI } from '@/utils/api/customer';
+import { authAPI } from '@/utils/api/auth';
 
 export const useProfile = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -17,13 +18,17 @@ export const useProfile = () => {
     fullName: '',
     firstName: '',
     lastName: '',
+    username: '',
     email: '',
     phone: '',
+    gender: 'unknown',
     address: '',
     avatar: '',
     dateOfBirth: '',
     pointsBalance: 0
   });
+
+  const [pointHistory, setPointHistory] = useState<PointHistory[]>([]);
 
   // Password Change State
   const [passwordData, setPasswordData] = useState<PasswordChange>({
@@ -53,6 +58,8 @@ export const useProfile = () => {
               fullName: `${data.firstName} ${data.lastName}`,
               firstName: data.firstName,
               lastName: data.lastName,
+              username: data.user.username,
+              gender: data.gender,
               email: data.user.email,
               phone: data.user.phone,
               address: '', // API không trả về address, có thể thêm sau
@@ -60,6 +67,8 @@ export const useProfile = () => {
               dateOfBirth: data.dateOfBirth,
               pointsBalance: data.pointsBalance
             });
+
+            setPointHistory(data.pointHistory || []);
           }
         } catch (error: any) {
           console.error('Error fetching customer data:', error);
@@ -94,23 +103,21 @@ export const useProfile = () => {
       const updateData = {
         firstName: personalInfo.firstName,
         lastName: personalInfo.lastName,
-        phone: personalInfo.phone,
-        dateOfBirth: personalInfo.dateOfBirth
+        username: personalInfo.username,
+        gender: personalInfo.gender,
       };
 
       // Call API to update customer info
       const response = await customerAPI.updateMe(updateData);
       
       if (response.status === 200 && response.data) {
-        const { data } = response;
         setPersonalInfo(prev => ({
           ...prev,
-          fullName: `${data.firstName} ${data.lastName}`,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.user.phone,
-          dateOfBirth: data.dateOfBirth,
-          pointsBalance: data.pointsBalance
+          fullName: `${personalInfo.firstName} ${personalInfo.lastName}`,
+          firstName: personalInfo.firstName,
+          lastName: personalInfo.lastName,
+          username: personalInfo.username,
+          gender: personalInfo.gender,
         }));
         toast.success(PROFILE_MESSAGES.SUCCESS.UPDATE_INFO);
       }
@@ -135,16 +142,19 @@ export const useProfile = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authAPI.changePassword(
+        passwordData.currentPassword,
+        passwordData.newPassword
+      );
       toast.success(PROFILE_MESSAGES.SUCCESS.CHANGE_PASSWORD);
       setPasswordData({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
       });
-    } catch (error) {
-      toast.error(PROFILE_MESSAGES.ERROR.CHANGE_PASSWORD);
+    } catch (error: any) {
+      console.error('Error changing password:', error);
+      toast.error(error.message || PROFILE_MESSAGES.ERROR.CHANGE_PASSWORD);
     } finally {
       setIsLoading(false);
     }
@@ -171,6 +181,7 @@ export const useProfile = () => {
     personalInfo,
     passwordData,
     isAuthenticated,
+    pointHistory,
     
     // Actions
     setActiveTab,

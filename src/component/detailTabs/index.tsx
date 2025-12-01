@@ -50,7 +50,16 @@ const DetailTabs: FC<DetailTabsProps> = ({
                     {specifications.map((spec, index) => (
                       <tr key={index}>
                         <td className={styles.specLabel}>{spec.label}</td>
-                        <td className={styles.specValue}>{spec.value}</td>
+                        <td className={styles.specValue}>
+                          {spec.value
+                            .split(';')
+                            .map((v, i, arr) => (
+                              <React.Fragment key={i}>
+                                {v.trim()}
+                                {i < arr.length - 1 && <br />}
+                              </React.Fragment>
+                            ))}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -80,7 +89,7 @@ const DetailTabs: FC<DetailTabsProps> = ({
                         </div>
                         <span className={styles.reviewDate}>{review.date}</span>
                       </div>
-                      <p className={styles.reviewComment}>{review.comment}</p>
+                      <p className={styles.reviewComment}>{review.comment ? review.comment : t("product.noComment")}</p>
                     </div>
                   ))}
                 </>

@@ -1,4 +1,5 @@
-import { phoneAxiosInstance } from './fetchData/axiosInstance';
+import axiosInstance, { phoneAxiosInstance } from './fetchData/axiosInstance';
+import { CartAPI as cartAPIEndpoint } from '@/const/endPoint';
 
 // Types for Cart API
 export interface AddToCartRequest {
@@ -55,6 +56,11 @@ export interface GetCartResponse {
   status: number;
   message: string;
   data: CartData;
+}
+
+export interface UpdateQuantityRequest {
+  itemId: number;
+  quantity: number;
 }
 
 class CartAPI {
@@ -159,6 +165,62 @@ class CartAPI {
         message: 'Có lỗi xảy ra khi lấy thông tin giỏ hàng',
         data: null
       } as CartApiError;
+    }
+  }
+
+  async updateQuantity(request: UpdateQuantityRequest): Promise<void> {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.put(`${cartAPIEndpoint}/quantity`,
+        request,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error: any) {
+      console.error('Error updating quantity:', error);
+      throw new Error(error.response?.message || 'Failed to update quantity');
+    }
+  }
+
+  async deleteCartItems(itemIds: number[]): Promise<void> {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.delete(`${cartAPIEndpoint}/items`, {
+        data: { itemIds },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error: any) {
+      console.error('Error updating quantity:', error);
+      throw new Error(error.response?.message || 'Failed to update quantity');
     }
   }
 }

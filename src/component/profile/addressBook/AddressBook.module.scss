@@ -1,0 +1,212 @@
+.addressBookContainer {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+  .headerSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .addButton {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #0056b3;
+      }
+    }
+  }
+
+  .addressList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .loadingText {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+
+    .emptyState {
+      text-align: center;
+      padding: 40px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      color: #888;
+    }
+
+    .addressItem {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      transition: all 0.2s;
+      background: #fff;
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-color: #d0d0d0;
+      }
+
+      // Style riêng cho item mặc định (opsional: viền xanh nhẹ)
+      &.defaultItem {
+        border-color: #007bff80;
+        background-color: #fbfdff;
+      }
+
+      // Dòng 1: Tên | SĐT + Badge
+      .topRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .contactInfo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+          }
+
+          .divider {
+            color: #ccc;
+          }
+
+          .phone {
+            font-size: 15px;
+            color: #555;
+            font-weight: 500;
+          }
+        }
+
+        .defaultBadge {
+          color: #28a745; // Màu xanh lá
+          font-size: 13px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          border: 1px solid #28a745;
+          padding: 2px 8px;
+          border-radius: 4px;
+          background: #e6f9ec;
+        }
+      }
+
+      // Dòng 2: Địa chỉ
+      .addressDetail {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.5;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      // Dòng 3: Nút bấm
+      .actionRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .leftActions {
+          display: flex;
+          gap: 12px;
+
+          .actionBtn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+            color: #007bff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            &:hover {
+              text-decoration: underline;
+            }
+
+            &.deleteBtn {
+              color: #dc3545; // Màu đỏ
+            }
+          }
+        }
+
+        .setDefaultBtn {
+          background: #fff;
+          border: 1px solid #bbb;
+          color: #555;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            border-color: #333;
+            color: #333;
+            background: #f8f9fa;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsive
+@media (max-width: 600px) {
+  .addressBookContainer {
+    padding: 16px;
+
+    .addressItem {
+      .topRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        
+        .defaultBadge {
+          align-self: flex-start;
+        }
+      }
+
+      .actionRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+
+        .setDefaultBtn {
+            width: 100%;
+        }
+      }
+    }
+  }
+}

@@ -34,7 +34,7 @@ const OrderItemsList: React.FC<OrderItemsListProps> = ({ items }) => {
               </p>
             </div>
             <div className={styles.itemPrice}>
-              {formatPrice(item.price)}
+              {formatPrice(item.discount > 0 ? item.discount : item.price)}
             </div>
           </div>
         ))}

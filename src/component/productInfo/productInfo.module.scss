@@ -38,13 +38,15 @@
     }
     
     .specsList {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 0.5rem;
       
       .specItem {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
+        gap: 7rem;
         
         .specLabel {
           font-size: 14px;

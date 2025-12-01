@@ -10,8 +10,9 @@ import {
   faSortDown
 } from '@fortawesome/free-solid-svg-icons';
 import { Order, OrderFilters, PaginationInfo, OrderStatusOption } from '../../admin.types';
-import { formatCurrency, formatDate } from '../utils/orderUtils';
+import { formatDate } from '../utils/orderUtils';
 import styles from '../OrderManagement.module.scss';
+import { formatCurrency } from '../../admin.utils';
 
 interface OrderTableProps {
   orders: Order[];

@@ -1,5 +1,7 @@
 // Types for Phone Variant API
 
+import { CustomerData } from "../api/customer";
+
 export interface Brand {
   id: number;
   name: string;
@@ -79,6 +81,7 @@ export interface Review {
   comment: string;
   createdAt: string;
   updatedAt: string;
+  customer?: CustomerData;
 }
 
 export interface Inventory {

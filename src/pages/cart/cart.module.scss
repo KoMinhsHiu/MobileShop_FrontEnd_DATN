@@ -82,6 +82,78 @@
       }
     }
 
+    .cartActions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        white-space: nowrap;
+        
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+          flex: 1;
+          padding: 10px 12px;
+          font-size: 13px;
+        }
+      }
+
+      .selectAllBtn {
+        background: white;
+        color: #007bff;
+        border: 1px solid #007bff;
+
+        &:hover {
+          background: #e7f1ff;
+          box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+
+      .deleteSelectedBtn {
+        background: #fff5f5;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+
+        &:hover {
+          background: #dc3545;
+          color: white;
+          box-shadow: 0 2px 8px rgba(220, 53, 69, 0.25);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        &:disabled {
+          background: #f1f3f5;
+          color: #adb5bd;
+          border: 1px solid #dee2e6;
+          box-shadow: none;
+        }
+      }
+    }
+
     .itemsList {
       background: white;
       border-radius: 12px;
@@ -90,7 +162,7 @@
 
       .tableHeader {
         display: grid;
-        grid-template-columns: 100px 2fr 100px 80px 100px 50px;
+        grid-template-columns: 50px 100px 1fr 120px 120px 120px;
         gap: 16px;
         align-items: center;
         padding: 16px 20px;
@@ -108,7 +180,8 @@
           text-align: center;
           
           &:nth-child(1),
-          &:nth-child(2) {
+          &:nth-child(2),
+          &:nth-child(3) {
             text-align: left;
           }
         }

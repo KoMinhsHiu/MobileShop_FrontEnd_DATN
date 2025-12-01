@@ -13,6 +13,7 @@ import {
 import { Order } from '../admin.types';
 import { ORDER_STATUS_OPTIONS } from './constants/orderConstants';
 import styles from './OrderDetailModal.module.scss';
+import { formatCurrency } from '../admin.utils';
 
 interface OrderDetailModalProps {
   order: Order | null;
@@ -27,13 +28,6 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 }) => {
   if (!isOpen || !order) return null;
 
-  // Format currency
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
-  };
 
   // Format date
   const formatDate = (dateString: string): string => {

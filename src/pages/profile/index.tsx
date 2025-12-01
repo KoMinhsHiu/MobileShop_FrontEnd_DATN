@@ -1,13 +1,12 @@
 import React from 'react';
-import toast from 'react-hot-toast';
 import styles from './profile.module.scss';
 import { useProfile } from '@/utils/hooks/api/useProfile';
-import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import PersonalInfo from '@/component/profile/personalInfo';
 import ChangePassword from '@/component/profile/changePassword';
-import AdditionalOptions from '@/component/profile/additionalOptions';
 import TabNavigation from '@/component/profile/tabNavigation';
 import { withAuth } from '@/component/auth';
+import PointHistory from '@/component/profile/pointHistory';
+import AddressBook from '@/component/profile/addressBook';
 
 const ProfilePageComponent: React.FC = () => {
   const {
@@ -15,6 +14,7 @@ const ProfilePageComponent: React.FC = () => {
     isLoading,
     personalInfo,
     passwordData,
+    pointHistory,
     isAuthenticated,
     setActiveTab,
     handlePersonalInfoChange,
@@ -47,9 +47,22 @@ const ProfilePageComponent: React.FC = () => {
               onAvatarUpload={handleAvatarUpload}
               onUpdate={handleUpdatePersonalInfo}
             />
-            <AdditionalOptions
-              onViewHistory={() => toast(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
-              onManagePayment={() => toast(PROFILE_MESSAGES.INFO.FEATURE_DEVELOPING)}
+          </div>
+        )}
+
+        {/* Address Book Tab */}
+        {activeTab === 'address' && (
+          <div className={styles.tabContent}>
+            <AddressBook />
+          </div>
+        )}
+
+        {/* Point History Tab */}
+        {activeTab === 'point' && (
+          <div className={styles.tabContent}>
+            <PointHistory
+              pointHistory={pointHistory}
+              pointsBalance={personalInfo.pointsBalance ?? 0}
             />
           </div>
         )}

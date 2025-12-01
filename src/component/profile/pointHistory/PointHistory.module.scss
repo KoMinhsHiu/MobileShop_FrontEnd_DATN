@@ -1,0 +1,164 @@
+.pointHistoryContainer {
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+  .balanceCard {
+    background: linear-gradient(135deg, #ffd700 0%, #fdb931 100%);
+    color: #333;
+    padding: 24px 32px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 15px rgba(253, 185, 49, 0.3);
+
+    .balanceInfo {
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        font-weight: 500;
+        opacity: 0.9;
+      }
+
+      .points {
+        font-size: 36px;
+        font-weight: 800;
+        
+        span {
+          font-size: 16px;
+          font-weight: 600;
+          margin-left: 4px;
+        }
+      }
+    }
+
+    .cardIcon {
+      font-size: 48px;
+      opacity: 0.8;
+    }
+  }
+
+  .historySection {
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tableWrapper {
+      overflow-x: auto;
+    }
+
+    .historyTable {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+
+      th {
+        text-align: left;
+        padding: 12px 16px;
+        color: #666;
+        font-weight: 500;
+        font-size: 14px;
+        background: #f8f9fa;
+        border-bottom: 2px solid #eee;
+        white-space: nowrap;
+
+        &.text-right {
+            text-align: right;
+        }
+      }
+
+      td {
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #333;
+        vertical-align: middle;
+      }
+
+      .dateCol {
+        color: #666;
+        font-size: 13px;
+      }
+
+      .orderCol {
+        font-family: monospace;
+        font-weight: 600;
+        color: #007bff;
+      }
+
+      .moneyCol {
+        text-align: right;
+        font-weight: 500;
+      }
+
+      .pointCol {
+        text-align: right;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: capitalize;
+      }
+
+      .typeEarn {
+        color: #28a745;
+        
+        &.badge {
+            background: #e6f9ec;
+        }
+      }
+
+      .typeRedeem {
+        color: #dc3545;
+        
+        &.badge {
+            background: #ffeaea;
+        }
+      }
+
+      .typeRefund {
+        color: #fd7e14;
+        
+        &.badge {
+            background: #fff0e6;
+        }
+      }
+    }
+
+    .emptyState {
+      text-align: center;
+      padding: 40px;
+      color: #888;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .pointHistoryContainer {
+    padding: 16px;
+    
+    .balanceCard {
+        padding: 20px;
+        
+        .balanceInfo .points {
+            font-size: 28px;
+        }
+    }
+  }
+}

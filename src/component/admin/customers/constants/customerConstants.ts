@@ -59,17 +59,6 @@ export const MOCK_CUSTOMERS: Customer[] = [];
 // UTILITY FUNCTIONS
 // ============================================================================
 
-/**
- * Format currency amount to Vietnamese Dong format
- * @param amount - The amount to format
- * @returns Formatted currency string
- */
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(amount);
-};
 
 /**
  * Format date string to Vietnamese locale format
