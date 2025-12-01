@@ -264,24 +264,6 @@ const RegisterForm: React.FC = () => {
         </button>
       </form>
 
-      {/* Social Registration */}
-      <div className={styles.socialLogin}>
-        <div className={styles.divider}>
-          <span>Hoặc đăng ký bằng</span>
-        </div>
-        
-        <div className={styles.socialButtons}>
-          <button
-            type="button"
-            className={`${styles.socialButton} ${styles.google}`}
-            onClick={handleGoogleRegister}
-          >
-            <span className={styles.socialIcon}>🔍</span>
-            Google
-          </button>
-        </div>
-      </div>
-
       {/* Login Link */}
       <div className={styles.signUpSection}>
         <span className={styles.signUpText}>Đã có tài khoản? </span>

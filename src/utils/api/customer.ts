@@ -1,5 +1,7 @@
+import { PointHistory } from '../type/profile';
 import axiosInstance from './fetchData/axiosInstance';
 import { CustomerAPI, CustomerMeAPI } from '@/const/endPoint';
+import { Commune, Province } from './orders';
 
 // API Response Types
 export interface CustomerUser {
@@ -15,10 +17,11 @@ export interface CustomerData {
   id: number;
   firstName: string;
   lastName: string;
-  gender: 'male' | 'female' | 'other';
+  gender: 'male' | 'female' | 'unknown';
   dateOfBirth: string;
   pointsBalance: number;
   user: CustomerUser;
+  pointHistory: PointHistory[];
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -65,6 +68,35 @@ export interface UpdateUserResponse {
   message: string;
   data: { success: boolean };
   errors: null;
+}
+
+export interface AddressData {
+  id: number;
+  customerId: number;
+  recipientName: string;
+  recipientPhone: string;
+  street: string;
+  postalCode: string;
+  isDefault: boolean;
+  commune: Commune;
+  province: Province;
+}
+
+export interface CustomerAddressResponse {
+  status: number;
+  message: string;
+  data: AddressData[];
+  errors: null;
+}
+
+export interface AddAddressRequest {
+  recipientName: string;
+  recipientPhone: string;
+  street: string;
+  communeId: number;
+  provinceId: number;
+  postalCode: string;
+  isDefault: boolean;
 }
 
 // API Functions
@@ -193,7 +225,118 @@ export const customerAPI = {
         throw new Error('Có lỗi xảy ra khi cập nhật thông tin: ' + error.message);
       }
     }
-  }
+  },
+
+  getAddresses: async (): Promise<CustomerAddressResponse> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${CustomerAPI}/addresses`,
+        { headers: { Authorization: `Bearer ${token}` } });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching addresses:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch addresses');
+    }
+  },
+
+  addAddress: async (addressData: AddAddressRequest): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.post(`${CustomerAPI}/addresses`,
+        addressData,
+        { headers: { Authorization: `Bearer ${token}` } });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error adding addresses:', error);
+      throw new Error(error.response?.data?.message || 'Failed to add addresses');
+    }
+  },
+
+  updateAddress: async (addressId: number, addressData: Partial<AddAddressRequest>): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.put(`${CustomerAPI}/addresses/update/${addressId}`, 
+        addressData,
+        { headers: { Authorization: `Bearer ${token}` } });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error updating addresses:', error);
+      throw new Error(error.response?.data?.message || 'Failed to update addresses');
+    }
+  },
+
+  deleteAddress: async (addressId: number): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.put(`${CustomerAPI}/addresses/delete/${addressId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error deleting addresses:', error);
+      throw new Error(error.response?.data?.message || 'Failed to delete addresses');
+    }
+  },
 };
 
 export default customerAPI;

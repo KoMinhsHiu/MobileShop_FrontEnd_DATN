@@ -22,11 +22,13 @@ export interface OrderItem {
 export interface Commune {
   id: number;
   name: string;
+  code: number;
 }
 
 export interface Province {
   id: number;
   name: string;
+  code: number;
 }
 
 export interface StatusHistory {
@@ -241,9 +243,27 @@ export const ordersAPI = {
   },
 
   // Get order by ID
-  getOrderById: async (orderId: number): Promise<{ status: number; message: string; data: { order: Order } }> => {
+  getCustomerOrderById: async (orderId: number): Promise<{ status: number; message: string; data: Order }> => {
     try {
-      const response = await axiosInstance.get(`${OrdersAPI}/${orderId}`);
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.get(`${OrdersAPI}/${orderId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       return response.data;
     } catch (error: any) {
       console.error('Error fetching order:', error);
@@ -291,6 +311,36 @@ export const ordersAPI = {
       throw new Error(error.response?.data?.message || 'Failed to update order status');
     }
   },
+
+  cancelOrder: async (orderCode: string): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.post(`${OrdersAPI}/cancel`,
+        { orderCode },
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+    } catch (error: any) {
+      console.error('Error canceling order:', error);
+      throw new Error(error.response?.data?.message || 'Failed to cancel order');
+    }
+  }
 };
 
 export default ordersAPI;

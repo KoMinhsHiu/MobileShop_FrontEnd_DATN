@@ -1,4 +1,4 @@
-import { BrandsAPI, CategoriesAPI, PhonesAPI } from "@/const/endPoint";
+import { BrandsAPI, CategoriesAPI, PhonesAPI, ReviewsAPI } from "@/const/endPoint";
 import { PhoneVariant } from "../type/phoneVariant";
 import axiosInstance from "./fetchData/axiosInstance";
 
@@ -179,6 +179,12 @@ export interface VariantsResponse {
   status: number;
   message: string;
   data: PhoneVariant[];
+}
+
+export interface CreateReviewRequest {
+  variantId: number;
+  rating: number;
+  comment?: string;
 }
 
 /**
@@ -739,7 +745,35 @@ export const phonesAPI = {
       console.error('Error deleting phone variant:', error);
       throw new Error(error.response?.message || 'Failed to delete phone variant');
     }
-  }
+  },
+
+  createReview: async (requestData: CreateReviewRequest): Promise<void> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      await axiosInstance.post(`${ReviewsAPI}`,
+        { ...requestData },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (error: any) {
+      console.error('Error creating review:', error);
+      throw new Error(error.response?.message || 'Failed to create review');
+    }
+  },
 }
 
 export default phonesAPI;

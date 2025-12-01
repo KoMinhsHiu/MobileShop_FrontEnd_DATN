@@ -60,7 +60,7 @@ const ProductsPage: FC = () => {
     
     // Add brand filter from URL
     if (brand && typeof brand === 'string') {
-      const validBrands = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OPPO'];
+      const validBrands = ['Apple', 'Samsung', 'Xiaomi', 'Vivo', 'OPPO'];
       if (validBrands.includes(brand)) {
         filtersFromUrl.push(brand);
       }
@@ -103,7 +103,7 @@ const ProductsPage: FC = () => {
     // Parse active filters into URL params
     activeFilters.forEach(filter => {
       // Check if it's a brand filter
-      if (['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo', 'OPPO'].includes(filter)) {
+      if (['Apple', 'Samsung', 'Xiaomi', 'Vivo', 'OPPO'].includes(filter)) {
         query.brand = filter;
       }
       // Check if it's a price filter
@@ -137,7 +137,7 @@ const ProductsPage: FC = () => {
       setFilterQuery(undefined);
     } else {
       // Check if it's a brand filter (single selection)
-      const isBrandFilter = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo'].includes(newFilter);
+      const isBrandFilter = ['Apple', 'Samsung', 'Xiaomi', 'OPPO', 'Vivo'].includes(newFilter);
       // Check if it's a price filter (single selection)
       const isPriceFilter = ['0-5000000', '5000000-10000000', '10000000-20000000', '20000000+'].includes(newFilter);
       
@@ -145,7 +145,7 @@ const ProductsPage: FC = () => {
         // For brand filters: single selection (radio button behavior)
         setActiveFilters(prev => {
           // Remove any existing brand filters
-          const nonBrandFilters = prev.filter(f => !['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo'].includes(f));
+          const nonBrandFilters = prev.filter(f => !['Apple', 'Samsung', 'Xiaomi', 'OPPO', 'Vivo'].includes(f));
           // Add the new brand filter
           const updatedFilters = [...nonBrandFilters, newFilter];
           setFilterQuery(updatedFilters.length > 0 ? updatedFilters.join(',') : undefined);
@@ -199,7 +199,7 @@ const ProductsPage: FC = () => {
         }
       }
       // Brand filters (single selection)
-      else if (['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Vivo'].includes(filter)) {
+      else if (['Apple', 'Samsung', 'Xiaomi', 'OPPO', 'Vivo'].includes(filter)) {
         // Only take the first brand filter (single selection)
         if (!filters.brand) {
           filters.brand = filter;
@@ -251,7 +251,7 @@ const ProductsPage: FC = () => {
         { label: "Apple", active: activeFilters.includes("Apple"), display: true, productCount: 0, filterQuery: "Apple", properties: { color: "" } },
         { label: "Samsung", active: activeFilters.includes("Samsung"), display: true, productCount: 0, filterQuery: "Samsung", properties: { color: "" } },
         { label: "Xiaomi", active: activeFilters.includes("Xiaomi"), display: true, productCount: 0, filterQuery: "Xiaomi", properties: { color: "" } },
-        { label: "Oppo", active: activeFilters.includes("Oppo"), display: true, productCount: 0, filterQuery: "Oppo", properties: { color: "" } },
+        { label: "OPPO", active: activeFilters.includes("OPPO"), display: true, productCount: 0, filterQuery: "OPPO", properties: { color: "" } },
         { label: "Vivo", active: activeFilters.includes("Vivo"), display: true, productCount: 0, filterQuery: "Vivo", properties: { color: "" } }
       ]
     }

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
-import { CardAPI } from "@/const/endPoint";
+import { CartAPI } from "@/const/endPoint";
 import { CartTransformer } from "@/utils/api/transformer/cart";
 import { getData } from "@/utils/api/fetchData/apiCall";
 import { CartContextType, AddToCartItem, AddToCartApiItem, RemoveFromCart } from "@/utils/type";
@@ -39,6 +39,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         totalProduct: (apiCartData as any).items.length,
         products: (apiCartData as any).items.map((item: any) => ({
           id: item.variant.id.toString(),
+          itemId: item.id,
           productAttributeId: item.variant.id,
           quantity: item.quantity,
           name: `${item.variant.name} ${item.variant.variantName}`,
@@ -58,20 +59,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       setCart({ totalProduct: 0, products: [] });
     }
   }, [apiCartData, isAuthenticated]);
-
-  const addToCart = useCallback(async (item: AddToCartItem) => {
-    setIsLoading(true);
-    
-    try {
-      // Simulate API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 300));
-      toast.success("Đã thêm vào giỏ hàng");
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi thêm vào giỏ hàng");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const addToCartApi = useCallback(async (item: AddToCartApiItem) => {
     if (!isAuthenticated) {
@@ -142,62 +129,44 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [isAuthenticated, cart, refetchCart]);
 
-  const removeFromCart = useCallback(async (item: RemoveFromCart) => {
+  const updateQuantityApi = useCallback(async (item: AddToCartItem, action: "up" | "down") => {
     setIsLoading(true);
-    
     try {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      if (cart?.products) {
-        const updatedProducts = cart.products.filter((p: any) => 
-          !(p.id === item.id && p.productAttributeId === item.productAttributeId)
-        );
-        
-        setCart({
-          ...cart,
-          products: updatedProducts,
-          totalProduct: updatedProducts.length
-        });
-        
-        toast.success("Đã xóa khỏi giỏ hàng");
-      }
-    } catch (error) {
-      toast.error("Có lỗi xảy ra khi xóa khỏi giỏ hàng");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [cart]);
-
-  const updateQuantity = useCallback(async (item: AddToCartItem, action: "up" | "down") => {
-    setIsLoading(true);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 150));
-      if (cart?.products) {
-        const updatedProducts = cart.products.map((p: any) => {
-          if (p.id === item.id && p.productAttributeId === item.productAttributeId) {
-            const newQuantity = action === "up" ? p.quantity + 1 : Math.max(1, p.quantity - 1);
-            return { ...p, quantity: newQuantity };
-          }
-          return p;
-        });
-        
-        setCart({
-          ...cart,
-          products: updatedProducts
-        });
-        
-        toast.success("Đã cập nhật số lượng");
-      }
+      // Gọi API updateQuantity
+      const newQuantity = action === "up" ? item.quantity + 1 : Math.max(1, item.quantity - 1);
+      await cartAPI.updateQuantity({ itemId: item.itemId, quantity: newQuantity });
+      toast.success("Đã cập nhật số lượng");
+      refetchCart();
     } catch (error) {
       toast.error("Có lỗi xảy ra khi cập nhật số lượng");
     } finally {
       setIsLoading(false);
     }
-  }, [cart]);
+  }, [refetchCart]);
+  
+  // Xóa nhiều item khỏi giỏ hàng bằng API
+  const deleteCartItemsApi = useCallback(async (itemIds: number[]) => {
+    setIsLoading(true);
+    try {
+      await cartAPI.deleteCartItems(itemIds);
+      toast.success("Đã xóa sản phẩm khỏi giỏ hàng");
+      refetchCart();
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi xóa sản phẩm");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refetchCart]);
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, addToCartApi, removeFromCart, updateQuantity, isLoading: isLoading || isApiLoading }}
+      value={{
+        cart,
+        addToCartApi,
+        updateQuantityApi,
+        deleteCartItemsApi,
+        isLoading: isLoading || isApiLoading
+      }}
     >
       {children}
     </CartContext.Provider>

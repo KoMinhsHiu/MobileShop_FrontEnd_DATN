@@ -6,7 +6,7 @@ export const MegaMenuAPI = "/lightbootstrap?menu_with_images=single";
 
 export const ProductDetailAPI = "/productdetail";
 
-export const CardAPI = "/cart";
+export const CartAPI = "/cart";
 
 export const FeaturedProductAPI ="/featuredproducts"
 
@@ -62,3 +62,10 @@ export const InventoriesAPI = "/inventory";
 
 // Dashboard Analytics API
 export const DashboardStatAPI = "/dashboard"; 
+
+// Reviews API
+export const ReviewsAPI = "/reviews";
+
+// Search API
+
+export const SearchAPIEndpoint = "/search";

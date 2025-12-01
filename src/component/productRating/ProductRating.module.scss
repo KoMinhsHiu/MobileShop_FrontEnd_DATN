@@ -1,0 +1,220 @@
+.productRatingContainer {
+	display: flex;
+	gap: 2rem;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	padding: 2rem;
+	margin-bottom: 2rem;
+	flex-direction: row;
+}
+
+.leftSection {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-width: 260px;
+}
+.rightSection {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	min-width: 260px;
+	gap: 2.5rem;
+	border-left: 1px solid #eee;
+	padding-left: 2rem;
+}
+.rightSummaryColumn {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-width: 180px;
+}
+.rightBreakdownColumn {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.averageRatingBox {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	font-size: 2.8rem;
+	font-weight: 700;
+	color: #222;
+}
+
+.ratingSummaryRow {
+	display: flex;
+	align-items: center;
+	gap: 2.5rem;
+	margin-bottom: 1.2rem;
+}
+.averageRating {
+	font-size: 2.8rem;
+	font-weight: 700;
+	color: #222;
+}
+.maxRating {
+	font-size: 1.5rem;
+	color: #888;
+}
+.starsRow {
+	font-size: 1.5rem;
+	color: #ffc107;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+.starIcon {
+	color: #ffc107;
+	font-size: 1.5rem;
+	margin-right: 2px;
+}
+.totalReviews {
+	font-size: 1rem;
+	color: #666;
+	margin-bottom: 1rem;
+}
+.writeReviewButton {
+	background: #c62828;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	padding: 0.7rem 1.5rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	cursor: pointer;
+	margin-bottom: 1.5rem;
+	transition: background 0.2s, opacity 0.2s;
+	box-shadow: 0 2px 8px rgba(198, 40, 40, 0.08);
+}
+.writeReviewButton:hover:not(:disabled) {
+	background: #b71c1c;
+}
+.writeReviewButton:disabled {
+	background: #e2e8f0;
+	color: #888;
+	cursor: not-allowed;
+	opacity: 0.7;
+	box-shadow: none;
+	pointer-events: none;
+}
+.ratingBreakdown {
+	width: 100%;
+	margin-top: 1rem;
+}
+.ratingRow {
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+	margin-bottom: 0.5rem;
+}
+.starLabel {
+	min-width: 32px;
+	font-size: 1rem;
+	color: #888;
+	display: flex;
+	align-items: center;
+}
+.ratingBarWrapper {
+	flex: 1;
+	background: #eee;
+	border-radius: 6px;
+	height: 10px;
+	overflow: hidden;
+	min-width: 40px;
+}
+.ratingBar {
+	height: 100%;
+	background: #c62828;
+	border-radius: 6px;
+	transition: width 0.3s;
+}
+.ratingCount {
+	min-width: 32px;
+	font-size: 1rem;
+	color: #888;
+	text-align: right;
+}
+
+@media screen and (max-width: 768px) {
+	.productRatingContainer {
+		flex-direction: column;
+		gap: 1.5rem;
+		padding: 1rem;
+	}
+	.leftSection {
+		flex-direction: column;
+		min-width: unset;
+		border-left: none;
+		padding-left: 0;
+		gap: 1rem;
+	}
+	.rightSection {
+        flex-direction: row;
+		min-width: unset;
+		border-left: none;
+		padding-left: 0;
+		gap: 1rem;
+		border-left: none;
+		padding-left: 0;
+	}
+	.rightSummaryColumn, .rightBreakdownColumn {
+		min-width: unset;
+		gap: 0.5rem;
+	}
+	
+    .ratingRow {
+		flex-wrap: nowrap;
+        width: 50%;
+	}
+
+	.ratingBarWrapper {
+		flex: 1 1 100%;
+		min-width: 100%;
+		margin: 0.3rem 0;
+	}
+}
+.voucherTitle {
+	font-size: 1.2rem;
+	font-weight: 600;
+	margin-bottom: 1rem;
+	color: #222;
+}
+.voucherList {
+	width: 100%;
+}
+.voucherItem {
+	background: linear-gradient(90deg, #ffe0e0 0%, #fff7e6 100%);
+	border: 2px solid #ffb3b3;
+	border-radius: 8px;
+	padding: 1rem 1.5rem;
+	color: #c62828;
+	margin-bottom: 0.7rem;
+	font-size: 1.08rem;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+	box-shadow: 0 2px 8px rgba(255, 182, 193, 0.08);
+	transition: box-shadow 0.2s, border-color 0.2s;
+}
+.voucherItem:hover {
+	border-color: #c62828;
+	box-shadow: 0 4px 16px rgba(198, 40, 40, 0.12);
+	background: linear-gradient(90deg, #fff7e6 0%, #ffe0e0 100%);
+}
+.voucherIcon {
+	font-size: 1.5rem;
+	margin-right: 0.3rem;
+}
+.voucherCodeIcon {
+	font-size: 1.2rem;
+	margin-right: 0.2rem;
+	color: #c62828;
+}

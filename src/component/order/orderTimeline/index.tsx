@@ -7,6 +7,18 @@ interface OrderTimelineProps {
   statusHistory: StatusHistory[];
 }
 
+const getStatusLabel = (status: string) => {
+  const statusMap: { [key: string]: string } = {
+    pending: 'Chờ xác nhận',
+    paid: 'Đã thanh toán',
+    processing: 'Đang xử lý',
+    shipped: 'Đang giao hàng',
+    delivered: 'Đã giao hàng',
+    canceled: 'Đã hủy',
+    failed: 'Thất bại'
+  };
+  return statusMap[status] || status;
+};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -31,7 +43,7 @@ const OrderTimeline: React.FC<OrderTimelineProps> = ({ statusHistory }) => {
               <span className={styles.stepIcon}>•</span>
             </div>
             <div className={styles.timelineContent}>
-              <h4 className={styles.stepTitle}>{item.status}</h4>
+              <h4 className={styles.stepTitle}>{getStatusLabel(item.status)}</h4>
               {item.note && <p className={styles.stepNote}>{item.note}</p>}
               <p className={styles.stepDate}>{formatDate(item.createdAt)}</p>
             </div>

@@ -32,7 +32,7 @@ const ProductInfo: FC<productInfoProps> = ({
   >([]);
   const router = useRouter();
   const locale = router.locale || "en";
-  const { addToCart, addToCartApi, isLoading } = useCart();
+  const { addToCartApi, isLoading } = useCart();
   const { isAuthenticated } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const { t } = useTranslation();
@@ -191,14 +191,7 @@ const ProductInfo: FC<productInfoProps> = ({
 
       await addToCartApi(apiItem);
     } else {
-      // Use old logic for non-phone variants
-      const item = {
-        id,
-        update: 1,
-        productAttributeId,
-        quantity,
-      };
-      addToCart(item);
+      console.log('🛒 handleAdd - Non-phone variant, using old logic');
     }
   };
 
@@ -239,14 +232,7 @@ const ProductInfo: FC<productInfoProps> = ({
       // Navigate to checkout page after adding to cart
       router.push('/checkout');
     } else {
-      // Use old logic for non-phone variants
-      const item = {
-        id,
-        update: 1,
-        productAttributeId,
-        quantity,
-      };
-      addToCart(item);
+      console.log('🛒 handleAdd - Non-phone variant, using old logic');
       // Navigate to checkout page
       router.push('/checkout');
     }
@@ -273,7 +259,16 @@ const ProductInfo: FC<productInfoProps> = ({
             {specifications.slice(0, 4).map((spec, index) => (
               <div key={index} className={styles.specItem}>
                 <span className={styles.specLabel}>{spec.label}:</span>
-                <span className={styles.specValue}>{spec.value}</span>
+                <span className={styles.specValue}>
+                  {spec.value
+                    .split(';')
+                    .map((v, i, arr) => (
+                      <React.Fragment key={i}>
+                        {v.trim()}
+                        {i < arr.length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                </span>
               </div>
             ))}
           </div>
@@ -363,39 +358,6 @@ const ProductInfo: FC<productInfoProps> = ({
                         }}
                         title={getDisplayColor(item.value)} // Tooltip hiển thị tên màu
                       >
-                        {/* Color circle */}
-                        <div
-                          style={{
-                            width: '24px',
-                            height: '24px',
-                            backgroundColor: item.hex_value || '#ccc',
-                            borderRadius: '50%',
-                            border: '1px solid #ddd',
-                            position: 'relative'
-                          }}
-                        >
-                          {/* Checkmark for selected color */}
-                          {isSelected && (
-                            <div style={{
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%)',
-                              width: '12px',
-                              height: '12px',
-                              backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '8px',
-                              color: '#007bff',
-                              fontWeight: 'bold'
-                            }}>
-                              ✓
-                            </div>
-                          )}
-                        </div>
                         {/* Color name */}
                         <span style={{
                           fontSize: '14px',
@@ -460,8 +422,9 @@ const ProductInfo: FC<productInfoProps> = ({
               onChange={(e) => setQuantity(Number(e.target.value))}
             />
             <button
-              className={styles.plus}
+              className={`${styles.plus} ${quantity >= 10 ? styles.disable : ""}`}
               onClick={() => setQuantity(quantity + 1)}
+              disabled={quantity >= 10}
             ></button>
           </div>
         </div>

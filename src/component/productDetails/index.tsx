@@ -5,13 +5,13 @@ import { FeaturedProductAPI } from "@/const/endPoint";
 import { FeaturedProductTransformer } from "@/utils/api/transformer/featuredProduct";
 import { getData } from "@/utils/api/fetchData/apiCall";
 
-import ProductCarousel from "../productCarousel";
 import ProductInfo from "../productInfo";
 import ProductGallery from "../productGallery";
 import DetailTabs from "../detailTabs";
 
 import { productDetailsProps } from "./productDetails.types";
 import styles from "./productDetails.module.scss";
+import ProductRating from "../productRating";
 
 const ProductDetails: FC<productDetailsProps> = ({ product }) => {
   const { data: featuredProduct = [] } = useQuery({
@@ -37,20 +37,7 @@ const ProductDetails: FC<productDetailsProps> = ({ product }) => {
 
   const reviews = product.reviews && product.reviews.length > 0 
     ? product.reviews 
-    : [
-        {
-          name: "Nguyen Van A",
-          rating: 5,
-          comment: "Sản phẩm rất tốt, chất lượng cao, giao hàng nhanh!",
-          date: "2024-01-15"
-        },
-        {
-          name: "Tran Thi B", 
-          rating: 4,
-          comment: "Điện thoại đẹp, camera chụp ảnh đẹp. Giá hợp lý.",
-          date: "2024-01-10"
-        }
-      ];
+    : [];
 
   return (
     <div className={styles.productContainer}>
@@ -74,6 +61,19 @@ const ProductDetails: FC<productDetailsProps> = ({ product }) => {
         </div>
       </div>
 
+      {/* Product Rating Section */}
+      <div className={styles.ratingSection}>
+        <ProductRating 
+          averageRating={
+            reviews.length > 0 
+              ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+              : 0
+          } 
+          reviews={reviews} 
+          productId={product.id} 
+        />
+      </div>
+
       {/* Detail Tabs Section */}
       <div className={styles.detailSection}>
         <DetailTabs
@@ -81,11 +81,6 @@ const ProductDetails: FC<productDetailsProps> = ({ product }) => {
           specifications={specifications}
           reviews={reviews}
         />
-      </div>
-
-      {/* Featured Products Section */}
-      <div className={styles.carouselContainer}>
-        <ProductCarousel product={featuredProduct} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useCallback } from "react";
+import React, { FC, useMemo } from "react";
 import Link from "next/link";
 
 import { useCart } from "@/context/cartContext";
@@ -11,9 +11,14 @@ import styles from "./cartItem.module.scss";
 
 import Image from 'next/image';
 
-const CartItem: FC<CartItemProps> = ({ product }) => {
-  const { id, productAttributeId, quantity, name, image, price, discount, attributes } = product;
-  const { removeFromCart, isLoading } = useCart();
+interface CartItemWithSelectProps extends CartItemProps {
+  selected: boolean;
+  onSelect: (id: number, checked: boolean) => void;
+}
+
+const CartItem: FC<CartItemWithSelectProps> = ({ product, selected, onSelect }) => {
+  const { id, productAttributeId, quantity, name, image, price, discount, attributes, itemId } = product;
+  const { isLoading } = useCart();
 
   // Calculate total price for this item
   const itemTotal = useMemo(() => {
@@ -22,15 +27,19 @@ const CartItem: FC<CartItemProps> = ({ product }) => {
     return (unitPrice - discountAmount) * quantity;
   }, [price, quantity, discount]);
 
-  // Handle remove item from cart
-  const handleRemove = useCallback(() => {
-    removeFromCart({ id, productAttributeId });
-  }, [id, productAttributeId, removeFromCart]);
-
   const productLink = `/product/${id}`;
 
   return (
     <div className={styles.cartItem}>
+      <div>
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={e => onSelect(itemId, e.target.checked)}
+          disabled={isLoading}
+          aria-label="Chọn sản phẩm"
+        />
+      </div>
       <div className={styles.imageColumn}>
         <Link href={productLink}>
           <Image
@@ -49,7 +58,6 @@ const CartItem: FC<CartItemProps> = ({ product }) => {
         <Link href={productLink} className={styles.productName}>
           {name}
         </Link>
-        
         {Object.entries(attributes)?.map(([key, value], index) => (
           <div className={styles.attribute} key={index}>
             <span className={styles.attributeName}>{key}: </span>
@@ -75,23 +83,12 @@ const CartItem: FC<CartItemProps> = ({ product }) => {
           id={id}
           productAttributeId={productAttributeId}
           quantity={quantity}
+          itemId={itemId}
         />
       </div>
 
       <div className={styles.totalColumn}>
         <span className={styles.totalPrice}>{formatPrice(itemTotal)}</span>
-      </div>
-
-      <div className={styles.actionColumn}>
-        <button
-          className={`${styles.removeButton} ${isLoading ? styles.disabled : ""}`}
-          disabled={isLoading}
-          onClick={handleRemove}
-          title="Xóa sản phẩm"
-          aria-label="Xóa sản phẩm khỏi giỏ hàng"
-        >
-          🗑️
-        </button>
       </div>
     </div>
   );

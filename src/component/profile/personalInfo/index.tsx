@@ -3,8 +3,6 @@ import { UserProfile } from '@/utils/type/profile';
 import { PROFILE_MESSAGES } from '@/const/profileMessages';
 import styles from './personalInfo.module.scss';
 
-import Image from 'next/image';
-
 interface PersonalInfoProps {
   personalInfo: UserProfile;
   isLoading: boolean;
@@ -17,38 +15,12 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
   personalInfo,
   isLoading,
   onFieldChange,
-  onAvatarUpload,
   onUpdate
 }) => {
   return (
     <div className={styles.personalInfoContainer}>
       <div className={styles.section}>
         <h2>Thông tin cá nhân</h2>
-        
-        {/* Avatar Upload */}
-        <div className={styles.avatarSection}>
-          <div className={styles.avatarContainer}>
-            <Image
-              src={personalInfo.avatar || '/images/logo.png'}
-              alt="Avatar"
-              width={100}
-              height={100}
-              priority
-              className={styles.avatar}
-              style={{ objectFit: 'cover', borderRadius: '50%' }}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={onAvatarUpload}
-              className={styles.avatarInput}
-              id="avatar-upload"
-            />
-            <label htmlFor="avatar-upload" className={styles.avatarLabel}>
-              Đổi ảnh đại diện
-            </label>
-          </div>
-        </div>
 
         {/* Personal Info Form */}
         <div className={styles.formGroup}>
@@ -76,6 +48,34 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
         </div>
 
         <div className={styles.formGroup}>
+          <label htmlFor="username">Tên đăng nhập *</label>
+          <input
+            type="text"
+            id="username"
+            value={personalInfo.username}
+            onChange={(e) => onFieldChange('username', e.target.value)}
+            className={styles.input}
+            placeholder="Nhập tên đăng nhập của bạn"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="gender">Giới tính</label>
+          <select
+            id="gender" 
+            value={personalInfo.gender || ''}
+            onChange={(e) => onFieldChange('gender', e.target.value)}
+            className={styles.selectInput}
+          >
+            <option value="" disabled>-- Chọn giới tính --</option>
+            <option value="male">Nam</option>
+            <option value="female">Nữ</option>
+            <option value="unknown">Khác</option>
+          </select>
+        </div>
+
+
+        <div className={styles.formGroup}>
           <label htmlFor="email">Email *</label>
           <input
             type="email"
@@ -90,50 +90,30 @@ const PersonalInfo: React.FC<PersonalInfoProps> = ({
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="phone">Số điện thoại</label>
+          <label htmlFor="phone">Số điện thoại *</label>
           <input
             type="tel"
             id="phone"
             value={personalInfo.phone}
             onChange={(e) => onFieldChange('phone', e.target.value)}
-            className={styles.input}
+            className={`${styles.input} ${styles.disabled}`}
             placeholder="Nhập số điện thoại"
+            disabled
           />
+          <small className={styles.helpText}>Số điện thoại không thể thay đổi</small>
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="dateOfBirth">Ngày sinh</label>
+          <label htmlFor="dateOfBirth">Ngày sinh *</label>
           <input
             type="date"
             id="dateOfBirth"
             value={personalInfo.dateOfBirth ? new Date(personalInfo.dateOfBirth).toISOString().split('T')[0] : ''}
             onChange={(e) => onFieldChange('dateOfBirth', e.target.value)}
-            className={styles.input}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="pointsBalance">Điểm tích lũy</label>
-          <input
-            type="text"
-            id="pointsBalance"
-            value={personalInfo.pointsBalance?.toLocaleString() || '0'}
             className={`${styles.input} ${styles.disabled}`}
             disabled
           />
-          <small className={styles.helpText}>Điểm tích lũy không thể thay đổi</small>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="address">Địa chỉ mặc định</label>
-          <textarea
-            id="address"
-            value={personalInfo.address}
-            onChange={(e) => onFieldChange('address', e.target.value)}
-            className={styles.textarea}
-            placeholder="Nhập địa chỉ mặc định"
-            rows={3}
-          />
+          <small className={styles.helpText}>Ngày sinh không thể thay đổi</small>
         </div>
 
         <button

@@ -41,6 +41,12 @@ export interface Voucher {
   paymentMethods?: VoucherPaymentMethod[];    
 }
 
+export interface VoucherResponse {
+  status: number;
+  message: string;
+  data: Voucher[];
+}
+
 export interface ListVouchersResponse {
   status: number;
   message: string;
@@ -109,6 +115,18 @@ export const voucherAPI = {
       return response.data;
     } catch (error: any) {
       console.error('Error fetching vouchers:', error);
+      throw error;
+    }
+  },
+
+  getVouchersByVariantId: async (variantIds: number[]): Promise<VoucherResponse> => {
+    try {
+      const response = await axiosInstance.post(`${VouchersAPI}/variants`, {
+        variantIds
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching vouchers by variant IDs:', error);
       throw error;
     }
   },

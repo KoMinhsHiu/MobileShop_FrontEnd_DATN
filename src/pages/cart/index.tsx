@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -11,7 +11,7 @@ import { withAuth } from "@/component/auth";
 import styles from "./cart.module.scss";
 
 const CartPageComponent = () => {
-  const { cart, isLoading } = useCart();
+  const { cart, isLoading, deleteCartItemsApi } = useCart();
   const router = useRouter();
 
   // Calculate cart summary
@@ -55,16 +55,41 @@ const CartPageComponent = () => {
     router.push('/');
   };
 
+  // State cho các sản phẩm đã chọn
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  // Chọn/bỏ chọn từng sản phẩm
+  const handleSelect = (id: number, checked: boolean) => {
+    setSelectedIds(prev => checked ? [...prev, id] : prev.filter(i => i !== id));
+  };
+
+  // Chọn tất cả
+  const handleSelectAll = () => {
+    if (cart?.products) {
+      if (selectedIds.length === cart.products.length) {
+        setSelectedIds([]);
+      } else {
+        setSelectedIds(cart.products.map((p: any) => p.itemId));
+      }
+    }
+  };
+
+  // Xóa sản phẩm đã chọn
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length > 0) {
+      await deleteCartItemsApi(selectedIds);
+      setSelectedIds([]);  
+    }
+  };
+
   return (
     <>
       <MetaTags
         title="Giỏ hàng - PhoneHub"
         description="Xem và quản lý sản phẩm trong giỏ hàng của bạn"
       />
-      
       <div className={styles.cartPage}>
         <div className="container">
-          {/* Page Header */}
           <div className={styles.pageHeader}>
             <div className={styles.breadcrumb}>
               <Link href="/">Trang chủ</Link>
@@ -81,7 +106,6 @@ const CartPageComponent = () => {
           </div>
 
           {isLoading ? (
-            // Loading State
             <div className={styles.loadingContainer}>
               <div className={styles.loadingSpinner}>
                 <div className={styles.spinner}></div>
@@ -89,60 +113,73 @@ const CartPageComponent = () => {
               </div>
             </div>
           ) : cart && cart.products && cart.products.length > 0 ? (
-        <div className={styles.cartContent}>
-          <div className={styles.cartItems}>
-            <div className={styles.sectionHeader}>
-              <h2>Danh sách sản phẩm ({cart.products.length} sản phẩm)</h2>
-            </div>
-            
-            <div className={styles.itemsList}>
-              <div className={styles.tableHeader}>
-                <div className={styles.headerColumn}>Sản phẩm</div>
-                <div className={styles.headerColumn}></div>
-                <div className={styles.headerColumn}>Giá đơn vị</div>
-                <div className={styles.headerColumn}>Số lượng</div>
-                <div className={styles.headerColumn}>Thành tiền</div>
-                <div className={styles.headerColumn}></div>
+            <div className={styles.cartContent}>
+              <div className={styles.cartItems}>
+                <div className={styles.sectionHeader}>
+                  <h2>Danh sách sản phẩm ({cart.products.length} sản phẩm)</h2>
+                </div>
+                <div className={styles.cartActions}>
+                  <button
+                    className={styles.selectAllBtn}
+                    onClick={handleSelectAll}
+                    disabled={isLoading}
+                  >
+                    {selectedIds.length === cart.products.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
+                  </button>
+                  <button
+                    className={styles.deleteSelectedBtn}
+                    onClick={handleDeleteSelected}
+                    disabled={isLoading || selectedIds.length === 0}
+                  >
+                    Xóa sản phẩm đã chọn
+                  </button>
+                </div>
+                <div className={styles.itemsList}>
+                  <div className={styles.tableHeader}>
+                    <div className={styles.headerColumn}>Chọn</div>
+                    <div className={styles.headerColumn}>Ảnh</div>
+                    <div className={styles.headerColumn}>Sản phẩm</div>
+                    <div className={styles.headerColumn}>Giá đơn vị</div>
+                    <div className={styles.headerColumn}>Số lượng</div>
+                    <div className={styles.headerColumn}>Thành tiền</div>
+                  </div>
+                  <div className={styles.itemsContainer}>
+                    {cart.products.map((product: any, idx: number) => (
+                      <CartItem
+                        product={product}
+                        key={idx}
+                        selected={selectedIds.includes(product.itemId)}
+                        onSelect={handleSelect}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
-              
-              <div className={styles.itemsContainer}>
-                {cart.products.map((product: any, idx: number) => (
-                  <CartItem product={product} key={idx} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.cartSummary}>
+              <div className={styles.cartSummary}>
                 <div className={styles.sectionHeader}>
                   <h2>Tóm tắt đơn hàng</h2>
                 </div>
-                
                 <div className={styles.summaryCard}>
                   <div className={styles.summaryDetails}>
                     <div className={styles.summaryRow}>
                       <span>Tổng số lượng:</span>
                       <span>{cartSummary.totalItems} sản phẩm</span>
                     </div>
-                    
                     <div className={styles.summaryRow}>
                       <span>Tổng tiền hàng:</span>
                       <span>{formatPrice(cartSummary.subtotal)}</span>
                     </div>
-                    
                     <div className={styles.summaryRow}>
                       <span>Phí vận chuyển:</span>
                       <span className={styles.shippingFee}>
                         Tính khi thanh toán
                       </span>
                     </div>
-                    
                     <div className={`${styles.summaryRow} ${styles.grandTotal}`}>
                       <span>Tổng cộng:</span>
                       <span>{formatPrice(cartSummary.grandTotal)}</span>
                     </div>
                   </div>
-
                   <div className={styles.actionButtons}>
                     <button 
                       className={styles.checkoutBtn}
@@ -161,7 +198,6 @@ const CartPageComponent = () => {
               </div>
             </div>
           ) : (
-            // Empty Cart State
             <div className={styles.emptyCart}>
               <div className={styles.emptyCartContent}>
                 <div className={styles.emptyIcon}>🛒</div>

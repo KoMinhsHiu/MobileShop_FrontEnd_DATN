@@ -17,6 +17,7 @@ import useWindowSize from "@/utils/hooks/useWindowSize";
 import AccordionItem from "../accordionItem";
 
 import styles from "./footer.module.scss";
+import Link from "next/link";
 
 const Footer: FC = () => {
   const { width } = useWindowSize();
@@ -51,13 +52,13 @@ const Footer: FC = () => {
                       <div className={styles.linkBox}>
                         {item.link?.map((link, idx) => {
                           return (
-                            <a
+                            <Link
                               href={link.link}
                               className={styles.subLink}
                               key={idx}
                             >
                               {link.title}
-                            </a>
+                            </Link>
                           );
                         })}
                       </div>

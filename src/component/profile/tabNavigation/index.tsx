@@ -10,6 +10,8 @@ interface TabNavigationProps {
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 'personal' as ProfileTab, label: 'Thông tin cá nhân' },
+    { id: 'address' as ProfileTab, label: 'Sổ địa chỉ' },
+    { id: 'point' as ProfileTab, label: 'Điểm tích lũy' },
     { id: 'password' as ProfileTab, label: 'Đổi mật khẩu' }
   ];
 

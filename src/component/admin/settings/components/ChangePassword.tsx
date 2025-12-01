@@ -42,6 +42,8 @@ const ChangePassword: React.FC = () => {
 
   const validatePasswords = (): boolean => {
     const newErrors: ValidationErrors = {};
+
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     
     // Validate current password
     if (!passwordData.currentPassword.trim()) {
@@ -51,8 +53,8 @@ const ChangePassword: React.FC = () => {
     // Validate new password
     if (!passwordData.newPassword.trim()) {
       newErrors.newPassword = 'Mật khẩu mới không được để trống';
-    } else if (passwordData.newPassword.length < 6) {
-      newErrors.newPassword = 'Mật khẩu mới phải có ít nhất 6 ký tự';
+    } else if (!strongPasswordRegex.test(passwordData.newPassword)) {
+      newErrors.newPassword = 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số';
     } else if (passwordData.newPassword === passwordData.currentPassword) {
       newErrors.newPassword = 'Mật khẩu mới phải khác mật khẩu hiện tại';
     }

@@ -9,7 +9,7 @@ export const PhoneVariantTransformer = (data: PhoneVariant): Product => {
   const finalPrice = originalPrice - (originalPrice * discountPercent / 100);
   
   // Combine category name + variant name
-  const displayName = `${data.phone.category.name} ${data.variantName}`;
+  const displayName = `${data.phone.name} ${data.variantName}`;
   
   // Calculate total stock quantity from inventories
   // Only count inventories that are not deleted (isDeleted: false)
@@ -115,7 +115,7 @@ export const PhoneVariantDetailTransformer = (response: PhoneVariantDetailRespon
   
   // Transform reviews
   const reviews = variant.reviews.map(review => ({
-    name: `User ${review.userId}`, // You might want to fetch user name from another API
+    name: `${review.customer?.user.username}`, // You might want to fetch user name from another API
     rating: review.rating,
     comment: review.comment,
     date: new Date(review.createdAt).toISOString().split('T')[0],

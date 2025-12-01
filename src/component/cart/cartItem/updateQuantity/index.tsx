@@ -10,16 +10,20 @@ const UpdateQuantity: FC<UpdateQuantityProps> = ({
   id,
   quantity,
   productAttributeId,
+  itemId,
 }) => {
-  const { updateQuantity, isLoading } = useCart();
+  const { updateQuantityApi, isLoading } = useCart();
   const handleUpdateQuantity = async (action: "up" | "down") => {
     const item = {
       id,
       update: 1,
       productAttributeId,
-      quantity: action === "down" ? quantity - 1 : quantity + 1,
+      itemId,
+      quantity,
     };
-    !isLoading && updateQuantity(item, action);
+    if (!isLoading) {
+      await updateQuantityApi(item, action);
+    }
   };
   return (
     <div
@@ -29,7 +33,7 @@ const UpdateQuantity: FC<UpdateQuantityProps> = ({
       <button
         className={styles.button}
         onClick={() => handleUpdateQuantity("down")}
-        disabled={quantity === 1 || isLoading}
+        disabled={quantity <= 1 || isLoading}
         title="Giảm số lượng"
         aria-label="Giảm số lượng"
       >
@@ -39,7 +43,7 @@ const UpdateQuantity: FC<UpdateQuantityProps> = ({
       <button
         className={styles.button}
         onClick={() => handleUpdateQuantity("up")}
-        disabled={isLoading}
+        disabled={quantity >= 10 || isLoading}
         title="Tăng số lượng"
         aria-label="Tăng số lượng"
       >

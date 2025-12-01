@@ -2,6 +2,7 @@ export type AddToCartItem = {
   update: number;
   id: string;
   productAttributeId: number;
+  itemId: number;
   quantity: number;
 };
 
@@ -27,6 +28,7 @@ export type CartType = {
 
 export type ProductCart = {
   id: string;
+  itemId: number;
   productAttributeId: number;
   name: string;
   attributes: { key: string };
@@ -40,9 +42,8 @@ export type ProductCart = {
 
 export type CartContextType = {
   cart: CartType;
-  addToCart: (item: AddToCartItem) => void;
   addToCartApi: (item: AddToCartApiItem) => Promise<void>;
-  removeFromCart: (item: RemoveFromCart) => void;
-  updateQuantity: (item: AddToCartItem, action: "up" | "down") => void;
+  updateQuantityApi: (item: AddToCartItem, action: "up" | "down") => Promise<void>;
+  deleteCartItemsApi: (itemIds: number[]) => Promise<void>;
   isLoading: boolean;
 };

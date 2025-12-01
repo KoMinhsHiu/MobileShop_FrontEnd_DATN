@@ -152,7 +152,7 @@ export const authAPI = {
         throw new Error('Không thể kết nối đến API server. Vui lòng kiểm tra server có đang chạy không.');
       } else if (error.response) {
         // Server responded with error status
-        const errorMessage = error.response.data?.message || error.response.data?.error || 'Đăng nhập thất bại';
+        const errorMessage = error.response.data?.errors[0]?.message;
         throw new Error(errorMessage);
       } else if (error.request) {
         // Request was made but no response received
@@ -247,7 +247,7 @@ export const authAPI = {
       return response.data;
     } catch (error: any) {
       console.error('❌ Change Password Error occurred:', error);
-      throw new Error('Có lỗi xảy ra khi thay đổi mật khẩu: ' + error.message);
+      throw new Error(error.response?.data?.errors?.[0]?.message || 'Có lỗi xảy ra khi đổi mật khẩu: ' + error.message);
     }
   },
 

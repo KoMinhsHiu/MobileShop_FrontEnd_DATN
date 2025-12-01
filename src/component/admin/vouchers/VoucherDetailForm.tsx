@@ -16,6 +16,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Voucher } from '@/utils/api/voucher';
 import styles from './VoucherForm.module.scss';
+import { formatCurrency } from '../admin.utils';
+import { formatDateTime } from '@/utils/function/ordersUtils';
 
 interface VoucherDetailFormProps {
   voucher: Voucher | null;
@@ -30,14 +32,6 @@ const VoucherDetailForm: React.FC<VoucherDetailFormProps> = ({
 }) => {
   if (!isOpen || !voucher) return null;
 
-  // Format currency
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(amount);
-  };
-
   // Format date
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -45,18 +39,6 @@ const VoucherDetailForm: React.FC<VoucherDetailFormProps> = ({
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
-    });
-  };
-
-  const formatDateTime = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
     });
   };
 

@@ -1,14 +1,4 @@
-import { Order, OrderStatus } from '../../admin.types';
-
-/**
- * Format currency to Vietnamese Dong
- */
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
-  }).format(amount);
-};
+import { Order } from '../../admin.types';
 
 /**
  * Format date to Vietnamese locale
