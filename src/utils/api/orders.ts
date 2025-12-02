@@ -131,7 +131,7 @@ export interface CreateOrderRequest {
   communeId: number;
   provinceId: number;
   postalCode?: string;
-  voucherIdApplied?: number;
+  voucherIdsApplied?: number[];
   pointUsed?: number;
   paymentMethod: PaymentMethodDto;
   items: CreateOrderItem[];

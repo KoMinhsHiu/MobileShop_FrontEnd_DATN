@@ -59,6 +59,34 @@
   }
 }
 
+.shipmentInfo {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  
+  &:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .infoItem {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    
+    .label {
+      color: #666;
+    }
+    
+    .value {
+      color: #333;
+      text-align: right;
+    }
+  }
+}
+
 .pageHeader {
   margin-bottom: 2rem;
 

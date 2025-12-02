@@ -131,6 +131,35 @@ export const voucherAPI = {
     }
   },
 
+  getAvailableVouchers: async (variantIds: number[]): Promise<VoucherResponse> => {
+    try {
+      let token = null;
+      try {
+        const tokens = localStorage.getItem('phonehub_tokens');
+        if (tokens) {
+          const tokenData = JSON.parse(tokens);
+          token = tokenData.accessToken || tokenData.access_token || tokenData.token;
+        }
+      } catch (error) {
+        console.error('Error parsing token data:', error);
+      }
+      
+      // Check if token exists
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+
+      const response = await axiosInstance.post(`${VouchersAPI}/available`,
+        { variantIds },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching available vouchers:', error);
+      throw error;
+    }
+  },
+
   createVoucher: async (data: CreateVoucherRequest): Promise<void> => {
     try {
       // Get JWT token from localStorage (using phonehub_tokens key)

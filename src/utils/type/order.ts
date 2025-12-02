@@ -22,6 +22,7 @@ export interface OrderSummary {
   totalItems: number;
   subtotal: number;
   shippingFee: number;
+  discountAmount: number;
   grandTotal: number;
 }
 

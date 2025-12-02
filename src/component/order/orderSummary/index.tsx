@@ -29,6 +29,15 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ summary, paymentMethod }) =
           </span>
         </div>
         <div className={styles.summaryRow}>
+          <span>Giảm giá:</span>
+          <span>
+            {summary.discountAmount === 0 
+              ? "Không" 
+              : formatPrice(summary.discountAmount)
+            }
+          </span>
+        </div>
+        <div className={styles.summaryRow}>
           <span>Phương thức thanh toán:</span>
           <span>{getPaymentMethodLabel(paymentMethod)}</span>
         </div>

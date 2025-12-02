@@ -1,0 +1,212 @@
+.container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+
+  .title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      color: #d70018;
+    }
+  }
+
+  .inputGroup {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #ddd;
+
+    input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: #007bff;
+      }
+    }
+
+    button {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover:not(:disabled) {
+        background: #000;
+      }
+
+      &:disabled {
+        background: #f0f0f0;
+        color: #999;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 350px;
+    overflow-y: auto;
+    padding-right: 4px;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+
+    .empty, .loading {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      padding: 20px 0;
+      font-style: italic;
+    }
+
+    .item {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+      overflow: hidden;
+
+      &::before, &::after {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        border: 1px solid #e0e0e0;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+      }
+      &::before { left: -7px; border-right-color: transparent; }
+      &::after { right: -7px; border-left-color: transparent; }
+
+      &:hover:not(.disabled) {
+        border-color: #007bff;
+        background: #f8fbff;
+      }
+
+      &.selected {
+        border-color: #007bff;
+        background: #eef7ff;
+        
+        .code { color: #007bff; }
+      }
+
+      &.disabled {
+        opacity: 0.6;
+        background: #f9f9f9;
+        cursor: not-allowed;
+        border-color: #eee;
+
+        .code { color: #999; }
+      }
+
+      .info {
+        flex: 1;
+        padding-right: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .conditions {
+            margin-top: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .warning {
+                font-size: 12px;
+                color: #dc3545;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-style: italic;
+            }
+
+            .minOrder {
+                font-size: 12px;
+                color: #888;
+            }
+        }
+
+        .code {
+          font-weight: 700;
+          color: #333;
+          font-size: 15px;
+        }
+
+        .desc {
+          font-size: 13px;
+          color: #555;
+          line-height: 1.4;
+        }
+
+        .subDesc {
+          display: block;
+          font-weight: 500;
+          color: #d70018;
+        }
+
+        .minOrder {
+          display: block;
+          font-size: 12px;
+          color: #888;
+        }
+      }
+
+      .action {
+        width: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .radioCircle {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          border: 2px solid #ccc;
+        }
+
+        .checkedIcon {
+          font-size: 20px;
+          color: #007bff;
+        }
+      }
+    }
+  }
+}

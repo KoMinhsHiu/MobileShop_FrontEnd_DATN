@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ShippingInfo } from "./types";
 import { Province, Commune } from "@/utils/api/locations";
 import styles from "./shippingForm.module.scss";
+import customerAPI, { AddressData } from "@/utils/api/customer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAddressBook } from "@fortawesome/free-solid-svg-icons";
 
 interface ShippingFormProps {
   shippingInfo: ShippingInfo;
@@ -31,6 +34,72 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   onProvinceChange,
   onCommuneChange
 }) => {
+  const [savedAddresses, setSavedAddresses] = useState<AddressData[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | 'new'>('new');
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        setIsLoadingAddresses(true);
+        const response = await customerAPI.getAddresses();
+        if (response && response.data) {
+          setSavedAddresses(response.data);
+          
+          const defaultAddr = response.data.find(addr => addr.isDefault);
+          if (defaultAddr) {
+            handleSelectSavedAddress(defaultAddr.id.toString());
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load saved addresses", error);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+    };
+
+    fetchAddresses();
+  }, []);
+
+  const handleSelectSavedAddress = (value: string) => {
+    if (value === 'new') {
+      setSelectedAddressId('new');
+      onInputChange('fullName', '');
+      onInputChange('phone', '');
+      onInputChange('address', '');
+      onInputChange('province', '');
+      onInputChange('commune', '');
+      onProvinceChange('');
+      return;
+    }
+
+    const addressId = parseInt(value);
+    setSelectedAddressId(addressId);
+    
+    const address = savedAddresses.find(addr => addr.id === addressId);
+    if (address) {
+      console.log('📦 Auto-filling address:', address);
+      
+      onInputChange('fullName', address.recipientName);
+      onInputChange('phone', address.recipientPhone);
+      onInputChange('address', address.street);
+      
+      if (address.province) {
+        onInputChange('province', address.province.name);
+        const pCode = address.province.code.toString();
+        onProvinceChange(pCode);
+
+        if (address.commune) {
+          const cCode = address.commune.code.toString();
+          onInputChange('commune', address.commune.name);
+          
+          setTimeout(() => {
+            onCommuneChange(cCode);
+          }, 500);
+        }
+      }
+    }
+  };
 
   // Handle province selection
   const handleProvinceSelect = (provinceCode: string) => {
@@ -66,6 +135,27 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
 
   return (
     <div className={styles.shippingForm}>
+      {savedAddresses.length > 0 && (
+        <div className={`${styles.formGroup} ${styles.savedAddressGroup}`}>
+          <label className={styles.highlightLabel}>
+            <FontAwesomeIcon icon={faAddressBook} /> Chọn từ sổ địa chỉ
+          </label>
+          <select
+            value={selectedAddressId}
+            onChange={(e) => handleSelectSavedAddress(e.target.value)}
+            className={styles.addressSelect}
+            disabled={isLoadingAddresses}
+          >
+            <option value="new">-- Nhập địa chỉ mới --</option>
+            {savedAddresses.map((addr) => (
+              <option key={addr.id} value={addr.id}>
+                {addr.isDefault ? '[Mặc định] ' : ''}{addr.recipientName} - {addr.street}, {addr.commune?.name}, {addr.province?.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className={styles.formGroup}>
         <label htmlFor="fullName">Họ tên người nhận</label>
         <input
@@ -159,17 +249,6 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
           onChange={(e) => onInputChange('address', e.target.value)}
           placeholder="Ví dụ: 123 Đường ABC"
           required
-        />
-      </div>
-
-      <div className={styles.formGroup}>
-        <label htmlFor="note">Ghi chú đơn hàng</label>
-        <textarea
-          id="note"
-          value={shippingInfo.note}
-          onChange={(e) => onInputChange('note', e.target.value)}
-          placeholder="Ghi chú thêm cho đơn hàng (không bắt buộc)"
-          rows={3}
         />
       </div>
     </div>

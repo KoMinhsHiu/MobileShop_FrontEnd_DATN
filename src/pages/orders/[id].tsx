@@ -117,7 +117,7 @@ const OrderDetailPage = () => {
     fetchOrderDetail();
   };
 
-  const totalOrderAmount = order ? (order.items.reduce((sum, item) => sum + item.discount * item.quantity, 0) + order.shippingFee) : 0;
+  const totalOrderAmount = order ? (order.items.reduce((sum, item) => sum + item.discount * item.quantity, 0) + order.shippingFee - order.discountAmount) : 0;
 
   if (isLoading || loading) {
     return (
@@ -271,6 +271,34 @@ const OrderDetailPage = () => {
                 </div>
               </div>
 
+              {order.shipments && order.shipments.length > 0 && (
+                <div className={styles.infoCard}>
+                  <h3>Thông tin vận chuyển</h3>
+                  {order.shipments.map((shipment) => (
+                    <div key={shipment.id} className={styles.shipmentInfo}>
+                      <div className={styles.infoItem}>
+                        <span className={styles.label}>Đơn vị vận chuyển:</span>
+                        <span className={styles.value} style={{fontWeight: 600}}>{shipment.provider}</span>
+                      </div>
+                      <div className={styles.infoItem}>
+                        <span className={styles.label}>Mã vận đơn:</span>
+                        <span className={styles.value} style={{color: '#007bff'}}>{shipment.trackingCode}</span>
+                      </div>
+                      {shipment.estimatedDeliveryDate && (
+                        <div className={styles.infoItem}>
+                          <span className={styles.label}>Dự kiến giao:</span>
+                          <span className={styles.value}>{formatDate(shipment.estimatedDeliveryDate)}</span>
+                        </div>
+                      )}
+                      <div className={styles.infoItem}>
+                        <span className={styles.label}>Phí vận chuyển:</span>
+                        <span className={styles.value}>{shipment.fee.toLocaleString('vi-VN')} ₫</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className={styles.actionButtons}>
                 {order.status === 'pending' && (
                   <button 
@@ -301,6 +329,7 @@ const OrderDetailPage = () => {
                   totalItems: order.items.reduce((sum, item) => sum + item.quantity, 0),
                   subtotal: order.items.reduce((sum, item) => sum + item.discount * item.quantity, 0),
                   shippingFee: order.shippingFee,
+                  discountAmount: order.discountAmount,
                   grandTotal: totalOrderAmount
                 }}
                 paymentMethod={order.payments[0]?.paymentMethod.name || 'undefined'}

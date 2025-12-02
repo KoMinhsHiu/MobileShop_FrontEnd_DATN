@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
-
 import { useCart } from "@/context/cartContext";
-import { formatPrice, parsePrice } from "@/utils/function/formatPrice";
+import { parsePrice } from "@/utils/function/formatPrice";
 import MetaTags from "@/component/metaTags";
 import ShippingForm from "@/component/checkout/ShippingForm";
 import PaymentMethods from "@/component/checkout/PaymentMethods";
@@ -13,15 +12,74 @@ import { PaymentMethod } from "@/component/checkout/PaymentMethods/types";
 import { ordersAPI, CreateOrderRequest, shippingAPI, PaymentMethodDto } from "@/utils/api/orders";
 import { useLocation } from "@/utils/hooks/useLocation";
 import { withAuth } from "@/component/auth";
-
+import { voucherAPI, Voucher } from "@/utils/api/voucher";
+import VoucherSelector from "@/component/checkout/VoucherSelector";
 import styles from "./checkout.module.scss";
 import { paymentAPI } from "@/utils/api/payment";
+import customerAPI from "@/utils/api/customer";
+import PointSelector from "@/component/checkout/PointSelector";
 
 const CheckoutPageComponent = () => {
   const { cart } = useCart() as { cart: any };
   const router = useRouter();
   const { provinces, communes, selectedProvince, selectedCommune, loading, handleProvinceChange, handleCommuneChange } = useLocation();
   const [shippingFee, setShippingFee] = useState<string>('0 ₫');
+  const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
+  const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [isLoadingVoucher, setIsLoadingVoucher] = useState(false);
+  const [userPoints, setUserPoints] = useState(0);
+  const [pointDiscount, setPointDiscount] = useState(0);
+  const [pointsUsed, setPointsUsed] = useState(0);
+  const [selectedPayment, setSelectedPayment] = useState<string>('cod');
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const userData = await customerAPI.getMe();
+        if (userData && userData.data) {
+          setUserPoints(userData.data.pointsBalance || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching user points:", error);
+      }
+    };
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
+    if (selectedVoucher && selectedVoucher.appliesTo === 'payment_method') {
+      const isValid = selectedVoucher.paymentMethods?.some(pm => 
+        pm.paymentMethod.code.toLowerCase() === selectedPayment.toLowerCase()
+      );
+       
+      if (!isValid) {
+        setSelectedVoucher(null);
+      }
+    }
+  }, [selectedPayment, selectedVoucher]);
+
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      if (!cart?.products || cart.products.length === 0) return;
+      
+      setIsLoadingVoucher(true);
+      try {
+        const variantIds = cart.products.map((p: any) => parseInt(p.productAttributeId));
+        
+        const response = await voucherAPI.getAvailableVouchers(variantIds);
+        
+        if (response && response.data) {
+          setAvailableVouchers(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching vouchers:", error);
+      } finally {
+        setIsLoadingVoucher(false);
+      }
+    };
+    
+    fetchVouchers();
+  }, [cart?.products]);
 
   // Debug logging for communes state
   useEffect(() => {
@@ -74,52 +132,63 @@ const CheckoutPageComponent = () => {
     note: ''
   });
 
-  const [selectedPayment, setSelectedPayment] = useState<string>('cod');
   const [phoneError, setPhoneError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const paymentMethods: PaymentMethod[] = [
     { type: 'cod', label: 'Thanh toán khi nhận hàng (COD)' },
-    { type: 'paypal', label: 'PayPal' },
-    { type: 'momo', label: 'Momo' },
     { type: 'vnpay', label: 'VNPay' }
   ];
 
   // Calculate order summary
   const orderSummary = useMemo(() => {
-    if (!cart?.products) {
-      return {
-        totalItems: 0,
-        subtotal: 0,
-        shippingFee: 0,
-        grandTotal: 0
-      };
-    }
+    if (!cart?.products) return { 
+        totalItems: 0, subtotal: 0, shippingFee: 0, grandTotal: 0, 
+        voucherDiscount: 0, pointDiscount: 0 
+    };
 
-    const totalItems = cart.products.reduce((sum: number, product: any) => sum + product.quantity, 0);
     const subtotal = cart.products.reduce((sum: number, product: any) => {
       const basePrice = parsePrice(product.price);
       const discount = product.discount ? parsePrice(product.discount) : 0;
-      const finalPrice = basePrice - discount;
-      
-      console.log(`🛒 Product: ${product.name}, Base Price: ${basePrice}, Discount: ${discount}, Final: ${finalPrice}`);
-      return sum + (finalPrice * product.quantity);
+      return sum + ((basePrice - discount) * product.quantity);
     }, 0);
 
     const fee = parsePrice(shippingFee);
+    
+    let voucherDiscount = 0;
+    if (selectedVoucher && subtotal >= selectedVoucher.minOrderValue) {
+        if (selectedVoucher.discountType === 'amount') {
+          voucherDiscount = selectedVoucher.discountValue;
+        } else {
+          voucherDiscount = (subtotal * selectedVoucher.discountValue) / 100;
+          if (selectedVoucher.maxDiscountValue > 0) {
+            voucherDiscount = Math.min(voucherDiscount, selectedVoucher.maxDiscountValue);
+          }
+        }
+    }
+    
+    const totalDiscount = voucherDiscount + pointDiscount;
+    const finalAmount = Math.max(0, subtotal + fee - totalDiscount);
 
     return {
-      totalItems,
+      totalItems: cart.products.reduce((sum: number, p: any) => sum + p.quantity, 0),
       subtotal,
       shippingFee: fee,
-      grandTotal: subtotal + fee,
+      voucherDiscount,
+      pointDiscount,
+      grandTotal: finalAmount,
     };
-  }, [cart?.products, shippingFee]);
+  }, [cart?.products, shippingFee, selectedVoucher, pointDiscount]);
 
   const validatePhone = (phone: string): boolean => {
     // Kiểm tra số điện thoại: bắt đầu bằng 0, có 10 ký tự, chỉ chứa số
     const phoneRegex = /^0\d{9}$/;
     return phoneRegex.test(phone);
+  };
+
+  const handlePointsApply = (discount: number, points: number) => {
+    setPointDiscount(discount);
+    setPointsUsed(points);
   };
 
   const handleInputChange = (field: keyof ShippingInfo, value: string) => {
@@ -329,6 +398,8 @@ const CheckoutPageComponent = () => {
         postalCode: '', // Optional field
         items: items,
         paymentMethod: paymentMethod,
+        voucherIdsApplied: selectedVoucher ? [selectedVoucher.id] : [],
+        pointUsed: pointsUsed,
       };
 
       console.log('🚀 Creating order with data:', {
@@ -474,6 +545,21 @@ const CheckoutPageComponent = () => {
 
               {/* Right Column - Order Summary */}
               <div className={styles.rightColumn}>
+                <VoucherSelector 
+                  vouchers={availableVouchers}
+                  selectedVoucher={selectedVoucher}
+                  onSelect={setSelectedVoucher}
+                  isLoading={isLoadingVoucher}
+                  subtotal={orderSummary.subtotal}
+                  selectedPayment={selectedPayment}
+                />
+
+                <PointSelector 
+                  userPoints={userPoints}
+                  subtotal={orderSummary.subtotal}
+                  onApply={handlePointsApply}
+                />
+
                 {/* 3. Tóm tắt đơn hàng */}
                 <div className={styles.section}>
                   <div className={styles.sectionHeader}>
@@ -482,6 +568,8 @@ const CheckoutPageComponent = () => {
                   <OrderSummary
                     products={cart.products}
                     orderSummary={orderSummary}
+                    voucherDiscountAmount={orderSummary.voucherDiscount}
+                    pointDiscountAmount={orderSummary.pointDiscount}
                   />
                 </div>
 
