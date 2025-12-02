@@ -14,7 +14,7 @@ import Image from 'next/image';
 
 const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const { addToCart, isLoading } = useCart();
+  const { isLoading } = useCart();
 
   useEffect(() => {
     // Debug logging moved to useEffect to prevent hydration issues
@@ -57,7 +57,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       productAttributeId: 0,
       quantity: 1,
     };
-    addToCart(item);
+    // addToCart(item);
   };
 
   const renderStars = (rating: number) => {

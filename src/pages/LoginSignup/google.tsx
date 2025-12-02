@@ -47,7 +47,7 @@ const GoogleCallbackPage = () => {
     };
 
     handleGoogleCallback();
-  }, [router.isReady, router.query.code]); 
+  }, [googleOAuthCallback, router]);
 
   return (
     <div style={{ 

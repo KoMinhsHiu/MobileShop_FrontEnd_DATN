@@ -115,7 +115,7 @@ const Search: FC = () => {
                       onClick={() => setIsOpen(false)}
                     >
                       <div className={styles.productImage}>
-                        <img src={phone.imageUrl} alt={phone.name} />
+                        <Image src={phone.imageUrl} alt={phone.name} width={60} height={60} />
                       </div>
                       <div className={styles.productInfo}>
                         <h4 className={styles.productName}>{phone.name}</h4>
@@ -139,7 +139,7 @@ const Search: FC = () => {
           
           {results.phones.length === 0 && results.categories.length === 0 && (
             <div className={styles.emptyState}>
-              Không tìm thấy kết quả nào cho "{query}"
+              Không tìm thấy kết quả nào cho &quot;{query}&quot;
             </div>
           )}
         </div>

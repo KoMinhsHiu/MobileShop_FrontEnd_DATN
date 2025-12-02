@@ -34,7 +34,7 @@ const PointSelector: React.FC<PointSelectorProps> = ({
     } else {
       onApply(0, 0);
     }
-  }, [isUsed, subtotal, userPoints]);
+  }, [isUsed, actualDiscountAmount, actualPointsToUse, onApply]);
 
   if (userPoints <= 0) return null;
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { voucherAPI, Voucher } from "@/utils/api/voucher";
-import styles from "./productRating.module.scss";
+import styles from "./ProductRating.module.scss";
 import { Review } from "../detailTabs/detailTabs.types";
 import RatingModal from "./RatingModal";
 

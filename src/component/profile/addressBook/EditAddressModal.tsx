@@ -4,7 +4,7 @@ import { faTimes, faSave } from '@fortawesome/free-solid-svg-icons';
 import customerAPI, { AddressData, AddAddressRequest } from '@/utils/api/customer';
 import { useLocation } from '@/utils/hooks/useLocation';
 import { useToast } from '@/component/common/ToastContainer';
-import styles from './addressModal.module.scss';
+import styles from './AddressModal.module.scss';
 
 interface EditAddressModalProps {
   isOpen: boolean;
@@ -67,7 +67,7 @@ const EditAddressModal: React.FC<EditAddressModalProps> = ({
         }, 100);
       }
     }
-  }, [isOpen, address]);
+  }, [isOpen, address, handleProvinceChange, handleCommuneChange]);
 
   if (!isOpen) return null;
 

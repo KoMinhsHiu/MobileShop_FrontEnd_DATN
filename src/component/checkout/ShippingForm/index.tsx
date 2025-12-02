@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ShippingInfo } from "./types";
 import { Province, Commune } from "@/utils/api/locations";
 import styles from "./shippingForm.module.scss";
@@ -38,6 +38,46 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   const [selectedAddressId, setSelectedAddressId] = useState<number | 'new'>('new');
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
+  const handleSelectSavedAddress = useCallback((value: string) => {
+    if (value === 'new') {
+      setSelectedAddressId('new');
+      onInputChange('fullName', '');
+      onInputChange('phone', '');
+      onInputChange('address', '');
+      onInputChange('province', '');
+      onInputChange('commune', '');
+      onProvinceChange('');
+      return;
+    }
+
+    const addressId = parseInt(value);
+    setSelectedAddressId(addressId);
+
+    const address = savedAddresses.find(addr => addr.id === addressId);
+    if (address) {
+      console.log('📦 Auto-filling address:', address);
+
+      onInputChange('fullName', address.recipientName);
+      onInputChange('phone', address.recipientPhone);
+      onInputChange('address', address.street);
+
+      if (address.province) {
+        onInputChange('province', address.province.name);
+        const pCode = address.province.code.toString();
+        onProvinceChange(pCode);
+
+        if (address.commune) {
+          const cCode = address.commune.code.toString();
+          onInputChange('commune', address.commune.name);
+
+          setTimeout(() => {
+            onCommuneChange(cCode);
+          }, 500);
+        }
+      }
+    }
+  }, [savedAddresses, onInputChange, onProvinceChange, onCommuneChange]);
+
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -59,47 +99,7 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
     };
 
     fetchAddresses();
-  }, []);
-
-  const handleSelectSavedAddress = (value: string) => {
-    if (value === 'new') {
-      setSelectedAddressId('new');
-      onInputChange('fullName', '');
-      onInputChange('phone', '');
-      onInputChange('address', '');
-      onInputChange('province', '');
-      onInputChange('commune', '');
-      onProvinceChange('');
-      return;
-    }
-
-    const addressId = parseInt(value);
-    setSelectedAddressId(addressId);
-    
-    const address = savedAddresses.find(addr => addr.id === addressId);
-    if (address) {
-      console.log('📦 Auto-filling address:', address);
-      
-      onInputChange('fullName', address.recipientName);
-      onInputChange('phone', address.recipientPhone);
-      onInputChange('address', address.street);
-      
-      if (address.province) {
-        onInputChange('province', address.province.name);
-        const pCode = address.province.code.toString();
-        onProvinceChange(pCode);
-
-        if (address.commune) {
-          const cCode = address.commune.code.toString();
-          onInputChange('commune', address.commune.name);
-          
-          setTimeout(() => {
-            onCommuneChange(cCode);
-          }, 500);
-        }
-      }
-    }
-  };
+  }, [handleSelectSavedAddress]);
 
   // Handle province selection
   const handleProvinceSelect = (provinceCode: string) => {

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/cartContext";
@@ -186,10 +186,10 @@ const CheckoutPageComponent = () => {
     return phoneRegex.test(phone);
   };
 
-  const handlePointsApply = (discount: number, points: number) => {
+  const handlePointsApply = useCallback((discount: number, points: number) => {
     setPointDiscount(discount);
     setPointsUsed(points);
-  };
+  }, []);
 
   const handleInputChange = (field: keyof ShippingInfo, value: string) => {
     setShippingInfo(prev => ({
