@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ShippingInfo } from "./types";
 import { Province, Commune } from "@/utils/api/locations";
 import styles from "./shippingForm.module.scss";
@@ -37,8 +37,9 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   const [savedAddresses, setSavedAddresses] = useState<AddressData[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<number | 'new'>('new');
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const hasAutoSelectedRef = useRef(false);
 
-  const handleSelectSavedAddress = useCallback((value: string) => {
+  const handleSelectSavedAddress = useCallback((value: string, addressesList: AddressData[] = savedAddresses) => {
     if (value === 'new') {
       setSelectedAddressId('new');
       onInputChange('fullName', '');
@@ -52,18 +53,16 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
 
     const addressId = parseInt(value);
     setSelectedAddressId(addressId);
-
-    const address = savedAddresses.find(addr => addr.id === addressId);
+    
+    const address = addressesList.find(addr => addr.id === addressId);
     if (address) {
-      console.log('📦 Auto-filling address:', address);
-
       onInputChange('fullName', address.recipientName);
       onInputChange('phone', address.recipientPhone);
       onInputChange('address', address.street);
-
+      
       if (address.province) {
-        onInputChange('province', address.province.name);
         const pCode = address.province.code.toString();
+        onInputChange('province', address.province.name);
         onProvinceChange(pCode);
 
         if (address.commune) {
@@ -81,25 +80,26 @@ const ShippingForm: React.FC<ShippingFormProps> = ({
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        setIsLoadingAddresses(true);
         const response = await customerAPI.getAddresses();
         if (response && response.data) {
           setSavedAddresses(response.data);
           
-          const defaultAddr = response.data.find(addr => addr.isDefault);
-          if (defaultAddr) {
-            handleSelectSavedAddress(defaultAddr.id.toString());
+          if (!hasAutoSelectedRef.current) {
+            const defaultAddr = response.data.find(addr => addr.isDefault);
+            if (defaultAddr) {
+              hasAutoSelectedRef.current = true;
+              handleSelectSavedAddress(defaultAddr.id.toString(), response.data);
+            }
           }
         }
       } catch (error) {
         console.error("Failed to load saved addresses", error);
-      } finally {
-        setIsLoadingAddresses(false);
       }
     };
 
     fetchAddresses();
-  }, [handleSelectSavedAddress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle province selection
   const handleProvinceSelect = (provinceCode: string) => {

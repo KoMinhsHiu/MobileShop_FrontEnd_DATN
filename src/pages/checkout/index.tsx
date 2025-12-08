@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import { useCart } from "@/context/cartContext";
@@ -31,6 +31,21 @@ const CheckoutPageComponent = () => {
   const [pointDiscount, setPointDiscount] = useState(0);
   const [pointsUsed, setPointsUsed] = useState(0);
   const [selectedPayment, setSelectedPayment] = useState<string>('cod');
+
+  const lastCalculatedRef = useRef({ province: '', commune: '', cartHash: '' });
+
+  const cartHash = useMemo(() => {
+    if (!cart?.products) return '';
+    return JSON.stringify(cart.products.map((p: any) => p.productAttributeId + '-' + p.quantity));
+  }, [cart?.products]);
+
+  const selectedProvinceName = useMemo(() => {
+    return provinces?.find(p => p.code.toString() === selectedProvince)?.name;
+  }, [provinces, selectedProvince]);
+
+  const selectedCommuneName = useMemo(() => {
+    return communes?.find(c => c.code.toString() === selectedCommune)?.name;
+  }, [communes, selectedCommune]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -79,7 +94,8 @@ const CheckoutPageComponent = () => {
     };
     
     fetchVouchers();
-  }, [cart?.products]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartHash]);
 
   // Debug logging for communes state
   useEffect(() => {
@@ -93,33 +109,44 @@ const CheckoutPageComponent = () => {
 
   useEffect(() => {
     const calculateShippingFee = async () => {
-      if (!cart?.products || cart.products.length === 0) return;
-      if (!selectedProvince || !selectedCommune) return;
+      if (!selectedProvinceName || !selectedCommuneName || !cartHash) return;
+
+      if (
+        lastCalculatedRef.current.province === selectedProvinceName &&
+        lastCalculatedRef.current.commune === selectedCommuneName &&
+        lastCalculatedRef.current.cartHash === cartHash
+      ) {
+        return;
+      }
 
       try {
-        console.log('🚚 Calculating shipping fee...');
+        lastCalculatedRef.current = { 
+            province: selectedProvinceName, 
+            commune: selectedCommuneName, 
+            cartHash 
+        };
 
-        const province = provinces.find(p => p.code.toString() === selectedProvince);
-        const commune = communes.find(c => c.code.toString() === selectedCommune);
-
+        console.log('🚚 API CALL: Calculating shipping fee...');
         const response = await shippingAPI.calculateShippingFee({
-          province: province ? province.name : '',
-          commune: commune ? commune.name : ''
+          province: selectedProvinceName,
+          commune: selectedCommuneName
         });
 
         if (response.status === 200 && response.data?.shippingFee) {
           setShippingFee(response.data.shippingFee);
-          console.log('🚚 Shipping fee calculated:', response.data.shippingFee);
-        } else {
-          console.error('❌ Failed to calculate shipping fee:', response);
         }
       } catch (error) {
         console.error('❌ Error calculating shipping fee:', error);
       }
     };
 
-    calculateShippingFee();
-  }, [cart, selectedProvince, selectedCommune, communes, provinces]);
+    const timer = setTimeout(() => {
+      calculateShippingFee();
+    }, 500);
+
+    return () => clearTimeout(timer);
+    
+  }, [selectedProvinceName, selectedCommuneName, cartHash]);
     
 
   // Form state
