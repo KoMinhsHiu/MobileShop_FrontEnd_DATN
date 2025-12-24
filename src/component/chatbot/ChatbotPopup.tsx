@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPaperPlane, faRobot, faUser } from "@fortawesome/free-solid-svg-icons";
 import styles from "./chatbot.module.scss";
 import { sendAIChatStream } from "@/utils/api/ai";
-
+import ReactMarkdown from 'react-markdown';
 interface Message {
   id: string;
   text: string;
@@ -155,6 +155,8 @@ const ChatbotPopup: FC = () => {
           return [...prev, errorMessage];
         }
       });
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -218,7 +220,15 @@ const ChatbotPopup: FC = () => {
                     <FontAwesomeIcon icon={message.isUser ? faUser : faRobot} />
                   </div>
                   <div className={styles.messageContent}>
-                    <div className={styles.messageText}>{message.text}</div>
+                    <div className={styles.messageText}>
+                      <ReactMarkdown
+                        components={{
+                          a: ({node, ...props}) => <a target="_blank" rel="noreferrer" {...props} />
+                        }}
+                      >
+                        {message.text}
+                      </ReactMarkdown>
+                    </div>
                     <div className={styles.messageTime}>
                       {formatTime(message.timestamp)}
                     </div>

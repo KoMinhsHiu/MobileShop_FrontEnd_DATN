@@ -26,6 +26,7 @@
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.4.1",
     "react-i18next": "^15.1.4",
+    "react-markdown": "^10.1.0",
     "recharts": "^3.2.1",
     "sass": "^1.76.0",
     "scss": "^0.2.4",

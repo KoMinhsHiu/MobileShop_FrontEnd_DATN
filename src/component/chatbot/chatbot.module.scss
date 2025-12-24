@@ -157,6 +157,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background-color: #f9fafb;
   
   &::-webkit-scrollbar {
     width: 6px;
@@ -180,7 +181,7 @@
 .message {
   display: flex;
   gap: 12px;
-  max-width: 80%;
+  max-width: 85%;
   
   &.userMessage {
     align-self: flex-end;
@@ -189,6 +190,12 @@
     .messageContent {
       background: #007bff;
       color: #fff;
+      border-radius: 18px 18px 0 18px;
+    }
+    
+    .messageTime {
+        color: rgba(255, 255, 255, 0.8);
+        text-align: right;
     }
   }
   
@@ -198,6 +205,12 @@
     .messageContent {
       background: #f8f9fa;
       color: #333;
+      border: 1px solid #e9ecef;
+      border-radius: 18px 18px 18px 0;
+    }
+
+    .messageTime {
+        color: #6c757d;
     }
   }
   
@@ -227,31 +240,73 @@
   
   .messageContent {
     padding: 12px 16px;
-    border-radius: 18px;
     position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     
     .messageText {
       font-size: 14px;
-      line-height: 1.4;
-      margin-bottom: 4px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      
+      p {
+        margin: 0 0 8px 0;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      ul, ol {
+        margin: 8px 0;
+        padding-left: 20px;
+        list-style-position: outside;
+      }
+      
+      li {
+        margin-bottom: 6px;
+        
+        p {
+            margin: 0; 
+        }
+      }
+
+      strong, b {
+        font-weight: 600;
+      }
+
+      a {
+        font-weight: 500;
+        text-decoration: underline;
+        transition: opacity 0.2s;
+        cursor: pointer;
+        
+        .userMessage & {
+          color: white; 
+          &:hover { opacity: 0.9; }
+        }
+
+        .botMessage & {
+          color: #007bff;
+          &:hover { color: #0056b3; }
+        }
+      }
     }
     
     .messageTime {
       font-size: 11px;
-      opacity: 0.7;
+      margin-top: 4px;
+      display: block;
     }
   }
 }
 
-// Typing Indicator
 .typingIndicator {
   display: flex;
   gap: 4px;
-  padding: 8px 0;
+  padding: 4px 0;
   
   span {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #6c757d;
     animation: typing 1.4s infinite ease-in-out;
