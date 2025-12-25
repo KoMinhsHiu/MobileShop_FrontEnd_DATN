@@ -28,9 +28,29 @@ const NotificationInfo: React.FC = () => {
     refreshNotifications
   } = useAdminContext();
 
-  // Sort notifications: unread first, then by creation date
+  const allNotifications = useMemo(() => {
+    const uniqueMap = new Map();
+    
+    if (Array.isArray(unreadNotifications)) {
+      unreadNotifications.forEach(n => uniqueMap.set(n.id, n));
+    }
+    
+    if (Array.isArray(notifications)) {
+      notifications.forEach(n => uniqueMap.set(n.id, n));
+    }
+
+    return Array.from(uniqueMap.values());
+  }, [notifications, unreadNotifications]);
+
+  const stats = useMemo(() => {
+    const total = allNotifications.length;
+    const unread = allNotifications.filter(n => !n.isRead).length;
+    const read = total - unread;
+    return { total, unread, read };
+  }, [allNotifications]);
+
   const sortedNotifications = useMemo(() => {
-    return [...notifications].sort((a, b) => {
+    return [...allNotifications].sort((a, b) => {
       // Unread notifications first
       if (!a.isRead && b.isRead) return -1;
       if (a.isRead && !b.isRead) return 1;
@@ -38,17 +58,17 @@ const NotificationInfo: React.FC = () => {
       // Then sort by creation date (newest first)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [notifications]);
+  }, [allNotifications]);
 
-  // Check if all notifications are selected
-  const allSelected = notifications.length > 0 && selectedNotifications.length === notifications.length;
-  const someSelected = selectedNotifications.length > 0 && selectedNotifications.length < notifications.length;
+  // Check if all notifications are selected based on the MERGED list
+  const allSelected = allNotifications.length > 0 && selectedNotifications.length === allNotifications.length;
+  const someSelected = selectedNotifications.length > 0 && selectedNotifications.length < allNotifications.length;
 
   const handleSelectAll = () => {
     if (allSelected) {
       setSelectedNotifications([]);
     } else {
-      setSelectedNotifications(notifications.map(n => n.id));
+      setSelectedNotifications(allNotifications.map(n => n.id));
     }
   };
 
@@ -70,7 +90,7 @@ const NotificationInfo: React.FC = () => {
 
     // Filter only unread notifications
     const unreadSelectedNotifications = selectedNotifications.filter(id => {
-      const notification = notifications.find(n => n.id === id);
+      const notification = allNotifications.find(n => n.id === id);
       return notification && !notification.isRead;
     });
 
@@ -244,15 +264,15 @@ const NotificationInfo: React.FC = () => {
         <div className={styles.notificationStats}>
           <div className={styles.statItem}>
             <FontAwesomeIcon icon={faBell} />
-            <span>Tổng: {notifications.length}</span>
+            <span>Tổng: {stats.total}</span>
           </div>
           <div className={styles.statItem}>
             <FontAwesomeIcon icon={faEnvelopeOpen} />
-            <span>Chưa đọc: {unreadNotifications.length}</span>
+            <span>Chưa đọc: {stats.unread}</span>
           </div>
           <div className={styles.statItem}>
             <FontAwesomeIcon icon={faInbox} />
-            <span>Đã đọc: {notifications.length - unreadNotifications.length}</span>
+            <span>Đã đọc: {stats.read}</span>
           </div>
         </div>
 
