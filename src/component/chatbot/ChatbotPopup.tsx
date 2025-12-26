@@ -4,6 +4,7 @@ import { faTimes, faPaperPlane, faRobot, faUser } from "@fortawesome/free-solid-
 import styles from "./chatbot.module.scss";
 import { sendAIChatStream } from "@/utils/api/ai";
 import ReactMarkdown from 'react-markdown';
+
 interface Message {
   id: string;
   text: string;
@@ -23,7 +24,10 @@ const ChatbotPopup: FC = () => {
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef("");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -31,12 +35,16 @@ const ChatbotPopup: FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
+
+  useEffect(() => {
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 100);
+  }, [isOpen]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isTyping) return;
 
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
       text: inputMessage,
       isUser: true,
@@ -50,7 +58,11 @@ const ChatbotPopup: FC = () => {
 
     // Create a temporary AI message for streaming updates
     const aiMessageId = (Date.now() + 1).toString();
-    let accumulatedContent = "";
+    contentRef.current = "";
+
+    const safetyTimeout = setTimeout(() => {
+      setIsTyping(false);
+    }, 15000);
 
     try {
       await sendAIChatStream(userQuery, {
@@ -59,7 +71,7 @@ const ChatbotPopup: FC = () => {
         },
         onPartialMessage: (content) => {
           // Accumulate partial content
-          accumulatedContent += content;
+          contentRef.current += content;
           
           // Update or create the AI message with accumulated content
           setMessages(prev => {
@@ -67,96 +79,79 @@ const ChatbotPopup: FC = () => {
             if (existingIndex >= 0) {
               // Update existing message
               const updated = [...prev];
-              updated[existingIndex] = {
-                ...updated[existingIndex],
-                text: accumulatedContent
-              };
+              updated[existingIndex] = { ...updated[existingIndex], text: contentRef.current };
               return updated;
             } else {
               // Create new message
               return [...prev, {
                 id: aiMessageId,
-                text: accumulatedContent,
+                text: contentRef.current,
                 isUser: false,
                 timestamp: new Date()
               }];
             }
           });
         },
-        onCompleteMessage: (content) => {
+        onCompleteMessage: (finalContent) => {
+          const finalText = finalContent || contentRef.current;
           // Update with final complete message
           setMessages(prev => {
             const existingIndex = prev.findIndex(m => m.id === aiMessageId);
             if (existingIndex >= 0) {
               const updated = [...prev];
-              updated[existingIndex] = {
-                ...updated[existingIndex],
-                text: content
-              };
+              updated[existingIndex] = { ...updated[existingIndex], text: finalText };
               return updated;
             } else {
-              return [...prev, {
+               return [...prev, {
                 id: aiMessageId,
-                text: content,
+                text: finalText,
                 isUser: false,
                 timestamp: new Date()
               }];
             }
           });
           setIsTyping(false);
+          clearTimeout(safetyTimeout);
         },
         onComplete: () => {
-          console.log("AI stream completed");
+          console.log("Stream completed signal");
           setIsTyping(false);
+          clearTimeout(safetyTimeout);
         },
         onError: (error) => {
           console.error("AI stream error:", error);
-          setIsTyping(false);
-          
-          // Show error message
-          const errorMessage: Message = {
+          const errorMessage = {
             id: aiMessageId,
-            text: `Xin lỗi, đã có lỗi xảy ra: ${error}. Vui lòng thử lại sau.`,
+            text: `⚠️ Đã có lỗi xảy ra: ${error}. Vui lòng thử lại.`,
             isUser: false,
             timestamp: new Date()
           };
           
           setMessages(prev => {
-            const existingIndex = prev.findIndex(m => m.id === aiMessageId);
-            if (existingIndex >= 0) {
-              const updated = [...prev];
-              updated[existingIndex] = errorMessage;
-              return updated;
-            } else {
-              return [...prev, errorMessage];
+            const idx = prev.findIndex(m => m.id === aiMessageId);
+            if(idx >= 0) {
+                const upd = [...prev];
+                upd[idx] = errorMessage;
+                return upd;
             }
+            return [...prev, errorMessage];
           });
+          
+          setIsTyping(false);
+          clearTimeout(safetyTimeout);
         }
       });
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("System/Network error:", error);
       setIsTyping(false);
+      clearTimeout(safetyTimeout);
       
-      // Show error message
-      const errorMessage: Message = {
+      setMessages(prev => [...prev, {
         id: aiMessageId,
-        text: "Xin lỗi, không thể kết nối đến AI. Vui lòng thử lại sau.",
+        text: "Không thể kết nối đến máy chủ. Vui lòng kiểm tra mạng.",
         isUser: false,
         timestamp: new Date()
-      };
-      
-      setMessages(prev => {
-        const existingIndex = prev.findIndex(m => m.id === aiMessageId);
-        if (existingIndex >= 0) {
-          const updated = [...prev];
-          updated[existingIndex] = errorMessage;
-          return updated;
-        } else {
-          return [...prev, errorMessage];
-        }
-      });
-    } finally {
-      setIsTyping(false);
+      }]);
     }
   };
 
